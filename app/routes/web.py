@@ -78,6 +78,12 @@ def blog_list():
     return send_from_directory(Config.BASE_DIR, "blog_pages.html")
 
 
+@web_bp.route("/terms")
+@web_bp.route("/terms.html")
+def terms():
+    return send_from_directory(Config.BASE_DIR, "terms.html")
+
+
 @web_bp.route("/uploads/<path:filename>")
 def uploaded_file(filename):
     """Serve uploaded media files."""

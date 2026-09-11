@@ -1672,7 +1672,7 @@
             </div>
 
             <div id="w-node-_0632acfa-8aaa-b158-7b6a-58a2921af576-921af54a" class="footer_template-links">
-              <a href="#" class="footer_template-link">Terms & Conditions</a>
+              <a href="#termsModal" class="footer_template-link" id="footerTermsLink">Terms & Conditions</a>
             </div>
           </div>
         </div>
@@ -1681,6 +1681,51 @@
     </footer>
 
 
+  </div>
+
+  <!-- Terms & Conditions Modal -->
+  <div id="termsModal" class="terms-modal" role="dialog" aria-modal="true" aria-labelledby="termsModalTitle" aria-hidden="true">
+    <div class="terms-modal-backdrop" id="termsModalBackdrop"></div>
+    <div class="terms-modal-dialog">
+      <div class="terms-modal-header">
+        <div class="terms-modal-badge">
+          <span class="terms-badge-dot"></span> Legal &amp; Policies
+        </div>
+        <button type="button" class="terms-modal-close" id="termsModalClose" aria-label="Close Terms and Conditions">&times;</button>
+      </div>
+      <div class="terms-modal-body">
+        <h2 id="termsModalTitle" class="terms-title">Terms &amp; Conditions</h2>
+        <p class="terms-updated">Last updated: September 2026</p>
+        <div class="terms-divider"></div>
+        <p class="terms-intro">
+          Welcome to <strong>Storyworks</strong>, the digital storytelling and marketing studio of <strong>Sri Bhagyalakshmi Enterprises</strong>. By accessing or using this website, you agree to be bound by the following Terms &amp; Conditions. Please read them carefully before using our site or engaging our services.
+        </p>
+
+        <div class="terms-section">
+          <h3 class="terms-section-title">1. Acceptance of Terms</h3>
+          <p class="terms-section-text">
+            By browsing this website, filling out a contact form, or otherwise engaging with our content, you confirm that you accept these Terms &amp; Conditions and agree to comply with them. If you do not agree with any part of these terms, please discontinue use of the website.
+          </p>
+        </div>
+
+        <div class="terms-section">
+          <h3 class="terms-section-title">2. Use of the Website</h3>
+          <p class="terms-section-text">
+            This website and its content are intended to showcase our work, services, and brand stories. You agree to use the site only for lawful purposes and in a manner that does not infringe the rights of, or restrict or inhibit the use and enjoyment of the site by, any third party.
+          </p>
+        </div>
+
+        <div class="terms-section">
+          <h3 class="terms-section-title">3. Intellectual Property</h3>
+          <p class="terms-section-text">
+            All content on this website — including but not limited to text, graphics, logos, images, videos, portfolio work, and page design — is the property of Storyworks / Sri Bhagyalakshmi Enterprises or its content partners and is protected by applicable intellectual property laws. No content may be reproduced, copied, or redistributed without prior written permission.
+          </p>
+        </div>
+      </div>
+      <div class="terms-modal-footer">
+        <button type="button" class="terms-btn-primary" id="termsModalAgreeBtn">I Understand</button>
+      </div>
+    </div>
   </div>
 
   <script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=694397e738c917f28f4324ca"
@@ -1732,6 +1777,242 @@
           navbar.classList.remove("scrolled");
         }
       }, { passive: true });
+    })();
+  <style>
+    /* ── Terms & Conditions Luxury Dark Modal ── */
+    .terms-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 999999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .terms-modal.active {
+      display: flex;
+      animation: termsFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .terms-modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(8, 10, 15, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .terms-modal-dialog {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 720px;
+      max-height: 85vh;
+      background: linear-gradient(135deg, rgba(20, 24, 33, 0.97) 0%, rgba(13, 16, 23, 0.99) 100%);
+      border: 1px solid rgba(244, 217, 111, 0.25);
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 40px rgba(244, 217, 111, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: termsSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .terms-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 28px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(14, 18, 25, 0.8);
+    }
+    .terms-modal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(244, 217, 111, 0.12);
+      color: #f4d96f;
+      border: 1px solid rgba(244, 217, 111, 0.25);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 5px 14px;
+      border-radius: 100px;
+    }
+    .terms-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #f4d96f;
+      box-shadow: 0 0 8px #f4d96f;
+    }
+    .terms-modal-close {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 24px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .terms-modal-close:hover {
+      background: rgba(244, 217, 111, 0.2);
+      border-color: #f4d96f;
+      color: #f4d96f;
+      transform: rotate(90deg);
+    }
+    .terms-modal-body {
+      padding: 24px 28px;
+      overflow-y: auto;
+      color: #cbd5e1;
+      font-size: 14.5px;
+      line-height: 1.75;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(244, 217, 111, 0.4) rgba(255, 255, 255, 0.05);
+    }
+    .terms-modal-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    .terms-modal-body::-webkit-scrollbar-thumb {
+      background: rgba(244, 217, 111, 0.35);
+      border-radius: 4px;
+    }
+    .terms-title {
+      color: #ffffff;
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: -0.5px;
+    }
+    .terms-updated {
+      color: #94a3b8;
+      font-size: 13px;
+      margin: 0 0 16px;
+      font-style: italic;
+    }
+    .terms-divider {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(244, 217, 111, 0.4), rgba(255, 255, 255, 0.04));
+      margin-bottom: 20px;
+    }
+    .terms-intro {
+      color: #e2e8f0;
+      font-size: 15px;
+      margin-bottom: 24px;
+      line-height: 1.75;
+    }
+    .terms-intro strong {
+      color: #f4d96f;
+    }
+    .terms-section {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-left: 3px solid #f4d96f;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 18px;
+    }
+    .terms-section-title {
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 8px;
+    }
+    .terms-section-text {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+    .terms-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 16px 28px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(10, 13, 19, 0.6);
+    }
+    .terms-btn-primary {
+      background: linear-gradient(135deg, #f4d96f 0%, #d4af37 100%);
+      color: #0c0e14;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 26px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(244, 217, 111, 0.3);
+    }
+    .terms-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(244, 217, 111, 0.45);
+    }
+    @keyframes termsFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes termsSlideUp {
+      from { opacity: 0; transform: translateY(25px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+  </style>
+
+  <script>
+    // Terms & Conditions Modal Handler
+    (function () {
+      var modal = document.getElementById("termsModal");
+      var openLink = document.getElementById("footerTermsLink");
+      var closeBtn = document.getElementById("termsModalClose");
+      var agreeBtn = document.getElementById("termsModalAgreeBtn");
+      var backdrop = document.getElementById("termsModalBackdrop");
+
+      function openTerms(e) {
+        if (e) e.preventDefault();
+        if (!modal) return;
+        modal.classList.add("active");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeTerms() {
+        if (!modal) return;
+        modal.classList.remove("active");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+
+      if (openLink) openLink.addEventListener("click", openTerms);
+
+      // Support any other terms triggers
+      document.querySelectorAll("[href='#termsModal'], [href='#terms']").forEach(function (el) {
+        el.addEventListener("click", openTerms);
+      });
+
+      if (closeBtn) closeBtn.addEventListener("click", closeTerms);
+      if (agreeBtn) agreeBtn.addEventListener("click", closeTerms);
+      if (backdrop) backdrop.addEventListener("click", closeTerms);
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && modal && modal.classList.contains("active")) {
+          closeTerms();
+        }
+      });
+
+      // Auto-open if URL contains #terms or #termsModal
+      if (window.location.hash === "#terms" || window.location.hash === "#termsModal") {
+        openTerms();
+      }
     })();
   </script>
 </body>

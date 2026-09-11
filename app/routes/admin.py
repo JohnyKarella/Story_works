@@ -18,10 +18,7 @@ from flask import (
 from werkzeug.utils import secure_filename
 from app.models import User, Inquiry, Blog, Portfolio, Service, Subscriber, Setting
 from app.config import Config
-
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
-
-
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -30,26 +27,19 @@ def login_required(f):
             return redirect(url_for("admin.login", next=request.url))
         return f(*args, **kwargs)
     return decorated_function
-
-
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in Config.ALLOWED_EXTENSIONS
-
-
 # ─────────────────────────────────────────────────────────────
 # AUTHENTICATION
 # ─────────────────────────────────────────────────────────────
-
 @admin_bp.route("/login", methods=["GET", "POST"], strict_slashes=False)
 def login():
     if session.get("user_id"):
         return redirect(url_for("admin.dashboard"))
-
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
         remember = bool(request.form.get("remember"))
-
         user = User.get_by_username(username)
         if user and User.verify_password(user["password_hash"], password):
             session.permanent = remember
@@ -63,21 +53,15 @@ def login():
             return redirect(next_page or url_for("admin.dashboard"))
         else:
             flash("Invalid username or password. Please try again.", "error")
-
     return render_template("admin/login.html")
-
-
 @admin_bp.route("/logout")
 def logout():
     session.clear()
     flash("You have been signed out.", "info")
     return redirect(url_for("admin.login"))
-
-
 # ─────────────────────────────────────────────────────────────
 # DASHBOARD
 # ─────────────────────────────────────────────────────────────
-
 @admin_bp.route("", strict_slashes=False)
 @admin_bp.route("/", strict_slashes=False)
 @admin_bp.route("/dashboard", strict_slashes=False)
@@ -89,7 +73,6 @@ def dashboard():
     portfolio_items = Portfolio.get_all()
     subscribers = Subscriber.get_all()
     service_items = Service.get_all()
-
     stats = {
         "total_inquiries": inquiry_stats["total"],
         "new_inquiries": inquiry_stats["new"],
@@ -98,7 +81,6 @@ def dashboard():
         "total_subscribers": len(subscribers),
         "total_services": len(service_items),
     }
-
     return render_template(
         "admin/dashboard.html",
         stats=stats,
@@ -110,12 +92,9 @@ def dashboard():
         all_portfolio=portfolio_items,
         all_services=service_items,
     )
-
-
 # ─────────────────────────────────────────────────────────────
 # INQUIRIES (LEADS)
 # ─────────────────────────────────────────────────────────────
-
 @admin_bp.route("/inquiries")
 @login_required
 def inquiries():
@@ -134,8 +113,6 @@ def inquiries():
         date_to=date_to,
         stats=stats,
     )
-
-
 @admin_bp.route("/inquiries/<int:inquiry_id>/status", methods=["POST"])
 @login_required
 def update_inquiry_status(inquiry_id):
@@ -146,8 +123,6 @@ def update_inquiry_status(inquiry_id):
             return jsonify({"success": True, "status": status})
         flash("Inquiry status updated.", "success")
     return redirect(url_for("admin.inquiries"))
-
-
 @admin_bp.route("/inquiries/<int:inquiry_id>/notes", methods=["POST"])
 @login_required
 def update_inquiry_notes(inquiry_id):
@@ -155,24 +130,18 @@ def update_inquiry_notes(inquiry_id):
     Inquiry.update_notes(inquiry_id, notes)
     flash("Internal notes updated.", "success")
     return redirect(url_for("admin.inquiries"))
-
-
 @admin_bp.route("/inquiries/<int:inquiry_id>/delete", methods=["POST"])
 @login_required
 def delete_inquiry(inquiry_id):
     Inquiry.delete(inquiry_id)
     flash("Inquiry deleted successfully.", "info")
     return redirect(url_for("admin.inquiries"))
-
-
 @admin_bp.route("/inquiries/delete-all", methods=["POST"])
 @login_required
 def delete_all_inquiries():
     Inquiry.delete_all()
     flash("All inquiries deleted successfully.", "info")
     return redirect(request.referrer or url_for("admin.dashboard"))
-
-
 @admin_bp.route("/api/unread-inquiries", methods=["GET"])
 @login_required
 def api_unread_inquiries():
@@ -198,8 +167,6 @@ def api_unread_inquiries():
         "unread_count": unread_count,
         "latest": latest_data,
     })
-
-
 @admin_bp.route("/inquiries/export")
 @login_required
 def export_inquiries_csv():
@@ -214,7 +181,6 @@ def export_inquiries_csv():
         "ID", "First Name", "Last Name", "Email", "Phone",
         "Company", "Budget", "Services", "Message", "Status", "Notes", "Date"
     ])
-
     for item in inquiries_list:
         writer.writerow([
             item["id"],
@@ -230,7 +196,6 @@ def export_inquiries_csv():
             item["notes"] or "",
             item["created_at"],
         ])
-
     output.seek(0)
     filename = f"storyworks_inquiries_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
     return Response(
@@ -238,19 +203,14 @@ def export_inquiries_csv():
         mimetype="text/csv",
         headers={"Content-Disposition": f"attachment;filename={filename}"},
     )
-
-
 # ─────────────────────────────────────────────────────────────
 # BLOGS
 # ─────────────────────────────────────────────────────────────
-
 @admin_bp.route("/blogs")
 @login_required
 def blogs():
     blog_list = Blog.get_all()
     return render_template("admin/blogs.html", blogs=blog_list)
-
-
 @admin_bp.route("/blogs/new", methods=["GET", "POST"])
 @login_required
 def new_blog():
@@ -263,7 +223,6 @@ def new_blog():
         excerpt = request.form.get("excerpt", "").strip()
         content = request.form.get("content", "").strip()
         status = request.form.get("status", "published")
-
         # Handle uploaded image if provided
         if "cover_file" in request.files:
             file = request.files["cover_file"]
@@ -271,11 +230,9 @@ def new_blog():
                 fname = f"blog_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
                 file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
                 cover_image = f"/uploads/{fname}"
-
         if not title:
             flash("Blog title is required.", "error")
             return render_template("admin/blog_form.html", blog=None)
-
         new_id = Blog.create({
             "title": title,
             "category": category,
@@ -288,10 +245,7 @@ def new_blog():
         })
         flash("Blog post created successfully!", "success")
         return redirect(url_for("admin.blogs"))
-
     return render_template("admin/blog_form.html", blog=None)
-
-
 @admin_bp.route("/blogs/<int:blog_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_blog(blog_id):
@@ -299,7 +253,6 @@ def edit_blog(blog_id):
     if not blog:
         flash("Blog post not found.", "error")
         return redirect(url_for("admin.blogs"))
-
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         slug = request.form.get("slug", "").strip()
@@ -310,14 +263,12 @@ def edit_blog(blog_id):
         excerpt = request.form.get("excerpt", "").strip()
         content = request.form.get("content", "").strip()
         status = request.form.get("status", "published")
-
         if "cover_file" in request.files:
             file = request.files["cover_file"]
             if file and file.filename and allowed_file(file.filename):
                 fname = f"blog_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
                 file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
                 cover_image = f"/uploads/{fname}"
-
         Blog.update(blog_id, {
             "title": title,
             "slug": slug,
@@ -331,29 +282,21 @@ def edit_blog(blog_id):
         })
         flash("Blog post updated successfully!", "success")
         return redirect(url_for("admin.blogs"))
-
     return render_template("admin/blog_form.html", blog=blog)
-
-
 @admin_bp.route("/blogs/<int:blog_id>/delete", methods=["POST"])
 @login_required
 def delete_blog(blog_id):
     Blog.delete(blog_id)
     flash("Blog post deleted.", "info")
     return redirect(url_for("admin.blogs"))
-
-
 # ─────────────────────────────────────────────────────────────
 # PORTFOLIO
 # ─────────────────────────────────────────────────────────────
-
 @admin_bp.route("/portfolio")
 @login_required
 def portfolio():
     items = Portfolio.get_all()
     return render_template("admin/portfolio.html", items=items)
-
-
 @admin_bp.route("/portfolio/new", methods=["GET", "POST"])
 @login_required
 def new_portfolio():
@@ -370,18 +313,15 @@ def new_portfolio():
         project_url = request.form.get("project_url", "").strip()
         is_featured = bool(request.form.get("is_featured"))
         status = request.form.get("status", "published")
-
         if "cover_file" in request.files:
             file = request.files["cover_file"]
             if file and file.filename and allowed_file(file.filename):
                 fname = f"port_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
                 file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
                 cover_image = f"/uploads/{fname}"
-
         if not title:
             flash("Project title is required.", "error")
             return render_template("admin/portfolio_form.html", item=None)
-
         Portfolio.create({
             "title": title,
             "client": client,
@@ -398,10 +338,7 @@ def new_portfolio():
         })
         flash("Portfolio project added successfully!", "success")
         return redirect(url_for("admin.portfolio"))
-
     return render_template("admin/portfolio_form.html", item=None)
-
-
 @admin_bp.route("/portfolio/<int:item_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_portfolio(item_id):
@@ -409,7 +346,6 @@ def edit_portfolio(item_id):
     if not item:
         flash("Portfolio item not found.", "error")
         return redirect(url_for("admin.portfolio"))
-
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         slug = request.form.get("slug", item["slug"]).strip()
@@ -424,14 +360,12 @@ def edit_portfolio(item_id):
         project_url = request.form.get("project_url", "").strip()
         is_featured = bool(request.form.get("is_featured"))
         status = request.form.get("status", "published")
-
         if "cover_file" in request.files:
             file = request.files["cover_file"]
             if file and file.filename and allowed_file(file.filename):
                 fname = f"port_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
                 file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
                 cover_image = f"/uploads/{fname}"
-
         Portfolio.update(item_id, {
             "title": title,
             "slug": slug,
@@ -449,22 +383,16 @@ def edit_portfolio(item_id):
         })
         flash("Portfolio project updated successfully!", "success")
         return redirect(url_for("admin.portfolio"))
-
     return render_template("admin/portfolio_form.html", item=item)
-
-
 @admin_bp.route("/portfolio/<int:item_id>/delete", methods=["POST"])
 @login_required
 def delete_portfolio(item_id):
     Portfolio.delete(item_id)
     flash("Portfolio project deleted.", "info")
     return redirect(url_for("admin.portfolio"))
-
-
 # ─────────────────────────────────────────────────────────────
 # SERVICES
 # ─────────────────────────────────────────────────────────────
-
 @admin_bp.route("/services", methods=["GET", "POST"])
 @login_required
 def services():
@@ -475,7 +403,6 @@ def services():
         icon = request.form.get("icon", "").strip()
         order = request.form.get("display_order", 0)
         is_active = bool(request.form.get("is_active", 1))
-
         if title:
             Service.create({
                 "title": title,
@@ -487,11 +414,8 @@ def services():
             })
             flash("Service created successfully!", "success")
         return redirect(url_for("admin.services"))
-
     service_list = Service.get_all()
     return render_template("admin/services.html", services=service_list)
-
-
 @admin_bp.route("/services/<int:service_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_service(service_id):
@@ -499,7 +423,6 @@ def edit_service(service_id):
     if not service:
         flash("Service not found.", "danger")
         return redirect(url_for("admin.services"))
-
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         slug = request.form.get("slug", "").strip()
@@ -508,11 +431,9 @@ def edit_service(service_id):
         icon = request.form.get("icon", "").strip()
         order = request.form.get("display_order", 0)
         is_active = bool(request.form.get("is_active"))
-
         if not title:
             flash("Service title is required.", "danger")
             return redirect(request.referrer or url_for("admin.services"))
-
         Service.update(service_id, {
             "title": title,
             "slug": slug or None,
@@ -524,41 +445,30 @@ def edit_service(service_id):
         })
         flash("Service updated successfully!", "success")
         return redirect(url_for("admin.services"))
-
     return render_template("admin/services_form.html", service=service)
-
-
 @admin_bp.route("/services/<int:service_id>/delete", methods=["POST"])
 @login_required
 def delete_service(service_id):
     Service.delete(service_id)
     flash("Service deleted.", "info")
     return redirect(url_for("admin.services"))
-
-
 # ─────────────────────────────────────────────────────────────
 # SUBSCRIBERS
 # ─────────────────────────────────────────────────────────────
-
 @admin_bp.route("/subscribers")
 @login_required
 def subscribers():
     sub_list = Subscriber.get_all()
     return render_template("admin/subscribers.html", subscribers=sub_list)
-
-
 @admin_bp.route("/subscribers/<int:sub_id>/delete", methods=["POST"])
 @login_required
 def delete_subscriber(sub_id):
     Subscriber.delete(sub_id)
     flash("Subscriber removed.", "info")
     return redirect(url_for("admin.subscribers"))
-
-
 # ─────────────────────────────────────────────────────────────
 # SETTINGS & PROFILE
 # ─────────────────────────────────────────────────────────────
-
 @admin_bp.route("/settings", methods=["GET", "POST"])
 @login_required
 def settings():
@@ -573,15 +483,10 @@ def settings():
                 category = "social" if "url" in k else ("contact" if "contact" in k else "general")
                 val = request.form[k].strip()
                 Setting.set(k, val, category)
-
         flash("Settings saved successfully!", "success")
         return redirect(url_for("admin.settings"))
-
     settings_dict = Setting.get_all_dict()
     return render_template("admin/settings.html", settings=settings_dict)
-
-
-
 @admin_bp.route("/profile", methods=["POST"])
 @login_required
 def update_profile():
@@ -590,12 +495,10 @@ def update_profile():
     email = request.form.get("email", "").strip()
     current_pass = request.form.get("current_password", "")
     new_pass = request.form.get("new_password", "")
-
     user = User.get_by_id(user_id)
     if not user:
         flash("User not found.", "error")
         return redirect(url_for("admin.settings"))
-
     # If user wants to change password
     if new_pass:
         if not User.verify_password(user["password_hash"], current_pass):
@@ -606,21 +509,16 @@ def update_profile():
             return redirect(url_for("admin.settings"))
         User.update_password(user_id, new_pass)
         flash("Password updated successfully!", "success")
-
     # Update username and email
     if username and email:
         User.update_profile(user_id, username, email)
         session["username"] = username
         session["email"] = email
         flash("Profile information updated!", "success")
-
     return redirect(url_for("admin.settings"))
-
-
 # ─────────────────────────────────────────────────────────────
 # MEDIA UPLOAD HANDLER
 # ─────────────────────────────────────────────────────────────
-
 @admin_bp.route("/upload", methods=["POST"])
 @login_required
 def upload_file():
@@ -637,4 +535,3 @@ def upload_file():
         file_url = f"/uploads/{filename}"
         return jsonify({"success": True, "url": file_url, "filename": filename})
     return jsonify({"success": False, "error": "File type not allowed"}), 400
-

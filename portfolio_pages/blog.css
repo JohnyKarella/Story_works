@@ -1,13 +1,10 @@
 /* blog */
-
 /*  Portfolio service */
-
   .services-section {
     padding: 0px 5vw 90px;
     background: #f5f3ee;
     font-family: 'DM Sans', sans-serif;
   }
-
   /* Header */
   .sv-head {
     text-align: center;
@@ -16,12 +13,10 @@
     transform: translateY(20px);
     transition: opacity .7s ease, transform .7s ease;
   }
-
   .sv-head.on {
     opacity: 1;
     transform: translateY(0);
   }
-
   .sv-label {
     display: inline-flex;
     align-items: center;
@@ -33,7 +28,6 @@
     color: #999;
     margin-bottom: 14px;
   }
-
   .sv-label::before,
   .sv-label::after {
     content: '';
@@ -43,7 +37,6 @@
     background: linear-gradient(90deg, #F5A623, #e8882a);
     border-radius: 2px;
   }
-
   .sv-head h2 {
     font-family: 'Cormorant Garamond', serif;
     font-size: clamp(28px, 4vw, 50px);
@@ -52,12 +45,10 @@
     line-height: 1.15;
     color: #1a1a1a;
   }
-
   .sv-head h2 em {
     font-style: italic;
     color: #F5A623;
   }
-
   /* Grid */
   .sv-grid {
     display: grid;
@@ -66,7 +57,6 @@
     max-width: 1100px;
     margin: 0 auto;
   }
-
   /* Card */
   .sv-card {
     background: rgba(255, 255, 255, .8);
@@ -90,12 +80,10 @@
       border-color .25s,
       box-shadow .25s;
   }
-
   .sv-card.on {
     opacity: 1;
     transform: translateY(0);
   }
-
   /* gold top bar on hover */
   .sv-card::before {
     content: '';
@@ -109,18 +97,15 @@
     transform-origin: left;
     transition: transform .35s cubic-bezier(.25, 1, .5, 1);
   }
-
   .sv-card:hover::before {
     transform: scaleX(1);
   }
-
   .sv-card:hover {
     background: #fff;
     border-color: rgba(245, 166, 35, .25);
     box-shadow: 0 12px 40px rgba(0, 0, 0, .09);
     transform: translateY(-5px) !important;
   }
-
   /* icon circle */
   .sv-icon {
     width: 54px;
@@ -132,12 +117,10 @@
     justify-content: center;
     transition: background .25s, transform .3s cubic-bezier(.34, 1.5, .64, 1);
   }
-
   .sv-card:hover .sv-icon {
     background: rgba(245, 166, 35, .18);
     transform: scale(1.1) rotate(-4deg);
   }
-
   .sv-icon svg {
     width: 22px;
     height: 22px;
@@ -147,7 +130,6 @@
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-
   /* name */
   .sv-name {
     font-family: 'Cormorant Garamond', serif;
@@ -157,11 +139,9 @@
     line-height: 1.25;
     transition: color .2s;
   }
-
   .sv-card:hover .sv-name {
     color: #e8882a;
   }
-
   /* Responsive */
   @media (max-width: 860px) {
     .sv-grid {

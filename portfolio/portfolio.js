@@ -3,69 +3,54 @@
 TAB & SIDEBAR SWITCHING
 JS only handles show/hide — no rendering
 ═══════════════════════════════════════ */
-
 /* map each cat key → which client is default-active */
 const defaultClient = {
     pkg: 'pkg-sbl', brd: 'brd-shaanvi', web: 'web-bship', mkt: 'mkt-sbl', pho: 'pho-sbl'
 };
 let activeCat = 'pkg';
 let activeClient = 'pkg-sbl';
-
 function switchCat(cat) {
     activeCat = cat;
     activeClient = defaultClient[cat];
-
     /* tabs */
     document.querySelectorAll('.cat-tab').forEach(t =>
         t.classList.toggle('active', t.dataset.cat === cat));
-
     /* sidebar groups */
     document.querySelectorAll('.sb-group').forEach(g =>
         g.classList.toggle('active', g.dataset.cat === cat));
-
     /* reset all sb-items; activate first of new group */
     document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
     const firstItem = document.querySelector(`.sb-item[data-client="${activeClient}"]`);
     if (firstItem) firstItem.classList.add('active');
-
     showClient(activeClient);
 }
-
 function switchClient(client) {
     activeClient = client;
-
     /* sidebar items */
     document.querySelectorAll('.sb-item').forEach(i =>
         i.classList.toggle('active', i.dataset.client === client));
-
     showClient(client);
 }
-
 function showClient(client) {
     /* info bars */
     document.querySelectorAll('.info-set').forEach(el =>
         el.classList.toggle('active', el.dataset.client === client));
-
     /* grids — fade out, swap, fade in */
     const current = document.querySelector('.grid-set.active');
     const next = document.querySelector(`.grid-set[data-client="${client}"]`);
     if (!next || current === next) return;
-
     current.classList.add('out');
     setTimeout(() => {
         current.classList.remove('active', 'out');
         next.classList.add('active');
     }, 200);
 }
-
 /* bind tab clicks */
 document.querySelectorAll('.cat-tab').forEach(btn =>
     btn.addEventListener('click', () => switchCat(btn.dataset.cat)));
-
 /* bind sidebar item clicks */
 document.querySelectorAll('.sb-item').forEach(item =>
     item.addEventListener('click', () => switchClient(item.dataset.client)));
-
 /* ═══════════════════════════════════════
    LIGHTBOX  (unchanged)
 ═══════════════════════════════════════ */
@@ -75,14 +60,11 @@ const lbImg = document.getElementById('lbImg');
 const lbBadge = document.getElementById('lbBadge');
 const lbTitle = document.getElementById('lbTitle');
 const lbQuote = document.getElementById('lbQuote');
-
 const lbDots = document.getElementById('lbDots');
 const lbX = document.getElementById('lbX');
 const lbPrev = document.getElementById('lbPrev');
 const lbNext = document.getElementById('lbNext');
-
 let list = [], idx = 0;
-
 function openLB(l, i) { list = l; idx = i; sync(); lb.classList.add('open'); document.body.style.overflow = 'hidden'; }
 function closeLB() { lb.classList.remove('open'); document.body.style.overflow = ''; }
 function goLB(dir) {
@@ -96,7 +78,6 @@ function sync() {
     lbBadge.textContent = p.badge || '';
     lbTitle.textContent = p.title || '';
     lbQuote.textContent = p.quote ? `"${p.quote}"` : '';
-  
     lbDots.innerHTML = '';
     list.forEach((_, i) => {
         const d = document.createElement('span');
@@ -108,7 +89,6 @@ function sync() {
     lbPrev.style.display = m ? '' : 'none';
     lbNext.style.display = m ? '' : 'none';
 }
-
 lb.addEventListener('click', e => { if (e.target === lb) closeLB(); });
 lbX.addEventListener('click', closeLB);
 lbPrev.addEventListener('click', e => { e.stopPropagation(); goLB(-1); });
@@ -125,7 +105,6 @@ lbBox.addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - tx;
     if (Math.abs(dx) > 45) goLB(dx < 0 ? 1 : -1);
 }, { passive: true });
-
 /* card click → lightbox — reads from live HTML */
 document.querySelector('.img-panel').addEventListener('click', e => {
     const card = e.target.closest('.pc');

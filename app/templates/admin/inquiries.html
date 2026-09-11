@@ -1,44 +1,36 @@
 {% extends "admin/base.html" %}
-
 {% block title %}Inquiries & Leads{% endblock %}
 {% block page_title %}Client Inquiries & Leads{% endblock %}
-
 {% block topbar_actions %}
 <a href="{{ url_for('admin.export_inquiries_csv') }}" class="btn btn-secondary btn-sm">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
   Export CSV
 </a>
 {% endblock %}
-
 {% block content %}
 <!-- ── Search & Date Range Filter Bar (Below Title, Above Status Pills) ── -->
 <div style="margin-bottom: 20px;">
   <form method="GET" action="{{ url_for('admin.inquiries') }}" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 14px 20px;">
     <input type="hidden" name="status" value="{{ current_status }}" />
-
     <!-- Search Input -->
     <div style="position: relative; flex: 1; min-width: 260px;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-dim);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" name="search" placeholder="Search leads by name, email, company, services…" value="{{ search_query }}" style="width: 100%; height: 40px; padding-left: 40px; padding-right: 14px; border-radius: var(--radius-md); background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); font-size: 13px;" />
     </div>
-
     <!-- Date Range: From & To Calendar Pickers -->
     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
       <div style="display: flex; align-items: center; gap: 8px;">
         <span style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">From</span>
         <input type="date" name="date_from" value="{{ date_from }}" style="height: 40px; padding: 6px 12px; font-size: 13px; border-radius: var(--radius-md); background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); color-scheme: dark;" />
       </div>
-
       <div style="display: flex; align-items: center; gap: 8px;">
         <span style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">To</span>
         <input type="date" name="date_to" value="{{ date_to }}" style="height: 40px; padding: 6px 12px; font-size: 13px; border-radius: var(--radius-md); background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); color-scheme: dark;" />
       </div>
-
       <button type="submit" class="btn btn-primary btn-sm" style="height: 40px; padding: 0 18px; display: inline-flex; align-items: center; gap: 6px;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         Filter
       </button>
-
       {% if search_query or date_from or date_to %}
       <a href="{{ url_for('admin.inquiries', status=current_status) }}" class="btn btn-secondary btn-sm" style="height: 40px; display: inline-flex; align-items: center; gap: 4px;" title="Reset filters">
         &times; Reset
@@ -47,7 +39,6 @@
     </div>
   </form>
 </div>
-
 <!-- ── Status Filter Pills (Below Search & Dates, Above Table) ── -->
 <div class="filter-bar" style="margin-bottom: 20px;">
   <div class="filter-pills" style="display: flex; flex-wrap: wrap; gap: 8px;">
@@ -71,7 +62,6 @@
     </a>
   </div>
 </div>
-
 <div class="card">
   <div class="table-responsive">
     <table class="admin-table">
@@ -144,7 +134,6 @@
     </table>
   </div>
 </div>
-
 <!-- ── Inquiry Details Modal ── -->
 <div class="modal-overlay" id="inquiryModal">
   <div class="modal-box">
@@ -179,17 +168,14 @@
           <div id="modalInquiryBudget" style="color: #34d399; font-weight: 600;"></div>
         </div>
       </div>
-
       <div style="margin-bottom: 20px;">
         <label class="form-label">Selected Services</label>
         <div id="modalInquiryServices" style="padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 13px;"></div>
       </div>
-
       <div style="margin-bottom: 24px;">
         <label class="form-label">Project Message</label>
         <div id="modalInquiryMessage" style="padding: 14px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 14px; line-height: 1.6; white-space: pre-wrap;"></div>
       </div>
-
       <!-- Update Status -->
       <form id="modalStatusForm" method="POST" style="margin-bottom: 20px;">
         <label class="form-label">Update Status</label>
@@ -204,7 +190,6 @@
           <button type="submit" class="btn btn-primary btn-sm">Update Status</button>
         </div>
       </form>
-
       <!-- Internal Notes -->
       <form id="modalNotesForm" method="POST">
         <label class="form-label">Internal Studio Notes</label>
@@ -218,4 +203,3 @@
   </div>
 </div>
 {% endblock %}
-

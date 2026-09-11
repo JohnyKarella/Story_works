@@ -1,8 +1,6 @@
 {% extends "admin/base.html" %}
-
 {% block title %}Dashboard{% endblock %}
 {% block page_title %}Studio Overview{% endblock %}
-
 {% block head %}
 <style>
   /* ── Design Tokens & Variables ── */
@@ -16,7 +14,6 @@
     --primary-glow: rgba(200, 117, 58, 0.32);
     --primary-glow-strong: rgba(200, 117, 58, 0.58);
   }
-
   /* ── Dashboard Keyframe Animations ── */
   @keyframes fadeInUp {
     from {
@@ -28,7 +25,6 @@
       transform: translateY(0) scale(1);
     }
   }
-
   @keyframes floatOrb {
     0% {
       transform: translate(0, 0) scale(1);
@@ -40,7 +36,6 @@
       transform: translate(-30px, -25px) scale(0.95);
     }
   }
-
   @keyframes pulseGlow {
     0%, 100% {
       transform: scale(1);
@@ -51,7 +46,6 @@
       opacity: 0.35;
     }
   }
-
   /* ── Ambient Background Lighting (from admin.html) ── */
   .ambient-canvas {
     position: fixed;
@@ -63,7 +57,6 @@
     z-index: 0;
     overflow: hidden;
   }
-
   .orb {
     position: absolute;
     border-radius: 50%;
@@ -72,7 +65,6 @@
     animation: floatOrb 22s infinite alternate ease-in-out;
     will-change: transform;
   }
-
   .orb-1 {
     width: 520px;
     height: 520px;
@@ -81,7 +73,6 @@
     right: 12%;
     animation-duration: 20s;
   }
-
   .orb-2 {
     width: 440px;
     height: 440px;
@@ -91,7 +82,6 @@
     animation-duration: 25s;
     animation-delay: -6s;
   }
-
   .orb-3 {
     width: 380px;
     height: 380px;
@@ -101,7 +91,6 @@
     animation-duration: 22s;
     animation-delay: -11s;
   }
-
   .orb-4 {
     width: 440px;
     height: 440px;
@@ -111,12 +100,10 @@
     animation-duration: 26s;
     animation-delay: -14s;
   }
-
   @keyframes radarRing {
     0% { transform: scale(0.6); opacity: 1; }
     100% { transform: scale(2.4); opacity: 0; }
   }
-
   @keyframes trashWiggle {
     0%, 100% { transform: rotate(0deg); }
     20% { transform: rotate(-9deg); }
@@ -124,30 +111,25 @@
     60% { transform: rotate(-6deg); }
     80% { transform: rotate(4deg); }
   }
-
   @keyframes arrowBounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(3px); }
   }
-
   @keyframes starTwinkle {
     0%, 100% { transform: scale(1.1) rotate(0deg); }
     50% { transform: scale(1.32) rotate(14deg); filter: drop-shadow(0 0 6px var(--primary)); }
   }
-
   @keyframes rippleAnim {
     to {
       transform: scale(3.5);
       opacity: 0;
     }
   }
-
   @keyframes counterGlowPulse {
     0% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
     50% { transform: scale(1.1); filter: drop-shadow(0 0 12px var(--primary-light)); }
     100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
   }
-
   .grid-overlay {
     position: fixed;
     top: 0;
@@ -164,7 +146,6 @@
     mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
     -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
   }
-
   /* ── Staggered Entrance Utility Classes ── */
   .anim-fade-up {
     animation: fadeInUp 0.65s var(--ease-smooth) both;
@@ -177,7 +158,6 @@
   .delay-4 { animation-delay: 0.22s; }
   .delay-5 { animation-delay: 0.30s; }
   .delay-6 { animation-delay: 0.38s; }
-
   /* ── Stats Grid & Enhanced Cards ── */
   .stats-grid {
     display: grid;
@@ -187,7 +167,6 @@
     position: relative;
     z-index: 1;
   }
-
   .stat-card {
     position: relative;
     overflow: hidden;
@@ -208,7 +187,6 @@
                 background 0.3s ease;
     will-change: transform, box-shadow;
   }
-
   /* Top hairline highlight (from admin.html login-card::before) */
   .stat-card::after {
     content: '';
@@ -221,7 +199,6 @@
     pointer-events: none;
     z-index: 2;
   }
-
   /* Shimmer beam sweep on hover */
   .stat-card::before {
     content: '';
@@ -241,11 +218,9 @@
     pointer-events: none;
     z-index: 1;
   }
-
   .stat-card:hover::before {
     left: 140%;
   }
-
   /* Stat Card 3D Lift & Illumination (from admin.html hover dynamics) */
   .stat-card:hover {
     transform: translateY(-6px) scale(1.015);
@@ -254,28 +229,24 @@
                 0 0 0 1px rgba(200, 117, 58, 0.25),
                 0 0 35px -8px var(--primary-glow);
   }
-
   .stat-card.card-amber:hover {
     border-color: rgba(245, 158, 11, 0.55);
     box-shadow: 0 24px 55px -12px rgba(0, 0, 0, 0.8),
                 0 0 0 1px rgba(245, 158, 11, 0.25),
                 0 0 38px -8px rgba(245, 158, 11, 0.35);
   }
-
   .stat-card.card-emerald:hover {
     border-color: rgba(16, 185, 129, 0.55);
     box-shadow: 0 24px 55px -12px rgba(0, 0, 0, 0.8),
                 0 0 0 1px rgba(16, 185, 129, 0.25),
                 0 0 38px -8px rgba(16, 185, 129, 0.35);
   }
-
   .stat-card.card-blue:hover {
     border-color: rgba(59, 130, 246, 0.55);
     box-shadow: 0 24px 55px -12px rgba(0, 0, 0, 0.8),
                 0 0 0 1px rgba(59, 130, 246, 0.25),
                 0 0 38px -8px rgba(59, 130, 246, 0.35);
   }
-
   /* Stat icon hover dynamics & Glowing Aura (from admin.html logo-badge-wrap) */
   .stat-icon {
     position: relative;
@@ -290,7 +261,6 @@
                 box-shadow 0.35s var(--ease-smooth),
                 background-color 0.3s ease;
   }
-
   .stat-icon::before {
     content: "";
     position: absolute;
@@ -303,33 +273,27 @@
     z-index: -1;
     pointer-events: none;
   }
-
   .stat-card:hover .stat-icon {
     transform: scale(1.12) rotate(4deg);
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
   }
-
   .stat-card:hover .stat-icon::before {
     opacity: 0.85;
     transform: scale(1.14);
   }
-
   .stat-icon svg {
     width: 24px;
     height: 24px;
     transition: transform 0.3s ease;
   }
-
   .stat-card:hover .stat-icon svg {
     transform: scale(1.1);
   }
-
   /* Stat numbers */
   .stat-body {
     position: relative;
     z-index: 2;
   }
-
   .stat-body .stat-num {
     font-size: 28px;
     font-weight: 800;
@@ -338,22 +302,18 @@
     font-variant-numeric: tabular-nums;
     transition: transform 0.3s var(--ease-smooth), color 0.3s ease;
   }
-
   .stat-card:hover .stat-body .stat-num {
     transform: scale(1.04) translateX(2px);
   }
-
   .stat-body .stat-label {
     font-size: 13px;
     color: var(--text-muted);
     margin-top: 4px;
     transition: color 0.2s ease;
   }
-
   .stat-card:hover .stat-body .stat-label {
     color: var(--text-main);
   }
-
   /* ── Content Card Elevate & Luxury Glow (from admin.html login-card) ── */
   .card {
     position: relative;
@@ -368,7 +328,6 @@
                 transform 0.4s var(--ease-smooth);
     overflow: hidden;
   }
-
   .card::before {
     content: "";
     position: absolute;
@@ -380,7 +339,6 @@
     pointer-events: none;
     z-index: 2;
   }
-
   .card:hover {
     border-color: rgba(255, 255, 255, 0.18);
     box-shadow: 0 28px 75px -15px rgba(0, 0, 0, 0.85),
@@ -388,16 +346,13 @@
                 0 0 45px -12px var(--primary-glow);
     transform: translateY(-3px);
   }
-
   .card-header {
     background: rgba(255, 255, 255, 0.015);
     transition: background 0.3s ease;
   }
-
   .card:hover .card-header {
     background: rgba(255, 255, 255, 0.035);
   }
-
   /* ── Interactive Buttons with Shimmer Sweep (from admin.html btn-submit) ── */
   .btn {
     position: relative;
@@ -415,30 +370,24 @@
                 filter 0.2s;
     overflow: hidden;
   }
-
   .btn:hover {
     transform: translateY(-2px);
   }
-
   .btn:active {
     transform: translateY(1px) scale(0.98);
   }
-
   .btn svg {
     transition: transform 0.25s var(--ease-bounce);
   }
-
   .btn:hover svg {
     transform: scale(1.12);
   }
-
   /* Shimmer light sweep across primary buttons */
   .btn-primary {
     background: var(--primary-gradient);
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 0 8px 22px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
-
   .btn-primary::after {
     content: "";
     position: absolute;
@@ -456,36 +405,30 @@
     transition: all 0.75s ease-in-out;
     pointer-events: none;
   }
-
   .btn-primary:hover {
     box-shadow: 0 14px 32px var(--primary-glow-strong), inset 0 1px 0 rgba(255, 255, 255, 0.4);
     filter: brightness(1.06);
     transform: translateY(-2px);
   }
-
   .btn-primary:hover::after {
     left: 130%;
   }
-
   .btn-secondary {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
-
   .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.09);
     border-color: rgba(255, 255, 255, 0.22);
     color: #fff;
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
   }
-
   .btn-danger {
     background: rgba(239, 68, 68, 0.14);
     border: 1px solid rgba(239, 68, 68, 0.35);
     color: #fca5a5;
     transition: all 0.25s var(--ease-smooth);
   }
-
   .btn-danger:hover {
     background: rgba(239, 68, 68, 0.25);
     border-color: rgba(239, 68, 68, 0.6);
@@ -493,7 +436,6 @@
     box-shadow: 0 6px 18px rgba(239, 68, 68, 0.35);
     transform: translateY(-2px);
   }
-
   /* Sliding arrow in header links (from admin.html back-link hover) */
   .btn-arrow-slide .arrow-icon {
     display: inline-block;
@@ -502,7 +444,6 @@
   .btn-arrow-slide:hover .arrow-icon {
     transform: translateX(5px);
   }
-
   /* Specific View Details button hover */
   .btn-view-details {
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -516,7 +457,6 @@
     box-shadow: 0 6px 18px var(--primary-glow) !important;
     transform: translateY(-2px) scale(1.02) !important;
   }
-
   /* ── Interactive Agency Services Cards (New Dedicated Micro-interactions) ── */
   .service-admin-card {
     position: relative;
@@ -536,7 +476,6 @@
                 background 0.3s ease;
     overflow: hidden;
   }
-
   .service-admin-card::before {
     content: "";
     position: absolute;
@@ -547,7 +486,6 @@
     background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
     pointer-events: none;
   }
-
   .service-admin-card::after {
     content: "";
     position: absolute;
@@ -565,7 +503,6 @@
     transition: all 0.8s ease;
     pointer-events: none;
   }
-
   .service-admin-card:hover {
     transform: translateY(-5px);
     border-color: rgba(200, 117, 58, 0.48);
@@ -573,11 +510,9 @@
                 0 0 0 1px rgba(200, 117, 58, 0.2),
                 0 0 32px -8px var(--primary-glow);
   }
-
   .service-admin-card:hover::after {
     left: 140%;
   }
-
   .service-icon-badge {
     display: inline-flex;
     align-items: center;
@@ -589,21 +524,17 @@
     font-weight: 600;
     transition: color 0.25s ease, transform 0.25s var(--ease-bounce);
   }
-
   .service-admin-card:hover .service-icon-badge {
     color: var(--primary-light);
     transform: translateX(2px);
   }
-
   .service-icon-badge svg {
     transition: transform 0.3s var(--ease-bounce), color 0.25s ease;
   }
-
   .service-admin-card:hover .service-icon-badge svg {
     transform: scale(1.25) rotate(8deg);
     color: var(--primary);
   }
-
   /* ── Live Studio Beacon (Radar Pulse) ── */
   .studio-status-beacon {
     display: inline-flex;
@@ -623,14 +554,12 @@
     cursor: default;
     user-select: none;
   }
-
   .studio-status-beacon:hover {
     background: rgba(16, 185, 129, 0.15);
     border-color: rgba(16, 185, 129, 0.5);
     box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
     transform: translateY(-1px);
   }
-
   .beacon-dot {
     width: 7px;
     height: 7px;
@@ -639,7 +568,6 @@
     position: relative;
     display: inline-block;
   }
-
   .beacon-dot::after {
     content: "";
     position: absolute;
@@ -648,7 +576,6 @@
     border: 1.5px solid #10b981;
     animation: radarRing 2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
   }
-
   /* ── Interactive Click Ripple Wave ── */
   .ripple-wave {
     position: absolute;
@@ -658,7 +585,6 @@
     animation: rippleAnim 0.6s linear;
     pointer-events: none;
   }
-
   /* ── Category Pill Styling & Hover Glow ── */
   .category-pill {
     display: inline-block;
@@ -671,7 +597,6 @@
     letter-spacing: 0.2px;
     transition: all 0.25s var(--ease-smooth);
   }
-
   .category-pill:hover {
     background: rgba(200, 117, 58, 0.15);
     border-color: rgba(200, 117, 58, 0.45);
@@ -679,53 +604,43 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(200, 117, 58, 0.2);
   }
-
   /* ── Counter Finish Sparkle Glow ── */
   .counter-sparkle {
     animation: counterGlowPulse 0.65s var(--ease-bounce) both;
   }
-
   /* ── Clean Table Layout without horizontal sliding / overflow ── */
   .admin-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
   }
-
   .admin-table th {
     padding: 12px 14px;
     font-size: 11px;
     letter-spacing: 0.04em;
     white-space: nowrap;
   }
-
   .admin-table td {
     padding: 12px 14px;
     font-size: 13px;
   }
-
   .admin-table tbody tr {
     transition: background-color 0.25s var(--ease-smooth),
                 box-shadow 0.25s var(--ease-smooth);
   }
-
   /* Removed transform: translateX(4px) sliding */
   .admin-table tbody tr:hover {
     transform: none;
   }
-
   .admin-table tbody tr:hover td {
     background: rgba(200, 117, 58, 0.055);
   }
-
   .admin-table tbody tr td:first-child {
     transition: box-shadow 0.25s var(--ease-smooth);
   }
-
   .admin-table tbody tr:hover td:first-child {
     box-shadow: inset 4px 0 0 var(--primary);
   }
-
   /* Sleek modern scrollbar and overflow control to remove sliding */
   .dashboard-inquiries-table-wrap {
     width: 100%;
@@ -733,51 +648,40 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
   }
-
   .dashboard-inquiries-table-wrap::-webkit-scrollbar {
     height: 4px;
   }
-
   .dashboard-inquiries-table-wrap::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.12);
     border-radius: 4px;
   }
-
   @media (min-width: 1024px) {
     .dashboard-inquiries-table-wrap {
       overflow-x: hidden;
     }
   }
-
   .admin-table a {
     transition: color 0.2s ease;
   }
-
   .admin-table a:hover {
     color: var(--primary-hover) !important;
   }
-
   /* ── SVG Micro-Interactions on Action Buttons ── */
   .btn-primary:hover svg {
     transform: rotate(90deg) scale(1.22);
   }
-
   .btn-danger:hover svg {
     animation: trashWiggle 0.55s ease-in-out infinite alternate;
   }
-
   .btn-arrow-slide:hover svg {
     animation: arrowBounce 0.7s ease-in-out infinite;
   }
-
   .btn-view-details:hover svg {
     transform: rotate(-15deg) scale(1.2);
   }
-
   .service-admin-card:hover .service-icon-badge svg {
     animation: starTwinkle 0.8s ease-in-out infinite;
   }
-
   /* ── Status Badges with Pulsing Dot ── */
   .badge {
     display: inline-flex;
@@ -792,11 +696,9 @@
                 box-shadow 0.25s ease;
     cursor: default;
   }
-
   .badge:hover {
     transform: scale(1.08);
   }
-
   .badge::before {
     content: '';
     width: 6px;
@@ -805,7 +707,6 @@
     display: inline-block;
     flex-shrink: 0;
   }
-
   .badge-new {
     background: rgba(245, 158, 11, 0.15);
     color: #fbbf24;
@@ -816,7 +717,6 @@
     box-shadow: 0 0 10px #f59e0b;
     animation: pulseGlow 1.8s infinite ease-in-out;
   }
-
   .badge-contacted {
     background: rgba(16, 185, 129, 0.15);
     color: #34d399;
@@ -827,7 +727,6 @@
     box-shadow: 0 0 10px #10b981;
     animation: pulseGlow 2.2s infinite ease-in-out;
   }
-
   .badge-in_progress {
     background: rgba(139, 92, 246, 0.15);
     color: #c4b5fd;
@@ -838,7 +737,6 @@
     box-shadow: 0 0 10px #a78bfa;
     animation: pulseGlow 2s infinite ease-in-out;
   }
-
   .badge-closed {
     background: rgba(107, 114, 128, 0.2);
     color: #9ca3af;
@@ -847,7 +745,6 @@
   .badge-closed::before {
     background: #9ca3af;
   }
-
   .badge-published {
     background: rgba(16, 185, 129, 0.15);
     color: #34d399;
@@ -858,7 +755,6 @@
     box-shadow: 0 0 10px #10b981;
     animation: pulseGlow 2.2s infinite ease-in-out;
   }
-
   .badge-draft {
     background: rgba(245, 158, 11, 0.15);
     color: #fbbf24;
@@ -867,7 +763,6 @@
   .badge-draft::before {
     background: #f59e0b;
   }
-
   /* ── Modal Enhancements ── */
   .modal-overlay {
     opacity: 0;
@@ -876,14 +771,12 @@
                 backdrop-filter 0.35s ease;
     backdrop-filter: blur(0px);
   }
-
   .modal-overlay.active {
     opacity: 1;
     pointer-events: auto;
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
   }
-
   .modal-overlay .modal-box {
     transform: scale(0.92) translateY(24px);
     transition: transform 0.4s var(--ease-smooth),
@@ -894,11 +787,9 @@
     border: 1px solid rgba(255, 255, 255, 0.14);
     background: linear-gradient(180deg, rgba(22, 23, 28, 0.95) 0%, rgba(14, 15, 18, 0.98) 100%);
   }
-
   .modal-overlay.active .modal-box {
     transform: scale(1) translateY(0);
   }
-
   .modal-close {
     width: 32px;
     height: 32px;
@@ -915,7 +806,6 @@
     color: var(--text-muted);
     font-size: 20px;
   }
-
   .modal-close:hover {
     transform: rotate(90deg) scale(1.15);
     color: #f87171;
@@ -923,7 +813,6 @@
   }
 </style>
 {% endblock %}
-
 {% block topbar_actions %}
 <div class="studio-status-beacon" title="Studio Admin Session Live">
   <span class="beacon-dot"></span>
@@ -938,7 +827,6 @@
   <span>New Blog</span>
 </a>
 {% endblock %}
-
 {% block content %}
 <!-- ── Ambient Background Lighting (From admin.html) ── -->
 <div class="ambient-canvas" aria-hidden="true">
@@ -948,7 +836,6 @@
   <div class="orb orb-4"></div>
 </div>
 <div class="grid-overlay" aria-hidden="true"></div>
-
 <!-- ── Metric Cards ── -->
 <div class="stats-grid">
   <div class="stat-card anim-fade-up delay-1">
@@ -960,7 +847,6 @@
       <div class="stat-label">Total Inquiries</div>
     </div>
   </div>
-
   <div class="stat-card card-amber anim-fade-up delay-2">
     <div class="stat-icon" style="background: rgba(245, 158, 11, 0.16); color: #f59e0b;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
@@ -970,7 +856,6 @@
       <div class="stat-label">New / Pending Leads</div>
     </div>
   </div>
-
   <div class="stat-card card-emerald anim-fade-up delay-3">
     <div class="stat-icon" style="background: rgba(16, 185, 129, 0.16); color: #10b981;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
@@ -980,7 +865,6 @@
       <div class="stat-label">Blog Articles</div>
     </div>
   </div>
-
   <div class="stat-card card-blue anim-fade-up delay-4">
     <div class="stat-icon" style="background: rgba(59, 130, 246, 0.16); color: #3b82f6;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -991,7 +875,6 @@
     </div>
   </div>
 </div>
-
 <!-- ── Recent Inquiries ── -->
 <div class="card anim-fade-up delay-4">
   <div class="card-header">
@@ -1002,7 +885,6 @@
       </a>
     </div>
   </div>
-
   <div class="table-responsive dashboard-inquiries-table-wrap">
     <table class="admin-table">
       <thead>
@@ -1051,7 +933,6 @@
     </table>
   </div>
 </div>
-
 <!-- ── Content Quick View (2 columns: Blogs & Portfolio) ── -->
 <div class="anim-fade-up delay-5" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 24px; margin-bottom: 24px;">
   <!-- All Blogs -->
@@ -1101,7 +982,6 @@
       </table>
     </div>
   </div>
-
   <!-- All Portfolio -->
   <div class="card" style="margin-bottom: 0;">
     <div class="card-header">
@@ -1146,7 +1026,6 @@
     </div>
   </div>
 </div>
-
 <!-- ── Agency Services Dedicated Management (Distinct Position) ── -->
 <div class="card anim-fade-up delay-6" style="margin-bottom: 0;">
   <div class="card-header">
@@ -1160,7 +1039,6 @@
       </a>
     </div>
   </div>
-
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; padding: 22px;">
     {% if recent_services %}
       {% for s in recent_services %}
@@ -1195,7 +1073,6 @@
     {% endif %}
   </div>
 </div>
-
 <!-- ── Inquiry Details Modal ── -->
 <div class="modal-overlay" id="inquiryModal">
   <div class="modal-box">
@@ -1230,17 +1107,14 @@
           <div id="modalInquiryBudget" style="color: #34d399; font-weight: 600;"></div>
         </div>
       </div>
-
       <div style="margin-bottom: 20px;">
         <label class="form-label">Selected Services</label>
         <div id="modalInquiryServices" style="padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 13px;"></div>
       </div>
-
       <div style="margin-bottom: 24px;">
         <label class="form-label">Project Message</label>
         <div id="modalInquiryMessage" style="padding: 14px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 14px; line-height: 1.6; white-space: pre-wrap;"></div>
       </div>
-
       <!-- Update Status -->
       <form id="modalStatusForm" method="POST" style="margin-bottom: 20px;">
         <label class="form-label">Update Status</label>
@@ -1254,7 +1128,6 @@
           <button type="submit" class="btn btn-primary btn-sm">Update Status</button>
         </div>
       </form>
-
       <!-- Internal Notes -->
       <form id="modalNotesForm" method="POST">
         <label class="form-label">Internal Studio Notes</label>
@@ -1268,7 +1141,6 @@
   </div>
 </div>
 {% endblock %}
-
 {% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -1277,11 +1149,9 @@
     counters.forEach(counter => {
       const target = parseInt(counter.getAttribute('data-target') || '0', 10);
       if (isNaN(target) || target === 0) return;
-
       const duration = 1000; // ms
       const startTime = performance.now();
       counter.textContent = '0';
-
       function updateCounter(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -1289,7 +1159,6 @@
         const ease = 1 - Math.pow(1 - progress, 3);
         const currentVal = Math.floor(ease * target);
         counter.textContent = currentVal.toLocaleString();
-
         if (progress < 1) {
           requestAnimationFrame(updateCounter);
         } else {
@@ -1297,10 +1166,8 @@
           counter.classList.add('counter-sparkle');
         }
       }
-
       requestAnimationFrame(updateCounter);
     });
-
     // ── Interactive Cursor Magnetic Spotlight on Cards ──
     const interactiveCards = document.querySelectorAll('.stat-card, .card, .service-admin-card');
     interactiveCards.forEach(card => {
@@ -1312,7 +1179,6 @@
         card.style.setProperty('--mouse-y', `${y}px`);
       });
     });
-
     // ── Tactile Button Click Ripple Wave ──
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.btn');
@@ -1330,7 +1196,6 @@
       btn.appendChild(circle);
       setTimeout(() => circle.remove(), 600);
     });
-
     // ── Subtle Interactive 3D Card Parallax Tilt on Mouse Move ──
     if (window.matchMedia('(pointer: fine)').matches) {
       document.querySelectorAll('.stat-card, .service-admin-card').forEach(card => {
@@ -1342,10 +1207,8 @@
           const centerY = rect.height / 2;
           const rotateX = ((y - centerY) / centerY) * -4;
           const rotateY = ((x - centerX) / centerX) * 4;
-
           card.style.transform = `perspective(800px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-5px)`;
         });
-
         card.addEventListener('mouseleave', () => {
           card.style.transform = '';
         });

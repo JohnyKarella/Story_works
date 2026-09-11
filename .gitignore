@@ -4,22 +4,18 @@ __pycache__/
 *$py.class
 *.so
 .pytest_cache/
-
 # Environments & secrets
 .env
 .venv/
 venv/
 ENV/
 env/
-
 # IDE & OS files
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
 ehthumbs.db
-
 # Backup archives & duplicate extraction folders
 *.zip
 06_storyworks_25-7-2026/
-

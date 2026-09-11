@@ -1,6 +1,4 @@
 /* New Animations */
-
-
 /* Background Animation Container */
 .bg-animation-container {
     position: fixed;
@@ -12,7 +10,6 @@
     overflow: hidden;
     /* background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%); */
 }
-
 /* Animated Grid Lines */
 .grid-lines {
     position: absolute;
@@ -24,17 +21,14 @@
     background-size: 50px 50px;
     animation: gridScroll 20s linear infinite;
 }
-
 @keyframes gridScroll {
     0% {
         transform: translateY(0);
     }
-
     100% {
         transform: translateY(50px);
     }
 }
-
 /* Floating Data Nodes */
 .data-node {
     position: absolute;
@@ -45,7 +39,6 @@
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
     animation: floatNode linear infinite;
 }
-
 .data-node::before {
     content: '';
     position: absolute;
@@ -58,52 +51,42 @@
     transform: translate(-50%, -50%);
     animation: pulse 2s ease-in-out infinite;
 }
-
 @keyframes floatNode {
     0% {
         transform: translateY(100vh) translateX(0);
         opacity: 0;
     }
-
     10% {
         opacity: 1;
     }
-
     90% {
         opacity: 1;
     }
-
     100% {
         transform: translateY(-100px) translateX(var(--drift));
         opacity: 0;
     }
 }
-
 @keyframes pulse {
-
     0%,
     100% {
         transform: translate(-50%, -50%) scale(1);
         opacity: 0.5;
     }
-
     50% {
         transform: translate(-50%, -50%) scale(1.5);
         opacity: 0;
     }
 }
-
 /* Geometric Shapes */
 .geo-shape {
     position: absolute;
     border: 1px solid rgba(139, 92, 246, 0.15);
     animation: rotateShape linear infinite;
 }
-
 .geo-shape.circle {
     border-radius: 50%;
 }
-
 .geo-shape.triangle {
     width: 0;
     height: 0;
@@ -114,27 +97,22 @@
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), transparent);
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 }
-
 @keyframes rotateShape {
     0% {
         transform: translateY(100vh) rotate(0deg);
         opacity: 0;
     }
-
     10% {
         opacity: 0.3;
     }
-
     90% {
         opacity: 0.3;
     }
-
     100% {
         transform: translateY(-100px) rotate(360deg);
         opacity: 0;
     }
 }
-
 /* Digital Lines/Connections */
 .connection-line {
     position: absolute;
@@ -142,29 +120,24 @@
     background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
     animation: lineMove linear infinite;
 }
-
 @keyframes lineMove {
     0% {
         transform: translateY(100vh) scaleX(0);
         opacity: 0;
     }
-
     20% {
         transform: translateY(80vh) scaleX(1);
         opacity: 1;
     }
-
     80% {
         transform: translateY(20vh) scaleX(1);
         opacity: 1;
     }
-
     100% {
         transform: translateY(0) scaleX(0);
         opacity: 0;
     }
 }
-
 /* Data Particles */
 .particle {
     position: absolute;
@@ -174,28 +147,23 @@
     border-radius: 50%;
     animation: particleFloat linear infinite;
 }
-
 @keyframes particleFloat {
     0% {
         transform: translateY(100vh) translateX(0) scale(0);
         opacity: 0;
     }
-
     10% {
         opacity: 1;
         transform: translateY(90vh) translateX(10px) scale(1);
     }
-
     90% {
         opacity: 1;
     }
-
     100% {
         transform: translateY(-50px) translateX(var(--particle-drift)) scale(0);
         opacity: 0;
     }
 }
-
 /* Chart Bars Animation */
 .chart-bar {
     position: absolute;
@@ -203,28 +171,23 @@
     background: linear-gradient(to top, rgba(34, 197, 94, 0.055), rgba(34, 197, 94, 0.1));
     animation: barGrow linear infinite;
 }
-
 @keyframes barGrow {
     0% {
         transform: translateY(100vh) scaleY(0);
         opacity: 0;
     }
-
     20% {
         opacity: 0.6;
         transform: translateY(80vh) scaleY(1);
     }
-
     80% {
         opacity: 0.6;
     }
-
     100% {
         transform: translateY(-100px) scaleY(0);
         opacity: 0;
     }
 }
-
 /* Glowing Orbs */
 .glow-orb {
     position: absolute;
@@ -233,53 +196,39 @@
     opacity: 0.15;
     animation: orbFloat 25s ease-in-out infinite;
 }
-
 @keyframes orbFloat {
-
     0%,
     100% {
         transform: translate(0, 0) scale(1);
     }
-
     33% {
         transform: translate(100px, -100px) scale(1.2);
     }
-
     66% {
         transform: translate(-100px, 100px) scale(0.8);
     }
 }
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .grid-lines {
         background-size: 30px 30px;
     }
-
     .data-node {
         width: 6px;
         height: 6px;
     }
-
     .glow-orb {
         filter: blur(30px);
     }
 }
-
 @media (max-width: 480px) {
     .grid-lines {
         background-size: 20px 20px;
     }
-
     .geo-shape {
         display: none;
     }
 }
-
-
-
-
-
 /* Back to top */
 #scroll {
     position: fixed;
@@ -295,7 +244,6 @@
     -moz-border-radius: 60px;
     border-radius: 60px
 }
-
 #scroll span {
     position: absolute;
     top: 50%;
@@ -307,18 +255,10 @@
     border: 8px solid transparent;
     border-bottom-color: #ffffff;
 }
-
 #scroll:hover {
     background-color: #e74c3c;
     opacity: 1;
     filter: "alpha(opacity=100)";
     -ms-filter: "alpha(opacity=100)";
 }
-
-
-
-
-
-
-
 /* services */

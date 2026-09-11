@@ -1,21 +1,15 @@
-
 /* ******************************************************
 	Author URI: https://codeconvey.com/
 	Demo Purpose Only - May not require to add.
 	font-family: "Raleway",sans-serif;
 *********************************************************/
-
 @import url('https://fonts.googleapis.com/css?family=Raleway:400,500,600,700,800,900');
-
-
-
 html {
   box-sizing: border-box;
 }
 *, *:before, *:after {
   box-sizing: inherit;
 }
-
 article, header, section, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
     display: block;
 }
@@ -57,15 +51,12 @@ h2 span {
     margin-top: 5px;
 	text-transform:uppercase;
 }
-
 #float-right{
 	float:right;	
 }
-
 /* ******************************************************
 	Script Top
 *********************************************************/
-
 .ScriptTop {
     background: #fff none repeat scroll 0 0;
     float: left;
@@ -76,7 +67,6 @@ h2 span {
     text-transform: uppercase;
     width: 100%;
 }
-
 /* To Navigation Style 1*/
 .ScriptTop ul {
     margin: 24px 0;
@@ -101,12 +91,9 @@ h2 span {
 	background:#000;
 	color:#fff;
 }
-
-
 /* ******************************************************
 	Script Header
 *********************************************************/
-
 .ScriptHeader {
     float: left;
     width: 100%;
@@ -128,7 +115,6 @@ h2 span {
     font-weight: 700;
     margin: 0;
     line-height: normal;
-
 }
 .ScriptHeader h2 {
     color: #312c8f;
@@ -136,7 +122,6 @@ h2 span {
     font-weight: 400;
     margin: 5px 0 0;
     line-height: normal;
-
 }
 .ScriptHeader h1 span {
     display: block;
@@ -144,7 +129,6 @@ h2 span {
     font-size: 22px;
     opacity: 0.7;
     margin-top: 5px;
-
 }
 .ScriptHeader span {
     display: block;
@@ -153,22 +137,12 @@ h2 span {
     opacity: 0.7;
     margin-top: 5px;
 }
-
-
-
-
 /* ******************************************************
 	Live Demo
 *********************************************************/
-
-
-
-
-
 /* ******************************************************
 	Responsive Grids
 *********************************************************/
-
 .rt-container {
 	margin: 0 auto;
 	padding-left:12px;
@@ -179,7 +153,6 @@ h2 span {
   line-height: 0;
   content: "";
 }
-
 .rt-row:after {
   clear: both;
 }
@@ -193,8 +166,6 @@ h2 span {
   min-height: 1px;
   position: relative;
 }
-
-
 @media (min-width: 768px) {
   .rt-container {
     width: 750px;
@@ -206,9 +177,7 @@ h2 span {
   .col-rt-6, .col-rt-12 {
     width: 100%;
   }
-  
 }
-
 @media (min-width: 1200px) {
 	.rt-container {
 		width: 1170px;
@@ -228,10 +197,7 @@ h2 span {
 	.col-rt-5 {
 		width: 83.33%;
 	}
-	
-
 }
-
 @media only screen and (min-width:240px) and (max-width: 768px){
 	 .ScriptTop h1, .ScriptTop ul {
 		text-align: center;
@@ -243,7 +209,6 @@ h2 span {
 	.ScriptTop ul{
 		 margin-top:12px;		
 	}
-	
 	.ScriptHeader h1,
 	.ScriptHeader h2, 
 	.scriptnav ul{
@@ -255,13 +220,4 @@ h2 span {
 	#float-right{
 		float:none;	
 	}
-	
 }
-
-
-
-
-
-
-
-

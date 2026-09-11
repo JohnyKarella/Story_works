@@ -1,9 +1,5 @@
 /* contact */
-
-
     /* ══════════════════════════════
-  
-
     /* ══════════════════════════════
    HERO
 ══════════════════════════════ */
@@ -15,7 +11,6 @@
       margin: 0 auto;
       text-align: center;
     }
-
     .hero-label {
       display: inline-flex;
       align-items: center;
@@ -30,7 +25,6 @@
       transform: translateY(16px);
       animation: fadeUp .7s ease .2s forwards;
     }
-
     .hero-label::before,
     .hero-label::after {
       content: '';
@@ -40,7 +34,6 @@
       background: linear-gradient(90deg, var(--gold), var(--gold2));
       border-radius: 2px;
     }
-
     .contact-hero h1 {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(36px, 6vw, 72px);
@@ -52,12 +45,10 @@
       transform: translateY(24px);
       animation: fadeUp .85s ease .35s forwards;
     }
-
     .contact-hero h1 em {
       font-style: italic;
       color: var(--gold);
     }
-
     .contact-hero p {
       font-size: clamp(14px, 1.7vw, 18px);
       line-height: 1.8;
@@ -69,7 +60,6 @@
       transform: translateY(18px);
       animation: fadeUp .8s ease .5s forwards;
     }
-
     /* ══════════════════════════════
    MAIN GRID — form + sidebar
 ══════════════════════════════ */
@@ -84,7 +74,6 @@
       gap: clamp(28px, 4vw, 56px);
       align-items: start;
     }
-
     /* ══════════════════════════════
    FORM CARD
 ══════════════════════════════ */
@@ -96,17 +85,14 @@
       box-shadow: 0 12px 48px rgba(0, 0, 0, .06), 0 2px 10px rgba(0, 0, 0, .03);
       position: relative;
       overflow: hidden;
-
       opacity: 0;
       transform: translateY(32px);
       transition: opacity .85s ease, transform .9s cubic-bezier(.25, 1, .5, 1);
     }
-
     .form-card.on {
       opacity: 1;
       transform: translateY(0);
     }
-
     /* top accent */
     .form-card::before {
       content: '';
@@ -120,30 +106,25 @@
       transform-origin: left;
       transition: transform .8s cubic-bezier(.25, 1, .5, 1) .5s;
     }
-
     .form-card.on::before {
       transform: scaleX(1);
     }
-
     .form-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(22px, 2.8vw, 30px);
       font-weight: 600;
       margin-bottom: 6px;
     }
-
     .form-subtitle {
       font-size: 13px;
       color: var(--muted2);
       font-weight: 300;
       margin-bottom: 32px;
     }
-
     /* ── SERVICE PILLS ── */
     .service-row {
       margin-bottom: 26px;
     }
-
     .service-row label {
       display: block;
       font-size: 12px;
@@ -153,13 +134,11 @@
       color: var(--muted2);
       margin-bottom: 12px;
     }
-
     .service-pills {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
-
     .pill-btn {
       padding: 8px 18px;
       border-radius: 24px;
@@ -172,12 +151,10 @@
       cursor: pointer;
       transition: border-color .2s, background .2s, color .2s, transform .2s;
     }
-
     .pill-btn:hover {
       border-color: rgba(245, 166, 35, .4);
       color: var(--text);
     }
-
     .pill-btn.selected {
       border-color: var(--gold2);
       background: rgb(245 166 35 / 68%);
@@ -185,26 +162,22 @@
       font-weight: 500;
       transform: translateY(-1px);
     }
-
     /* ── FORM FIELDS ── */
     .fields {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
-
     .field-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
-
     .field {
       display: flex;
       flex-direction: column;
       gap: 7px;
     }
-
     .field label {
       font-size: 12px;
       font-weight: 600;
@@ -212,7 +185,6 @@
       text-transform: uppercase;
       color: var(--muted2);
     }
-
     .field input,
     .field textarea,
     .field select {
@@ -229,7 +201,6 @@
       transition: border-color .2s, box-shadow .2s, background .2s;
       appearance: none;
     }
-
     .field input:focus,
     .field textarea:focus,
     .field select:focus {
@@ -237,40 +208,33 @@
       box-shadow: 0 0 0 3px rgba(245, 166, 35, .1);
       background: var(--white);
     }
-
     .field input.err,
     .field textarea.err {
       border-color: var(--error);
     }
-
     .field .err-msg {
       font-size: 11px;
       color: var(--error);
       display: none;
     }
-
     .field input.err~.err-msg,
     .field textarea.err~.err-msg {
       display: block;
     }
-
     .field textarea {
       resize: vertical;
       min-height: 130px;
       line-height: 1.65;
     }
-
     .field select {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 14px center;
       padding-right: 36px;
     }
-
     .field select option {
       background: var(--white);
     }
-
     /* ── SUBMIT BTN ── */
     .submit-btn {
       width: 100%;
@@ -294,16 +258,13 @@
       transition: transform .2s, box-shadow .2s;
       box-shadow: 0 6px 24px rgba(0, 0, 0, .15);
     }
-
     .submit-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 32px rgba(0, 0, 0, .2);
     }
-
     .submit-btn:active {
       transform: translateY(0);
     }
-
     .submit-btn::before {
       content: '';
       position: absolute;
@@ -315,11 +276,9 @@
       transform: skewX(-20deg);
       transition: left .4s ease;
     }
-
     .submit-btn:hover::before {
       left: 150%;
     }
-
     .submit-btn svg {
       width: 18px;
       height: 18px;
@@ -330,11 +289,9 @@
       stroke-linejoin: round;
       transition: transform .2s;
     }
-
     .submit-btn:hover svg {
       transform: translateX(3px);
     }
-
     /* ── SUCCESS STATE ── */
     .success-state {
       display: none;
@@ -345,7 +302,6 @@
       padding: 48px 24px;
       gap: 16px;
     }
-
     .success-icon {
       width: 64px;
       height: 64px;
@@ -356,17 +312,14 @@
       justify-content: center;
       animation: popIn .5s cubic-bezier(.34, 1.6, .64, 1) forwards;
     }
-
     @keyframes popIn {
       from {
         transform: scale(0);
       }
-
       to {
         transform: scale(1);
       }
     }
-
     .success-icon svg {
       width: 28px;
       height: 28px;
@@ -376,13 +329,11 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-
     .success-state h3 {
       font-family: 'Cormorant Garamond', serif;
       font-size: 28px;
       font-weight: 600;
     }
-
     .success-state p {
       font-size: 14px;
       color: var(--muted);
@@ -390,7 +341,6 @@
       font-weight: 300;
       max-width: 340px;
     }
-
     /* ══════════════════════════════
    SIDEBAR
 ══════════════════════════════ */
@@ -402,12 +352,10 @@
       transform: translateX(24px);
       transition: opacity .85s ease .15s, transform .85s cubic-bezier(.25, 1, .5, 1) .15s;
     }
-
     .sidebar.on {
       opacity: 1;
       transform: translateX(0);
     }
-
     /* info card */
     .info-card {
       background: var(--white);
@@ -418,7 +366,6 @@
       position: relative;
       overflow: hidden;
     }
-
     .info-card::after {
       content: '';
       position: absolute;
@@ -430,7 +377,6 @@
       background: radial-gradient(circle, rgba(245, 166, 35, .07), transparent 65%);
       pointer-events: none;
     }
-
     .info-card-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: 20px;
@@ -440,7 +386,6 @@
       align-items: center;
       gap: 10px;
     }
-
     .info-card-title svg {
       width: 18px;
       height: 18px;
@@ -451,7 +396,6 @@
       stroke-linejoin: round;
       flex-shrink: 0;
     }
-
     .contact-item {
       display: flex;
       align-items: flex-start;
@@ -459,16 +403,13 @@
       padding: 14px 0;
       border-bottom: 1px solid var(--border);
     }
-
     .contact-item:last-child {
       border-bottom: none;
       padding-bottom: 0;
     }
-
     .contact-item:first-of-type {
       padding-top: 0;
     }
-
     .ci-icon {
       width: 38px;
       height: 38px;
@@ -480,7 +421,6 @@
       justify-content: center;
       margin-top: 1px;
     }
-
     .ci-icon svg {
       width: 16px;
       height: 16px;
@@ -490,7 +430,6 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-
     .ci-label {
       font-size: 11px;
       font-weight: 600;
@@ -499,24 +438,20 @@
       color: var(--muted2);
       margin-bottom: 3px;
     }
-
     .ci-value {
       font-size: 14px;
       font-weight: 400;
       color: var(--text);
       line-height: 1.5;
     }
-
     .ci-value a {
       color: var(--text);
       text-decoration: none;
       transition: color .2s;
     }
-
     .ci-value a:hover {
       color: var(--gold2);
     }
-
     /* hours card */
     .hours-row {
       display: flex;
@@ -525,27 +460,22 @@
       padding: 10px 0;
       border-bottom: 1px solid var(--border);
     }
-
     .hours-row:last-child {
       border-bottom: none;
     }
-
     .hours-day {
       font-size: 13px;
       color: var(--muted);
       font-weight: 400;
     }
-
     .hours-time {
       font-size: 13px;
       color: var(--text);
       font-weight: 500;
     }
-
     .hours-time.closed {
       color: var(--muted2);
     }
-
     /* social card */
     .social-grid {
       display: grid;
@@ -553,7 +483,6 @@
       gap: 10px;
       margin-top: 4px;
     }
-
     .social-btn {
       display: flex;
       align-items: center;
@@ -569,14 +498,12 @@
       text-decoration: none;
       transition: border-color .2s, color .2s, transform .2s, background .2s;
     }
-
     .social-btn:hover {
       border-color: rgba(245, 166, 35, .3);
       color: var(--text);
       background: rgba(245, 166, 35, .06);
       transform: translateY(-2px);
     }
-
     .social-btn svg {
       width: 16px;
       height: 16px;
@@ -587,7 +514,6 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-
     /* ── PROCESS CARD ── */
     .process-card {
       background: linear-gradient(135deg, var(--text), #2d2a26);
@@ -597,7 +523,6 @@
       position: relative;
       overflow: hidden;
     }
-
     .process-card::before {
       content: '';
       position: absolute;
@@ -609,7 +534,6 @@
       background: radial-gradient(circle, rgba(245, 166, 35, .15), transparent 65%);
       pointer-events: none;
     }
-
     .process-card-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: 20px;
@@ -619,7 +543,6 @@
       position: relative;
       z-index: 1;
     }
-
     .process-step {
       display: flex;
       gap: 12px;
@@ -628,11 +551,9 @@
       position: relative;
       z-index: 1;
     }
-
     .process-step:last-child {
       margin-bottom: 0;
     }
-
     .ps-num {
       font-family: 'Cormorant Garamond', serif;
       font-size: 22px;
@@ -643,21 +564,18 @@
       width: 28px;
       line-height: 1.1;
     }
-
     .ps-body h5 {
       font-size: 13px;
       font-weight: 600;
       color: #fff;
       margin-bottom: 2px;
     }
-
     .ps-body p {
       font-size: 12px;
       color: rgba(255, 255, 255, .5);
       font-weight: 300;
       line-height: 1.5;
     }
-
     /* ══════════════════════════════
    MAP STRIP
 ══════════════════════════════ */
@@ -671,19 +589,16 @@
       transform: translateY(28px);
       transition: opacity .8s ease, transform .8s ease;
     }
-
     .map-strip.on {
       opacity: 1;
       transform: translateY(0);
     }
-
     .map-strip h3 {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(22px, 2.5vw, 30px);
       font-weight: 600;
       margin-bottom: 20px;
     }
-
     .map-frame {
       width: 100%;
       height: 320px;
@@ -697,7 +612,6 @@
       justify-content: center;
       position: relative;
     }
-
     .map-pin {
       display: flex;
       flex-direction: column;
@@ -705,7 +619,6 @@
       gap: 8px;
       opacity: .5;
     }
-
     .map-pin svg {
       width: 36px;
       height: 36px;
@@ -715,17 +628,14 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-
     .map-pin span {
       font-family: 'Cormorant Garamond', serif;
       font-size: 16px;
       color: var(--muted2);
       letter-spacing: 1px;
     }
-
     /* Uncomment and replace src to embed a real map:
 .map-frame iframe{width:100%;height:100%;border:none;} */
-
     /* ══════════════════════════════
    FAQ
 ══════════════════════════════ */
@@ -739,35 +649,29 @@
       transform: translateY(28px);
       transition: opacity .8s ease, transform .8s ease;
     }
-
     .faq-section.on {
       opacity: 1;
       transform: translateY(0);
     }
-
     .faq-head {
       text-align: center;
       margin-bottom: 40px;
     }
-
     .faq-head h3 {
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(24px, 3vw, 36px);
       font-weight: 600;
       margin-bottom: 8px;
     }
-
     .faq-head p {
       font-size: 14px;
       color: var(--muted);
       font-weight: 300;
     }
-
     .faq-item {
       border-bottom: 1px solid var(--border);
       overflow: hidden;
     }
-
     .faq-q {
       width: 100%;
       display: flex;
@@ -785,11 +689,9 @@
       color: var(--text);
       transition: color .2s;
     }
-
     .faq-q:hover {
       color: var(--gold2);
     }
-
     .faq-q svg {
       width: 18px;
       height: 18px;
@@ -801,16 +703,13 @@
       stroke-linejoin: round;
       transition: transform .35s cubic-bezier(.34, 1.4, .64, 1), stroke .2s;
     }
-
     .faq-item.open .faq-q svg {
       transform: rotate(45deg);
       stroke: #e8882a;
     }
-
     .faq-item.open .faq-q {
       color: #e8882a;
     }
-
     .faq-a {
       font-size: 14px;
       line-height: 1.75;
@@ -821,12 +720,10 @@
       transition: max-height .4s ease, padding .3s ease;
       padding-bottom: 0;
     }
-
     .faq-item.open .faq-a {
       max-height: 200px;
       padding-bottom: 20px;
     }
-
     /* ══════════════════════════════
    FOOTER
 ══════════════════════════════ */
@@ -838,7 +735,6 @@
       padding: 52px 5vw 32px;
       text-align: center;
     }
-
     .footer-logo {
       font-family: 'Cormorant Garamond', serif;
       font-size: 26px;
@@ -847,13 +743,11 @@
       margin-bottom: 10px;
       display: block;
     }
-
     .footer-tag {
       font-size: 13px;
       color: rgba(255, 255, 255, .4);
       margin-bottom: 28px;
     }
-
     .footer-links {
       display: flex;
       gap: 20px;
@@ -861,23 +755,19 @@
       flex-wrap: wrap;
       margin-bottom: 28px;
     }
-
     .footer-links a {
       font-size: 12px;
       color: rgba(255, 255, 255, .45);
       text-decoration: none;
       transition: color .2s;
     }
-
     .footer-links a:hover {
       color: #fff;
     }
-
     .footer-copy {
       font-size: 11px;
       color: rgba(255, 255, 255, .3);
     }
-
     /* ══════════════════════════════
    RESPONSIVE
 ══════════════════════════════ */
@@ -886,49 +776,38 @@
         grid-template-columns: 1fr;
         max-width: 600px;
       }
-
       .sidebar {
         transform: translateY(24px) !important;
       }
-
       .sidebar.on {
         transform: translateY(0) !important;
       }
     }
-
     @media(max-width:860px) {
       .nav-links {
         display: none;
       }
-
       .hamburger {
         display: flex;
       }
     }
-
     @media(max-width:560px) {
       .contact-hero {
         padding-top: 110px;
       }
-
       .field-row {
         grid-template-columns: 1fr;
       }
-
       .social-grid {
         grid-template-columns: 1fr;
       }
     }
-
     @media(max-width:380px) {
       .service-pills {
         gap: 6px;
       }
-
       .pill-btn {
         font-size: 12px;
         padding: 7px 14px;
       }
     }
-
-    

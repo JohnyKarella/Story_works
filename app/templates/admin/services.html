@@ -1,7 +1,5 @@
 {% extends "admin/base.html" %}
-
 {% block title %}Agency Services{% endblock %}
-
 {% block extra_js %}
 <script>
 function openEditService(serviceOrBtn) {
@@ -19,29 +17,23 @@ function openEditService(serviceOrBtn) {
       is_active: d.active === "1" || d.active === "true"
     };
   }
-
   const form = document.getElementById("editServiceForm");
   if (!form || !service) return;
-
   form.action = `/admin/services/${service.id}/edit`;
-
   const setInputVal = (name, val) => {
     const el = form.querySelector(`input[name="${name}"], textarea[name="${name}"]`);
     if (el) el.value = val !== undefined && val !== null ? val : "";
   };
-
   setInputVal("title", service.title);
   setInputVal("slug", service.slug);
   setInputVal("short_desc", service.short_desc);
   setInputVal("full_desc", service.full_desc);
   setInputVal("icon", service.icon);
   setInputVal("display_order", service.display_order || 0);
-
   const activeCheckbox = form.querySelector('input[name="is_active"]');
   if (activeCheckbox) {
     activeCheckbox.checked = Boolean(service.is_active);
   }
-
   if (typeof openModal === "function") {
     openModal("editServiceModal");
   } else {
@@ -52,16 +44,13 @@ function openEditService(serviceOrBtn) {
 window.openEditService = openEditService;
 </script>
 {% endblock %}
-
 {% block page_title %}Agency Services{% endblock %}
-
 {% block topbar_actions %}
 <button type="button" class="btn btn-primary btn-sm" onclick="openModal('newServiceModal')">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   Add Service
 </button>
 {% endblock %}
-
 {% block content %}
 <div class="card">
   <div class="table-responsive">
@@ -129,7 +118,6 @@ window.openEditService = openEditService;
     </table>
   </div>
 </div>
-
 <!-- ── New Service Modal ── -->
 <div class="modal-overlay" id="newServiceModal">
   <div class="modal-box">
@@ -171,7 +159,6 @@ window.openEditService = openEditService;
     </form>
   </div>
 </div>
-
 <!-- ── Edit Service Modal ── -->
 <div class="modal-overlay" id="editServiceModal">
   <div class="modal-box">
@@ -222,4 +209,3 @@ window.openEditService = openEditService;
   </div>
 </div>
 {% endblock %}
-

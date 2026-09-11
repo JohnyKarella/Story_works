@@ -1,6 +1,4 @@
 /* Home text testimonials */
-
-
 /* ── SECTION ── */
 .testi-section {
     padding: 90px 0 100px;
@@ -9,7 +7,6 @@
     overflow: hidden;
     position: relative;
 }
-
 /* ambient glow */
 .testi-section::before {
     content: '';
@@ -22,7 +19,6 @@
     background: radial-gradient(ellipse, rgba(245, 166, 35, .07), transparent 65%);
     pointer-events: none;
 }
-
 /* ── HEADER ── */
 .testi-head {
     text-align: center;
@@ -32,12 +28,10 @@
     transform: translateY(20px);
     transition: opacity .7s ease, transform .7s ease;
 }
-
 .testi-head.on {
     opacity: 1;
     transform: translateY(0);
 }
-
 .testi-label {
     display: inline-flex;
     align-items: center;
@@ -49,7 +43,6 @@
     color: #999;
     margin-bottom: 14px;
 }
-
 .testi-label::before,
 .testi-label::after {
     content: '';
@@ -59,7 +52,6 @@
     background: linear-gradient(90deg, #F5A623, #e8882a);
     border-radius: 2px;
 }
-
 .testi-head h2 {
     font-family: 'Cormorant Garamond', serif;
     font-size: clamp(28px, 4vw, 50px);
@@ -68,12 +60,10 @@
     line-height: 1.15;
     color: #1a1a1a;
 }
-
 .testi-head h2 em {
     font-style: italic;
     color: #F5A623;
 }
-
 /* ── STAGE ── */
 .testi-stage-wrap {
     position: relative;
@@ -82,7 +72,6 @@
     align-items: center;
     gap: 48px;
 }
-
 .testi-stage {
     position: relative;
     width: 100%;
@@ -92,7 +81,6 @@
     justify-content: center;
     perspective: 1200px;
 }
-
 /* ── CARD ── */
 .testi-card {
     position: absolute;
@@ -107,7 +95,6 @@
     gap: 20px;
     cursor: pointer;
     user-select: none;
-
     /* default: hidden behind */
     opacity: 0;
     transform: scale(.86) translateY(28px) translateZ(-180px);
@@ -119,7 +106,6 @@
     z-index: 1;
     pointer-events: none;
 }
-
 /* PREV — peeking left behind */
 .testi-card.pos-prev {
     opacity: .5;
@@ -127,7 +113,6 @@
     z-index: 2;
     pointer-events: auto;
 }
-
 /* NEXT — peeking right behind */
 .testi-card.pos-next {
     opacity: .5;
@@ -135,20 +120,17 @@
     z-index: 2;
     pointer-events: auto;
 }
-
 /* FAR cards */
 .testi-card.pos-far-prev {
     opacity: .25;
     transform: scale(.80) translateX(-50%) translateY(25px) rotateY(50deg) translateZ(-260px);
     z-index: 1;
 }
-
 .testi-card.pos-far-next {
     opacity: .25;
     transform: scale(.80) translateX(50%) translateY(25px) rotateY(-50deg) translateZ(-260px);
     z-index: 1;
 }
-
 /* ACTIVE — front and centre */
 .testi-card.pos-active {
     opacity: 1;
@@ -162,7 +144,6 @@
         box-shadow .4s ease,
         z-index 0s 0s;
 }
-
 /* ── gold accent top bar ── */
 .testi-card::before {
     content: '';
@@ -176,11 +157,9 @@
     opacity: 0;
     transition: opacity .4s ease .3s;
 }
-
 .testi-card.pos-active::before {
     opacity: 1;
 }
-
 /* ── QUOTE MARK ── */
 .testi-quote-mark {
     font-family: 'Cormorant Garamond', serif;
@@ -193,20 +172,17 @@
     right: 32px;
     pointer-events: none;
 }
-
 /* ── STARS ── */
 .testi-stars {
     display: flex;
     gap: 4px;
 }
-
 .testi-stars svg {
     width: 16px;
     height: 16px;
     fill: #F5A623;
     stroke: none;
 }
-
 /* ── REVIEW TEXT ── */
 .testi-text {
     font-size: clamp(14px, 1.6vw, 15px);
@@ -216,7 +192,6 @@
     font-style: italic;
     flex: 1;
 }
-
 /* ── DIVIDER ── */
 .testi-divider {
     height: 1px;
@@ -225,18 +200,15 @@
     transition: width .8s ease .5s;
     border-radius: 2px;
 }
-
 .testi-card.pos-active .testi-divider {
     width: 60%;
 }
-
 /* ── AUTHOR ── */
 .testi-author {
     display: flex;
     align-items: center;
     gap: 14px;
 }
-
 .testi-photo {
     width: 52px;
     height: 52px;
@@ -253,30 +225,25 @@
     font-weight: 600;
     color: #b0a090;
 }
-
 .testi-photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
 }
-
 .testi-author-info {}
-
 .testi-name {
     font-size: 15px;
     font-weight: 600;
     color: #1a1a1a;
     margin-bottom: 2px;
 }
-
 .testi-designation {
     font-size: 12px;
     color: #999;
     font-weight: 300;
     letter-spacing: .2px;
 }
-
 /* ── DOTS ── */
 .testi-dots {
     display: flex;
@@ -284,7 +251,6 @@
     justify-content: center;
     margin-top: 0;
 }
-
 .testi-dot {
     width: 8px;
     height: 8px;
@@ -295,21 +261,18 @@
     padding: 0;
     transition: background .3s, transform .3s, width .3s;
 }
-
 .testi-dot.active {
     background: #F5A623;
     width: 24px;
     border-radius: 4px;
     transform: scaleY(1.1);
 }
-
 /* ── ARROWS ── */
 .testi-arrows {
     display: flex;
     gap: 12px;
     justify-content: center;
 }
-
 .testi-arrow {
     width: 48px;
     height: 48px;
@@ -322,14 +285,12 @@
     cursor: pointer;
     transition: border-color .2s, background .2s, transform .25s cubic-bezier(.34, 1.5, .64, 1), box-shadow .2s;
 }
-
 .testi-arrow:hover {
     border-color: rgba(245, 166, 35, .4);
     background: rgba(245, 166, 35, .06);
     transform: scale(1.1);
     box-shadow: 0 6px 20px rgba(0, 0, 0, .07);
 }
-
 .testi-arrow svg {
     width: 18px;
     height: 18px;
@@ -340,11 +301,9 @@
     stroke-linejoin: round;
     transition: stroke .2s;
 }
-
 .testi-arrow:hover svg {
     stroke: #e8882a;
 }
-
 /* controls row */
 .testi-controls {
     display: flex;
@@ -354,37 +313,30 @@
     padding: 0 5vw;
     flex-wrap: wrap;
 }
-
 /* ── RESPONSIVE ── */
 @media (max-width: 700px) {
     .testi-stage {
         height: 420px;
     }
-
     .testi-card {
         width: calc(100vw - 48px);
         padding: 28px 24px 24px;
     }
-
     .testi-card.pos-prev {
         transform: scale(.84) translateX(-8%) translateY(20px) rotateY(5deg) translateZ(-100px);
     }
-
     .testi-card.pos-next {
         transform: scale(.84) translateX(8%) translateY(20px) rotateY(-5deg) translateZ(-100px);
     }
-
     .testi-card.pos-far-prev,
     .testi-card.pos-far-next {
         opacity: 0;
     }
 }
-
 @media (max-width: 420px) {
     .testi-section {
         padding: 64px 0 72px;
     }
-
     .testi-stage {
         height: 460px;
     }

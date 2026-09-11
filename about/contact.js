@@ -1,5 +1,4 @@
 // Storyworks Contact Page Scripts (Scroll reveal & FAQ Accordion)
-
 /* ── Scroll reveal ── */
 const revEls = [
   document.getElementById("formCard"),
@@ -21,7 +20,6 @@ const revIO = new IntersectionObserver(
 revEls.forEach((el) => {
   if (el) revIO.observe(el);
 });
-
 /* ── FAQ accordion ── */
 document.querySelectorAll(".faq-q").forEach((btn) => {
   btn.addEventListener("click", () => {

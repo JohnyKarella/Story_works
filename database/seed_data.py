@@ -1,22 +1,16 @@
 import sys
 import os
 from pathlib import Path
-
 # Add project root to sys.path
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
-
 from app.database import get_db, init_db
 from app.models import Blog, Portfolio, Service, Inquiry, Subscriber
-
-
 def seed_all():
     print("[*] Initializing database schema...")
     init_db(run_seed=False)
-
     conn = get_db()
     cursor = conn.cursor()
-
     # 1. Seed Blogs if empty
     cursor.execute("SELECT COUNT(*) FROM blogs")
     if cursor.fetchone()[0] == 0:
@@ -31,7 +25,6 @@ def seed_all():
                 "cover_image": "assets/blogs/a1.jpg",
                 "excerpt": "If your business is not showing up when someone searches for your service in Bengaluru, you are losing customers in real time. Every day, potential buyers are searching for exactly what you offer.",
                 "content": """If your business is not showing up when someone searches for your service in Bengaluru, you are losing customers in real time. Every day, potential buyers are searching for exactly what you offer and they are choosing from the businesses that appear first, not necessarily the ones that are best. Local SEO is not a marketing add-on anymore, it is the primary way high-intent customers discover and decide. In a city like Bengaluru, where convenience drives decisions and competition is dense across almost every category, ranking in local search directly impacts revenue.
-
 The most valuable real estate on Google today is the map pack, where three businesses capture the majority of clicks, calls and visits. If you are not there, you are competing for residual attention, which rarely converts at the same rate.""",
                 "status": "published",
             },
@@ -44,7 +37,6 @@ The most valuable real estate on Google today is the map pack, where three busin
                 "cover_image": "assets/blogs/b1.jpg",
                 "excerpt": "Most businesses put money into social media with the hope that being seen will lead to sales, but in reality, a lot of marketing spend goes to waste without an ROI-driven architecture.",
                 "content": """Most businesses put money into social media with the hope that being seen will lead to sales, but in reality, a lot of vanity metrics distract from what actually moves the needle. A high follower count and thousands of likes don't pay payroll—conversions and customer acquisition do.
-
 Our ROI-first framework focuses on audience intent, high-converting creative hooks, and frictionless purchase or inquiry funnels.""",
                 "status": "published",
             },
@@ -57,7 +49,6 @@ Our ROI-first framework focuses on audience intent, high-converting creative hoo
                 "cover_image": "assets/blogs/c1.jpg",
                 "excerpt": "A well-designed website can make a strong first impression, but design alone doesn't guarantee sales. Here is why pretty websites fail and how conversion architecture solves it.",
                 "content": """A well-designed website can make a strong first impression, but aesthetic design alone does not guarantee business results. If users find navigation confusing, loading speeds slow, or value propositions vague, they bounce within 3 seconds.
-
 Fixing this requires marrying visual elegance with clear user journeys, prominent calls to action, and technical speed optimization.""",
                 "status": "published",
             },
@@ -70,7 +61,6 @@ Fixing this requires marrying visual elegance with clear user journeys, prominen
                 "cover_image": "assets/blogs/a1.jpg",
                 "excerpt": "In an era of fleeting attention spans, consumers process imagery 60,000 times faster than text. High-caliber photography and visual craft are your brand's ultimate differentiator.",
                 "content": """In an era of fleeting attention spans, visual storytelling is the fastest way to communicate prestige, craftsmanship, and trustworthiness. 
-
 Stock photography degrades brand credibility. Bespoke product photography and art direction create distinct emotional resonance that commands premium pricing.""",
                 "status": "published",
             },
@@ -97,11 +87,9 @@ Stock photography degrades brand credibility. Bespoke product photography and ar
                 "status": "published",
             },
         ]
-
         for b in blogs:
             Blog.create(b)
         print(f"[OK] Seeded {len(blogs)} blog articles.")
-
     # 2. Seed Portfolio if empty
     cursor.execute("SELECT COUNT(*) FROM portfolio")
     if cursor.fetchone()[0] == 0:
@@ -243,11 +231,9 @@ Stock photography degrades brand credibility. Bespoke product photography and ar
                 "status": "published",
             },
         ]
-
         for p in portfolio_items:
             Portfolio.create(p)
         print(f"[OK] Seeded {len(portfolio_items)} portfolio projects.")
-
     # 3. Seed Services if empty
     cursor.execute("SELECT COUNT(*) FROM services")
     if cursor.fetchone()[0] == 0:
@@ -293,7 +279,6 @@ Stock photography degrades brand credibility. Bespoke product photography and ar
         for s in services_data:
             Service.create(s)
         print(f"[OK] Seeded {len(services_data)} services.")
-
     # 4. Seed initial sample inquiries if empty
     cursor.execute("SELECT COUNT(*) FROM inquiries")
     if cursor.fetchone()[0] == 0:
@@ -310,16 +295,12 @@ Stock photography degrades brand credibility. Bespoke product photography and ar
             "ip_address": "127.0.0.1",
         })
         print("[OK] Seeded sample inquiry.")
-
     # 5. Seed sample subscriber if empty
     cursor.execute("SELECT COUNT(*) FROM subscribers")
     if cursor.fetchone()[0] == 0:
         Subscriber.add("design-trends@storyworks.studio")
         print("[OK] Seeded sample newsletter subscriber.")
-
     conn.close()
     print("[*] All seeding completed successfully!")
-
-
 if __name__ == "__main__":
     seed_all()

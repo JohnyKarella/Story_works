@@ -3,8 +3,6 @@ import os
 from pathlib import Path
 from werkzeug.security import generate_password_hash
 from app.config import Config
-
-
 def get_db():
     """Create and return a database connection with dict-like Row factory."""
     db_path = Config.DATABASE_PATH
@@ -13,16 +11,12 @@ def get_db():
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
-
-
 def init_db(app=None, run_seed=True):
     """Initialize database tables and create default admin user if not exists."""
     # Ensure uploads folder exists
     os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
-    
     conn = get_db()
     cursor = conn.cursor()
-
     # 1. Users table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
@@ -35,7 +29,6 @@ def init_db(app=None, run_seed=True):
         last_login TIMESTAMP
     );
     """)
-
     # 2. Contact Inquiries table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS inquiries (
@@ -54,7 +47,6 @@ def init_db(app=None, run_seed=True):
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
-
     # 3. Blogs table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS blogs (
@@ -73,7 +65,6 @@ def init_db(app=None, run_seed=True):
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
-
     # 4. Portfolio Projects table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS portfolio (
@@ -95,7 +86,6 @@ def init_db(app=None, run_seed=True):
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
-
     # 5. Services table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS services (
@@ -110,7 +100,6 @@ def init_db(app=None, run_seed=True):
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
-
     # 6. Subscribers table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS subscribers (
@@ -119,7 +108,6 @@ def init_db(app=None, run_seed=True):
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
-
     # 7. Site Settings table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS settings (
@@ -128,9 +116,7 @@ def init_db(app=None, run_seed=True):
         category TEXT DEFAULT 'general'
     );
     """)
-
     conn.commit()
-
     # Seed default admin if no user exists
     cursor.execute("SELECT COUNT(*) FROM users")
     if cursor.fetchone()[0] == 0:
@@ -141,7 +127,6 @@ def init_db(app=None, run_seed=True):
         )
         conn.commit()
         print(f"[*] Created default admin user: {Config.DEFAULT_ADMIN_USERNAME}")
-
     # Seed default site settings if not present
     default_settings = [
         ("site_name", "Storyworks Studio", "general"),
@@ -153,14 +138,12 @@ def init_db(app=None, run_seed=True):
         ("linkedin_url", "https://linkedin.com", "social"),
         ("twitter_url", "https://x.com", "social"),
     ]
-
     for key, val, cat in default_settings:
         cursor.execute(
             "INSERT OR IGNORE INTO settings (key, value, category) VALUES (?, ?, ?)",
             (key, val, cat)
         )
     conn.commit()
-
     # Auto-seed initial content if database was freshly created
     if run_seed:
         cursor.execute("SELECT COUNT(*) FROM blogs")
@@ -170,7 +153,5 @@ def init_db(app=None, run_seed=True):
                 seed_all()
             except Exception as seed_err:
                 print(f"[*] Auto-seed notice: {seed_err}")
-
     conn.close()
     print("[*] Database initialized successfully.")
-

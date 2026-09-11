@@ -1,6 +1,4 @@
 /* ABOUT US */
-
-
 /* ==================== HERO SECTION ==================== */
 .hero-section {
     min-height: 80vh;
@@ -12,7 +10,6 @@
     /* background: linear-gradient(135deg, #1e2442 0%, #2d1b3d 50%, #1a2332 100%); */
     padding: 2rem;
 }
-
 /* Animated Background Gradient Orbs */
 .hero-background {
     position: absolute;
@@ -23,7 +20,6 @@
     z-index: 0;
     overflow: hidden;
 }
-
 .gradient-orb {
     position: absolute;
     border-radius: 50%;
@@ -31,25 +27,18 @@
     opacity: 0.4;
     animation: float 20s ease-in-out infinite;
 }
-
-
 @keyframes float {
-
     0%,
     100% {
         transform: translate(0, 0) scale(1);
     }
-
     33% {
         transform: translate(50px, -50px) scale(1.1);
     }
-
     66% {
         transform: translate(-30px, 30px) scale(0.9);
     }
 }
-
-
 /* Container */
 .container_about_cube {
     max-width: 1400px;
@@ -58,7 +47,6 @@
     position: relative;
     z-index: 2;
 }
-
 /* Hero Content Grid */
 .hero-content {
     display: grid;
@@ -67,25 +55,21 @@
     align-items: center;
     padding: 2rem 0;
 }
-
 /* Left Content */
 .hero-text {
     max-width: 700px;
     animation: fadeInUp 1s ease-out;
 }
-
 @keyframes fadeInUp {
     from {
         opacity: 0;
         transform: translateY(30px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
-
 .label {
     display: inline-block;
     font-size: 15px;
@@ -99,17 +83,14 @@
     margin-bottom: 2rem;
     animation: fadeIn 1s ease-out 0.2s both;
 }
-
 @keyframes fadeIn {
     from {
         opacity: 0;
     }
-
     to {
         opacity: 1;
     }
 }
-
 .hero-title {
     font-size: 44px;
     font-family: var(--_typography---h4--font-family);
@@ -118,14 +99,12 @@
     margin-bottom: 1.5rem;
     animation: fadeInUp 1s ease-out 0.3s both;
 }
-
 .text-gradient {
     background: linear-gradient(135deg, #eab308 0%, #797979 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
-
 .hero-description {
     font-size: 1.25rem;
     color: #000000;
@@ -134,7 +113,6 @@
     max-width: 600px;
     animation: fadeInUp 1s ease-out 0.5s both;
 }
-
 /* Buttons */
 .hero-buttons {
     display: flex;
@@ -142,7 +120,6 @@
     flex-wrap: wrap;
     animation: fadeInUp 1s ease-out 0.7s both;
 }
-
 .btn {
     padding: 1.125rem 2.5rem;
     border-radius: 50px;
@@ -156,13 +133,11 @@
     position: relative;
     overflow: hidden;
 }
-
 .btn-primary {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #ffffff;
     box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
 }
-
 .btn-primary::before {
     content: '';
     position: absolute;
@@ -173,28 +148,23 @@
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     transition: left 0.5s ease;
 }
-
 .btn-primary:hover::before {
     left: 100%;
 }
-
 .btn-primary:hover {
     transform: translateY(-3px);
     box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
 }
-
 .btn-secondary {
     background: transparent;
     color: #ffffff;
     border: 2px solid #667eea;
 }
-
 .btn-secondary:hover {
     background: rgba(102, 126, 234, 0.1);
     border-color: #a78bfa;
     transform: translateY(-3px);
 }
-
 /* Right Content - 3D Cube */
 .hero-cube-wrapper {
     display: flex;
@@ -202,26 +172,22 @@
     align-items: center;
     animation: fadeInRight 2s ease-out 0.5s both;
 }
-
 @keyframes fadeInRight {
     from {
         opacity: 0;
         transform: translateX(50px);
     }
-
     to {
         opacity: 1;
         transform: translateX(0);
     }
 }
-
 .cube-container {
     perspective: 1200px;
     width: 500px;
     height: 500px;
     position: relative;
 }
-
 .cube {
     width: 100%;
     height: 100%;
@@ -230,21 +196,17 @@
     animation: rotateCube 25s infinite linear;
     transition: transform 0.3s ease;
 }
-
 .cube:hover {
     animation-play-state: paused;
 }
-
 @keyframes rotateCube {
     0% {
         transform: rotateX(0deg) rotateY(0deg);
     }
-
     100% {
         transform: rotateX(360deg) rotateY(360deg);
     }
 }
-
 /* Cube Faces */
 .cube-face {
     position: absolute;
@@ -266,7 +228,6 @@
         0 0 20px rgba(102, 126, 234, 0.2),
         inset 0 0 20px rgba(102, 126, 234, 0.1);
 }
-
 .face-icon {
     width: 80px;
     height: 80px;
@@ -274,39 +235,31 @@
     color: #ffffff;
     filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
 }
-
 .cube-face span {
     font-size: 1.3rem;
     letter-spacing: 2px;
     text-transform: uppercase;
     text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
 }
-
 /* Cube Face Positions */
 .cube-face.front {
     transform: translateZ(175px);
 }
-
 .cube-face.back {
     transform: rotateY(180deg) translateZ(175px);
 }
-
 .cube-face.right {
     transform: rotateY(90deg) translateZ(175px);
 }
-
 .cube-face.left {
     transform: rotateY(-90deg) translateZ(175px);
 }
-
 .cube-face.top {
     transform: rotateX(90deg) translateZ(175px);
 }
-
 .cube-face.bottom {
     transform: rotateX(-90deg) translateZ(175px);
 }
-
 /* Scroll Indicator */
 .scroll-indicator {
     position: absolute;
@@ -322,170 +275,135 @@
     animation: fadeIn 1s ease-out 1s both;
     z-index: 3;
 }
-
 .scroll-line {
     width: 2px;
     height: 60px;
     background: linear-gradient(to bottom, #667eea, transparent);
     animation: scrollDown 2s infinite;
 }
-
 @keyframes scrollDown {
-
     0%,
     100% {
         opacity: 0;
         transform: translateY(0);
     }
-
     50% {
         opacity: 1;
         transform: translateY(20px);
     }
 }
-
 /* ==================== RESPONSIVE DESIGN ==================== */
 @media (max-width: 1200px) {
     .hero-title {
         font-size: 3.5rem;
     }
-
     .cube-container {
         width: 400px;
         height: 400px;
     }
-
     .cube-face {
         width: 280px;
         height: 280px;
         left: 60px;
         top: 60px;
     }
-
     .cube-face.front {
         transform: translateZ(140px);
     }
-
     .cube-face.back {
         transform: rotateY(180deg) translateZ(140px);
     }
-
     .cube-face.right {
         transform: rotateY(90deg) translateZ(140px);
     }
-
     .cube-face.left {
         transform: rotateY(-90deg) translateZ(140px);
     }
-
     .cube-face.top {
         transform: rotateX(90deg) translateZ(140px);
     }
-
     .cube-face.bottom {
         transform: rotateX(-90deg) translateZ(140px);
     }
 }
-
 @media (max-width: 968px) {
     .hero-content {
         grid-template-columns: 1fr;
         gap: 3rem;
         text-align: center;
     }
-
     .hero-cube-wrapper {
         order: 2;
     }
-
     .hero-text {
         margin: 0 auto;
     }
-
     .hero-title {
         font-size: 3rem;
     }
-
     .hero-description {
         margin: 0 auto 2.5rem;
     }
-
     .hero-buttons {
         justify-content: center;
     }
-
     .cube-container {
         width: 350px;
         height: 350px;
     }
-
     .cube-face {
         width: 240px;
         height: 240px;
         left: 55px;
         top: 55px;
     }
-
     .cube-face.front {
         transform: translateZ(120px);
     }
-
     .cube-face.back {
         transform: rotateY(180deg) translateZ(120px);
     }
-
     .cube-face.right {
         transform: rotateY(90deg) translateZ(120px);
     }
-
     .cube-face.left {
         transform: rotateY(-90deg) translateZ(120px);
     }
-
     .cube-face.top {
         transform: rotateX(90deg) translateZ(120px);
     }
-
     .cube-face.bottom {
         transform: rotateX(-90deg) translateZ(120px);
     }
 }
-
 @media (max-width: 640px) {
     .hero-section {
         padding: 1rem;
         top: 60px;
     }
-
     .label {
         font-size: 0.65rem;
         padding: 6px 16px;
     }
-
     .hero-title {
         font-size: 2.25rem;
     }
-
     .hero-description {
         font-size: 1.1rem;
     }
-
     .hero-buttons {
         flex-direction: column;
         width: 100%;
     }
-
     .btn {
         width: 100%;
         text-align: center;
         padding: 1rem 2rem;
     }
-
     .cube-container {
         width: 280px;
         height: 280px;
     }
-
     .cube-face {
         width: 180px;
         height: 180px;
@@ -493,98 +411,71 @@
         top: 50px;
         font-size: 1.1rem;
     }
-
     .face-icon {
         width: 60px;
         height: 60px;
     }
-
     .cube-face span {
         font-size: 1rem;
     }
-
     .cube-face.front {
         transform: translateZ(90px);
     }
-
     .cube-face.back {
         transform: rotateY(180deg) translateZ(90px);
     }
-
     .cube-face.right {
         transform: rotateY(90deg) translateZ(90px);
     }
-
     .cube-face.left {
         transform: rotateY(-90deg) translateZ(90px);
     }
-
     .cube-face.top {
         transform: rotateX(90deg) translateZ(90px);
     }
-
     .cube-face.bottom {
         transform: rotateX(-90deg) translateZ(90px);
     }
-
     .scroll-indicator {
         bottom: 2rem;
     }
 }
-
 @media (max-width: 480px) {
     .hero-title {
         font-size: 1.85rem;
     }
-
     .hero-description {
         font-size: 1rem;
     }
-
     .cube-container {
         width: 220px;
         height: 220px;
     }
-
     .cube-face {
         width: 150px;
         height: 150px;
         left: 35px;
         top: 35px;
     }
-
     .cube-face.front {
         transform: translateZ(75px);
     }
-
     .cube-face.back {
         transform: rotateY(180deg) translateZ(75px);
     }
-
     .cube-face.right {
         transform: rotateY(90deg) translateZ(75px);
     }
-
     .cube-face.left {
         transform: rotateY(-90deg) translateZ(75px);
     }
-
     .cube-face.top {
         transform: rotateX(90deg) translateZ(75px);
     }
-
     .cube-face.bottom {
         transform: rotateX(-90deg) translateZ(75px);
     }
 }
-
-
-
-
-
-
-
-
     /* ── FAQ SECTION ── */
     .faq-section2 {
       background: linear-gradient(135deg, #f5f0e0 0%, #ede8d0 40%, #e8e2c8 100%);
@@ -596,7 +487,6 @@
       position: relative;
       overflow: hidden;
     }
-
     /* subtle grain overlay */
     .faq-section::before {
       content: '';
@@ -606,7 +496,6 @@
       pointer-events: none;
       opacity: 0.5;
     }
-
     .faq-inner {
       max-width: 1200px;
       width: 100%;
@@ -618,14 +507,12 @@
       position: relative;
       z-index: 1;
     }
-
     /* ── LEFT PANEL ── */
     .faq-left {
       display: flex;
       flex-direction: column;
       gap: 24px;
     }
-
     .faq-label {
       font-size: 13px;
       font-weight: 600;
@@ -633,7 +520,6 @@
       text-transform: uppercase;
       color: #c97d3a;
     }
-
     .faq-heading {
       font-family: 'Playfair Display', serif;
       font-size: clamp(2rem, 3.5vw, 2.8rem);
@@ -641,19 +527,16 @@
       color: #2a2a2a;
       line-height: 1.15;
     }
-
     .faq-heading em {
       font-style: italic;
       color: #c97d3a;
     }
-
     .faq-sub {
       font-size: 15px;
       color: #7a7060;
       line-height: 1.7;
       max-width: 380px;
     }
-
     /* ── ANIMATED ILLUSTRATION ── */
     .faq-illustration {
       position: relative;
@@ -662,7 +545,6 @@
       aspect-ratio: 1 / 0.9;
       margin-top: 10px;
     }
-
     /* floating blobs */
     .blob {
       position: absolute;
@@ -670,7 +552,6 @@
       filter: blur(2px);
       opacity: 0.18;
     }
-
     .blob-1 {
       width: 200px;
       height: 200px;
@@ -679,7 +560,6 @@
       left: 5%;
       animation: blobFloat 6s ease-in-out infinite;
     }
-
     .blob-2 {
       width: 140px;
       height: 140px;
@@ -688,141 +568,112 @@
       right: 10%;
       animation: blobFloat 8s ease-in-out infinite reverse;
     }
-
     @keyframes blobFloat {
-
       0%,
       100% {
         transform: translateY(0) scale(1);
       }
-
       50% {
         transform: translateY(-18px) scale(1.05);
       }
     }
-
     /* SVG scene */
     .scene-svg {
       width: 100%;
       height: auto;
       animation: sceneFadeIn 1s ease forwards;
     }
-
     @keyframes sceneFadeIn {
       from {
         opacity: 0;
         transform: translateY(20px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-
     /* person 1 – standing */
     .person-stand {
       animation: stand 4s ease-in-out infinite;
       transform-origin: bottom center;
     }
-
     @keyframes stand {
-
       0%,
       100% {
         transform: translateY(0);
       }
-
       50% {
         transform: translateY(-6px);
       }
     }
-
     /* person 2 – sitting */
     .person-sit {
       animation: sit 5s ease-in-out infinite 1s;
       transform-origin: bottom center;
     }
-
     @keyframes sit {
-
       0%,
       100% {
         transform: translateY(0);
       }
-
       50% {
         transform: translateY(-4px);
       }
     }
-
     /* phone / board */
     .phone-board {
       animation: boardSway 6s ease-in-out infinite;
       transform-origin: bottom center;
     }
-
     @keyframes boardSway {
-
       0%,
       100% {
         transform: rotate(0deg);
       }
-
       25% {
         transform: rotate(1.5deg);
       }
-
       75% {
         transform: rotate(-1.5deg);
       }
     }
-
     /* floating question bubbles */
     .bubble-1 {
       animation: bubbleFloat 3s ease-in-out infinite;
     }
-
     .bubble-2 {
       animation: bubbleFloat 4s ease-in-out infinite 0.8s;
     }
-
     .bubble-3 {
       animation: bubbleFloat 3.5s ease-in-out infinite 1.5s;
     }
-
     @keyframes bubbleFloat {
-
       0%,
       100% {
         transform: translateY(0) scale(1);
       }
-
       50% {
         transform: translateY(-10px) scale(1.08);
       }
     }
-
     /* chart lines */
     .chart-line {
       stroke-dasharray: 100;
       stroke-dashoffset: 100;
       animation: drawLine 2s ease forwards 0.5s;
     }
-
     @keyframes drawLine {
       to {
         stroke-dashoffset: 0;
       }
     }
-
     /* ── RIGHT PANEL ── */
     .faq-right {
       display: flex;
       flex-direction: column;
       gap: 0;
     }
-
     .faq-right-label {
       font-family: 'Playfair Display', serif;
       font-size: 18px;
@@ -832,16 +683,13 @@
       color: #9a9080;
       margin-bottom: 15px;
     }
-
     .faq-item {
       border-bottom: 1px solid rgba(160, 145, 110, 0.35);
       overflow: hidden;
     }
-
     .faq-item:first-of-type {
       border-top: 1px solid rgba(160, 145, 110, 0.35);
     }
-
     .faq-question {
       display: flex;
       align-items: center;
@@ -852,11 +700,9 @@
       user-select: none;
       transition: color 0.25s;
     }
-
     .faq-question:hover .faq-q-text {
       color: #c97d3a;
     }
-
     .faq-q-text {
       font-size: 18px;
       font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -865,11 +711,9 @@
       line-height: 1.4;
       transition: color 0.25s;
     }
-
     .faq-item.active .faq-q-text {
       color: #c97d3a;
     }
-
     .faq-icon {
       flex-shrink: 0;
       width: 28px;
@@ -882,28 +726,23 @@
       transition: background 0.25s, transform 0.35s;
       color: #c97d3a;
     }
-
     .faq-item.active .faq-icon {
       background: #c97d3a;
       color: #fff;
       transform: rotate(45deg);
     }
-
     .faq-icon svg {
       width: 14px;
       height: 14px;
     }
-
     .faq-answer {
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s;
     }
-
     .faq-item.active .faq-answer {
       max-height: 300px;
     }
-
     .faq-answer-inner {
       padding: 0 4px 20px;
       font-size: 15px;
@@ -912,38 +751,31 @@
       color: #363028;
       line-height: 1.8;
     }
-
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       .faq-inner {
         grid-template-columns: 1fr;
         gap: 40px;
       }
-
       .faq-illustration {
         max-width: 360px;
         margin: 0 auto;
       }
-
       .faq-left {
         align-items: center;
         text-align: center;
       }
-
       .faq-sub {
         max-width: 480px;
       }
     }
-
     @media (max-width: 520px) {
       .faq-section {
         padding: 60px 5%;
       }
-
       .faq-heading {
         font-size: 1.7rem;
       }
-
       .faq-q-text {
         font-size: 14px;
       }

@@ -3,16 +3,12 @@ import re
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.database import get_db
-
-
 def slugify(text: str) -> str:
     """Convert text to URL-friendly slug."""
     text = text.lower().strip()
     text = re.sub(r"[^\w\s-]", "", text)
     text = re.sub(r"[\s_-]+", "-", text)
     return text.strip("-")
-
-
 class User:
     @staticmethod
     def get_by_id(user_id):
@@ -20,18 +16,15 @@ class User:
         user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
         conn.close()
         return dict(user) if user else None
-
     @staticmethod
     def get_by_username(username):
         conn = get_db()
         user = conn.execute("SELECT * FROM users WHERE username = ? OR email = ?", (username, username)).fetchone()
         conn.close()
         return dict(user) if user else None
-
     @staticmethod
     def verify_password(stored_hash, password):
         return check_password_hash(stored_hash, password)
-
     @staticmethod
     def update_password(user_id, new_password):
         conn = get_db()
@@ -39,14 +32,12 @@ class User:
         conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (hashed, user_id))
         conn.commit()
         conn.close()
-
     @staticmethod
     def update_profile(user_id, username, email):
         conn = get_db()
         conn.execute("UPDATE users SET username = ?, email = ? WHERE id = ?", (username, email, user_id))
         conn.commit()
         conn.close()
-
     @staticmethod
     def record_login(user_id):
         conn = get_db()
@@ -54,8 +45,6 @@ class User:
         conn.execute("UPDATE users SET last_login = ? WHERE id = ?", (now, user_id))
         conn.commit()
         conn.close()
-
-
 class Inquiry:
     @staticmethod
     def create(data):
@@ -82,63 +71,52 @@ class Inquiry:
         conn.commit()
         conn.close()
         return new_id
-
     @staticmethod
     def get_all(status=None, search=None, date_from=None, date_to=None):
         conn = get_db()
         query = "SELECT * FROM inquiries WHERE 1=1"
         params = []
-
         if status and status != "all":
             query += " AND status = ?"
             params.append(status)
-
         if search:
             query += " AND (first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR company LIKE ? OR phone LIKE ? OR services LIKE ?)"
             s_param = f"%{search}%"
             params.extend([s_param, s_param, s_param, s_param, s_param, s_param])
-
         if date_from:
             query += " AND DATE(created_at) >= DATE(?)"
             params.append(date_from)
-
         if date_to:
             query += " AND DATE(created_at) <= DATE(?)"
             params.append(date_to)
-
         query += " ORDER BY id DESC"
         rows = conn.execute(query, params).fetchall()
         conn.close()
         return [dict(r) for r in rows]
-
     @staticmethod
     def get_by_id(inquiry_id):
         conn = get_db()
         row = conn.execute("SELECT * FROM inquiries WHERE id = ?", (inquiry_id,)).fetchone()
         conn.close()
         return dict(row) if row else None
-
     @staticmethod
     def update_status(inquiry_id, status):
         conn = get_db()
         conn.execute("UPDATE inquiries SET status = ? WHERE id = ?", (status, inquiry_id))
         conn.commit()
         conn.close()
-
     @staticmethod
     def update_notes(inquiry_id, notes):
         conn = get_db()
         conn.execute("UPDATE inquiries SET notes = ? WHERE id = ?", (notes, inquiry_id))
         conn.commit()
         conn.close()
-
     @staticmethod
     def delete(inquiry_id):
         conn = get_db()
         conn.execute("DELETE FROM inquiries WHERE id = ?", (inquiry_id,))
         conn.commit()
         conn.close()
-
     @staticmethod
     def delete_all():
         conn = get_db()
@@ -149,7 +127,6 @@ class Inquiry:
             pass
         conn.commit()
         conn.close()
-
     @staticmethod
     def get_stats():
         conn = get_db()
@@ -168,8 +145,6 @@ class Inquiry:
             "closed": closed,
             "not_interested": not_interested,
         }
-
-
 class Blog:
     @staticmethod
     def get_all(status=None):
@@ -180,34 +155,29 @@ class Blog:
             rows = conn.execute("SELECT * FROM blogs ORDER BY id DESC").fetchall()
         conn.close()
         return [dict(r) for r in rows]
-
     @staticmethod
     def get_by_id(blog_id):
         conn = get_db()
         row = conn.execute("SELECT * FROM blogs WHERE id = ?", (blog_id,)).fetchone()
         conn.close()
         return dict(row) if row else None
-
     @staticmethod
     def get_by_slug(slug):
         conn = get_db()
         row = conn.execute("SELECT * FROM blogs WHERE slug = ?", (slug,)).fetchone()
         conn.close()
         return dict(row) if row else None
-
     @staticmethod
     def create(data):
         conn = get_db()
         cursor = conn.cursor()
         slug = data.get("slug") or slugify(data.get("title", ""))
-        
         # Ensure unique slug
         base_slug = slug
         counter = 1
         while cursor.execute("SELECT id FROM blogs WHERE slug = ?", (slug,)).fetchone():
             slug = f"{base_slug}-{counter}"
             counter += 1
-
         cursor.execute(
             """
             INSERT INTO blogs (title, slug, category, author, published_date, cover_image, excerpt, content, status)
@@ -229,13 +199,11 @@ class Blog:
         conn.commit()
         conn.close()
         return new_id
-
     @staticmethod
     def update(blog_id, data):
         conn = get_db()
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         slug = data.get("slug") or slugify(data.get("title", ""))
-        
         conn.execute(
             """
             UPDATE blogs
@@ -258,22 +226,18 @@ class Blog:
         )
         conn.commit()
         conn.close()
-
     @staticmethod
     def delete(blog_id):
         conn = get_db()
         conn.execute("DELETE FROM blogs WHERE id = ?", (blog_id,))
         conn.commit()
         conn.close()
-
     @staticmethod
     def increment_views(blog_id):
         conn = get_db()
         conn.execute("UPDATE blogs SET views = views + 1 WHERE id = ?", (blog_id,))
         conn.commit()
         conn.close()
-
-
 class Portfolio:
     @staticmethod
     def get_all(category=None, status=None):
@@ -290,33 +254,28 @@ class Portfolio:
         rows = conn.execute(query, params).fetchall()
         conn.close()
         return [dict(r) for r in rows]
-
     @staticmethod
     def get_by_id(item_id):
         conn = get_db()
         row = conn.execute("SELECT * FROM portfolio WHERE id = ?", (item_id,)).fetchone()
         conn.close()
         return dict(row) if row else None
-
     @staticmethod
     def get_by_slug(slug):
         conn = get_db()
         row = conn.execute("SELECT * FROM portfolio WHERE slug = ?", (slug,)).fetchone()
         conn.close()
         return dict(row) if row else None
-
     @staticmethod
     def create(data):
         conn = get_db()
         cursor = conn.cursor()
         slug = data.get("slug") or slugify(data.get("title", ""))
-        
         base_slug = slug
         counter = 1
         while cursor.execute("SELECT id FROM portfolio WHERE slug = ?", (slug,)).fetchone():
             slug = f"{base_slug}-{counter}"
             counter += 1
-
         cursor.execute(
             """
             INSERT INTO portfolio (title, slug, client, category, badge, cover_image, gallery_images, short_desc, full_desc, quote, year, project_url, is_featured, status)
@@ -343,7 +302,6 @@ class Portfolio:
         conn.commit()
         conn.close()
         return new_id
-
     @staticmethod
     def update(item_id, data):
         conn = get_db()
@@ -374,15 +332,12 @@ class Portfolio:
         )
         conn.commit()
         conn.close()
-
     @staticmethod
     def delete(item_id):
         conn = get_db()
         conn.execute("DELETE FROM portfolio WHERE id = ?", (item_id,))
         conn.commit()
         conn.close()
-
-
 class Service:
     @staticmethod
     def get_all(only_active=False):
@@ -393,14 +348,12 @@ class Service:
             rows = conn.execute("SELECT * FROM services ORDER BY display_order ASC, id ASC").fetchall()
         conn.close()
         return [dict(r) for r in rows]
-
     @staticmethod
     def get_by_id(service_id):
         conn = get_db()
         row = conn.execute("SELECT * FROM services WHERE id = ?", (service_id,)).fetchone()
         conn.close()
         return dict(row) if row else None
-
     @staticmethod
     def create(data):
         conn = get_db()
@@ -425,7 +378,6 @@ class Service:
         conn.commit()
         conn.close()
         return new_id
-
     @staticmethod
     def update(service_id, data):
         conn = get_db()
@@ -449,15 +401,12 @@ class Service:
         )
         conn.commit()
         conn.close()
-
     @staticmethod
     def delete(service_id):
         conn = get_db()
         conn.execute("DELETE FROM services WHERE id = ?", (service_id,))
         conn.commit()
         conn.close()
-
-
 class Setting:
     @staticmethod
     def get_all_dict():
@@ -465,14 +414,12 @@ class Setting:
         rows = conn.execute("SELECT key, value FROM settings").fetchall()
         conn.close()
         return {r["key"]: r["value"] for r in rows}
-
     @staticmethod
     def get(key, default=""):
         conn = get_db()
         row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
         conn.close()
         return row["value"] if row else default
-
     @staticmethod
     def set(key, value, category="general"):
         conn = get_db()
@@ -482,8 +429,6 @@ class Setting:
         )
         conn.commit()
         conn.close()
-
-
 class Subscriber:
     @staticmethod
     def add(email):
@@ -497,18 +442,15 @@ class Subscriber:
         finally:
             conn.close()
         return success
-
     @staticmethod
     def get_all():
         conn = get_db()
         rows = conn.execute("SELECT * FROM subscribers ORDER BY id DESC").fetchall()
         conn.close()
         return [dict(r) for r in rows]
-
     @staticmethod
     def delete(sub_id):
         conn = get_db()
         conn.execute("DELETE FROM subscribers WHERE id = ?", (sub_id,))
         conn.commit()
         conn.close()
-

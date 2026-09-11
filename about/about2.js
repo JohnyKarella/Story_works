@@ -1,36 +1,29 @@
 // About2
-
 // Service Flow
 // Animate the flowing line on page load/refresh
 window.addEventListener('load', function () {
     const animatedPaths = document.querySelectorAll('.path-animated');
-
     // Set up all animated paths
     animatedPaths.forEach((path, index) => {
         const pathLength = path.getTotalLength();
-
         // Set up the starting positions
         path.style.strokeDasharray = pathLength + ' ' + pathLength;
         path.style.strokeDashoffset = pathLength;
-
         // Trigger the animation with sequential delay
         setTimeout(() => {
             path.style.transition = 'stroke-dashoffset 0.4s ease-in-out';
             path.style.strokeDashoffset = '0';
         }, 100 + (index * 250));
     });
-
     // Animate numbers appearing sequentially
     const processNumbers = document.querySelectorAll('.process-number');
     const numberOrder = [0, 1, 2, 5, 4, 3]; // Order: 1,2,3,4,5,6 based on flow
-
     numberOrder.forEach((numIndex, i) => {
         const number = processNumbers[numIndex];
         setTimeout(() => {
             number.style.opacity = '0';
             number.style.transform = 'scale(0)';
             number.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-
             setTimeout(() => {
                 number.style.opacity = '1';
                 number.style.transform = 'scale(1)';
@@ -38,12 +31,7 @@ window.addEventListener('load', function () {
         }, 200 + (i * 500));
     });
 });
-
-
-
-
 // Services Card
-
 // Service data
 const services = [
     {
@@ -76,22 +64,17 @@ const services = [
         title: 'Launch & <br>Campaign Strategy',
         description: 'We transform entries into arrivals through strategic blueprints and high-impact storytelling. By orchestrating the pivotal moments where brands meet the world, we ensure your debut is both seen and felt.'
     }
-
 ];
-
 // Generate cards
 const servicesGrid = document.getElementById('servicesGrid');
-
 services.forEach(service => {
     const card = document.createElement('div');
     card.className = 'service-card-container';
-
     // Generate 60 icons for seamless scroll (6 columns × 10 rows)
     let iconHTML = '';
     for (let i = 0; i < 60; i++) {
         iconHTML += `<i class="${service.icon}"></i>`;
     }
-
     card.innerHTML = `
                 <div class="service-card-inner">
                     <div class="service-card-front">
@@ -108,13 +91,10 @@ services.forEach(service => {
                         </div>
                     </div>
                     <div class="service-card-back">
-                       
                         <h3>${service.title.replace('<br>', ' ')}</h3>
                         <p>${service.description}</p>
-                       
                     </div>
                 </div>
             `;
-
     servicesGrid.appendChild(card);
 });

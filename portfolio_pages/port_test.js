@@ -1,11 +1,8 @@
 // Portfolio testimonials
-
-
 (function () {
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let W, H, tick = 0;
-
     /* ── particles ── */
     const PCOUNT = 72;
     let pts = [];
@@ -20,7 +17,6 @@
             hue: 270 + Math.random() * 55,
         };
     }
-
     /* ── ripple rings ── */
     let rings = [];
     function spawnRing() {
@@ -30,14 +26,12 @@
             a: 0.16, speed: 0.5 + Math.random() * 0.45
         });
     }
-
     /* ── flowing lines data ── */
     const LINES = Array.from({ length: 7 }, (_, i) => ({
         yFrac: (i + 0.5) / 7,
         amp: 16 + i * 5, freq: 0.006 + i * 0.001,
         sp: 0.0018 + i * 0.0005, a: 0.055 - i * 0.006,
     }));
-
     /* ── shimmering grid dots ── */
     let gdots = [];
     function initGrid() {
@@ -51,20 +45,16 @@
                     sp: 0.011 + Math.random() * 0.019,
                 });
     }
-
     function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
-
     function init() {
         resize();
         pts = Array.from({ length: PCOUNT }, mkPt);
         rings = [];
         for (let i = 0; i < 5; i++) spawnRing();
     }
-
     /* ── DRAW ORBS ── */
     function drawOrbs() {
         const pulse = 0.88 + 0.12 * Math.sin(tick * 0.005);
-
         // large purple orb, top-right
         const ox = W * 0.8 + Math.sin(tick * 0.0022) * 38, oy = H * 0.2 + Math.cos(tick * 0.003) * 22, r = 210 * pulse;
         const g = ctx.createRadialGradient(ox, oy, 0, ox, oy, r);
@@ -72,14 +62,12 @@
         g.addColorStop(.5, 'rgba(130,60,175,0.06)');
         g.addColorStop(1, 'rgba(130,60,175,0)');
         ctx.beginPath(); ctx.arc(ox, oy, r, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
-
         // warm gold, bottom-centre
         const ox2 = W * .5 + Math.cos(tick * 0.003) * 55, oy2 = H * .88 + Math.sin(tick * 0.0025) * 16;
         const g2 = ctx.createRadialGradient(ox2, oy2, 0, ox2, oy2, 150);
         g2.addColorStop(0, 'rgba(195,150,90,0.11)');
         g2.addColorStop(1, 'rgba(195,150,90,0)');
         ctx.beginPath(); ctx.arc(ox2, oy2, 150, 0, Math.PI * 2); ctx.fillStyle = g2; ctx.fill();
-
         // small accent, left
         const ox3 = W * .06 + Math.sin(tick * 0.004) * 18, oy3 = H * .44 + Math.cos(tick * 0.003) * 25;
         const g3 = ctx.createRadialGradient(ox3, oy3, 0, ox3, oy3, 110);
@@ -87,7 +75,6 @@
         g3.addColorStop(1, 'rgba(123,63,160,0)');
         ctx.beginPath(); ctx.arc(ox3, oy3, 110, 0, Math.PI * 2); ctx.fillStyle = g3; ctx.fill();
     }
-
     /* ── DRAW FLOWING LINES ── */
     function drawLines() {
         for (const l of LINES) {
@@ -104,7 +91,6 @@
             ctx.lineWidth = 1; ctx.stroke();
         }
     }
-
     /* ── DRAW GRID DOTS ── */
     function drawGrid() {
         for (const d of gdots) {
@@ -114,7 +100,6 @@
             ctx.fillStyle = `rgba(123,63,160,${a})`; ctx.fill();
         }
     }
-
     /* ── DRAW RIPPLES ── */
     function drawRipples() {
         for (let i = rings.length - 1; i >= 0; i--) {
@@ -127,7 +112,6 @@
             if (rg.r >= rg.maxR) { rings.splice(i, 1); spawnRing(); }
         }
     }
-
     /* ── DRAW PARTICLES ── */
     function drawPts() {
         for (const p of pts) {
@@ -140,7 +124,6 @@
             if (p.y < -4) p.y = H + 4; if (p.y > H + 4) p.y = -4;
         }
     }
-
     /* ── AURORA sweep across background ── */
     function drawAurora() {
         const sweep = ((tick * 0.0015) % 1);
@@ -153,7 +136,6 @@
         ctx.fillStyle = ag;
         ctx.fillRect(0, 0, W, H);
     }
-
     function loop() {
         tick++;
         ctx.clearRect(0, 0, W, H);
@@ -165,7 +147,6 @@
         drawPts();
         requestAnimationFrame(loop);
     }
-
     window.addEventListener('resize', () => { resize(); });
     init(); initGrid(); loop();
 })();

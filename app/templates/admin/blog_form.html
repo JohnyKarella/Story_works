@@ -1,12 +1,9 @@
 {% extends "admin/base.html" %}
-
 {% block title %}{% if blog %}Edit Article: {{ blog.title }}{% else %}New Blog Article{% endif %}{% endblock %}
 {% block page_title %}{% if blog %}Edit Blog Article{% else %}Create Blog Article{% endif %}{% endblock %}
-
 {% block topbar_actions %}
 <a href="{{ url_for('admin.blogs') }}" class="btn btn-secondary btn-sm">&larr; Back to Articles</a>
 {% endblock %}
-
 {% block content %}
 <div class="card" style="max-width: 900px;">
   <div class="card-body">
@@ -15,7 +12,6 @@
         <label class="form-label" for="title">Article Title *</label>
         <input type="text" id="title" name="title" class="form-control" value="{{ blog.title if blog else '' }}" placeholder="e.g. Stop Buying Likes & Start Driving Sales" required />
       </div>
-
       {% if blog %}
       <div class="form-group">
         <label class="form-label" for="slug">URL Slug</label>
@@ -23,25 +19,21 @@
         <small style="color: var(--text-dim); font-size: 11px;">Leave empty or unchanged to maintain current URL path.</small>
       </div>
       {% endif %}
-
       <div class="form-row">
         <div class="form-group">
           <label class="form-label" for="category">Category / Tag</label>
           <input type="text" id="category" name="category" class="form-control" value="{{ blog.category if blog else 'Digital Strategy' }}" placeholder="e.g. SEO, Branding, Design" />
         </div>
-
         <div class="form-group">
           <label class="form-label" for="author">Author</label>
           <input type="text" id="author" name="author" class="form-control" value="{{ blog.author if blog else 'Storyworks Studio' }}" />
         </div>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label class="form-label" for="published_date">Publication Date Display</label>
           <input type="text" id="published_date" name="published_date" class="form-control" value="{{ blog.published_date if blog else '' }}" placeholder="e.g. FEB 25, 2026" />
         </div>
-
         <div class="form-group">
           <label class="form-label" for="status">Publication Status</label>
           <select id="status" name="status" class="form-select">
@@ -50,7 +42,6 @@
           </select>
         </div>
       </div>
-
       <!-- Cover Image -->
       <div class="form-group">
         <label class="form-label">Cover Image</label>
@@ -66,17 +57,14 @@
         </div>
         <img id="blogCoverPreview" class="img-preview" src="{{ blog.cover_image if blog and blog.cover_image else '' }}" style="display: {{ 'block' if blog and blog.cover_image else 'none' }}; margin-top: 12px;" />
       </div>
-
       <div class="form-group">
         <label class="form-label" for="excerpt">Short Summary / Excerpt</label>
         <textarea id="excerpt" name="excerpt" class="form-textarea" style="min-height: 80px;" placeholder="Brief 1-2 sentence preview shown on the blog index cards…">{{ blog.excerpt if blog else '' }}</textarea>
       </div>
-
       <div class="form-group">
         <label class="form-label" for="content">Article Full Content (HTML / Markdown supported)</label>
         <textarea id="content" name="content" class="form-textarea" style="min-height: 280px; font-family: monospace; font-size: 13px;" placeholder="Write or paste your article content here…">{{ blog.content if blog else '' }}</textarea>
       </div>
-
       <div style="display: flex; gap: 12px; margin-top: 24px;">
         <button type="submit" class="btn btn-primary">Save Article</button>
         <a href="{{ url_for('admin.blogs') }}" class="btn btn-secondary">Cancel</a>
@@ -85,4 +73,3 @@
   </div>
 </div>
 {% endblock %}
-

@@ -1,6 +1,5 @@
 // New Animations
 const container = document.querySelector('.bg-animation-container');
-
 // Create Data Nodes
 function createDataNodes() {
     for (let i = 0; i < 15; i++) {
@@ -13,7 +12,6 @@ function createDataNodes() {
         container.appendChild(node);
     }
 }
-
 // Create Geometric Shapes
 function createGeoShapes() {
     const shapes = ['circle', 'triangle'];
@@ -29,7 +27,6 @@ function createGeoShapes() {
         container.appendChild(shape);
     }
 }
-
 // Create Connection Lines
 function createConnectionLines() {
     for (let i = 0; i < 6; i++) {
@@ -42,7 +39,6 @@ function createConnectionLines() {
         container.appendChild(line);
     }
 }
-
 // Create Particles
 function createParticles() {
     for (let i = 0; i < 25; i++) {
@@ -55,7 +51,6 @@ function createParticles() {
         container.appendChild(particle);
     }
 }
-
 // Create Chart Bars
 function createChartBars() {
     for (let i = 0; i < 10; i++) {
@@ -68,14 +63,12 @@ function createChartBars() {
         container.appendChild(bar);
     }
 }
-
 // Initialize all animations
 createDataNodes();
 createGeoShapes();
 createConnectionLines();
 createParticles();
 createChartBars();
-
 // Recreate elements periodically to maintain continuous animation
 setInterval(() => {
     const oldNodes = document.querySelectorAll('.data-node, .particle, .chart-bar');
@@ -85,20 +78,7 @@ setInterval(() => {
         createChartBars();
     }
 }, 20000);
-
-
-
-
-
-
-
-
-
-
-
-
 // Back to top
-
 $(document).ready(function () {
     $(window).scroll(function () {
         if ($(this).scrollTop() > 100) {

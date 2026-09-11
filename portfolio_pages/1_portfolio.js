@@ -1,6 +1,5 @@
 // Portfolio page
 // Testi
-
 /* ── Scroll reveal ── */
 new IntersectionObserver((entries, obs) => {
     if (!entries[0].isIntersecting) return;

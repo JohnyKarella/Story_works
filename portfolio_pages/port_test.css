@@ -1,6 +1,4 @@
 /* portfolio testimonials */
-
-
     :root {
       --bg: #ede8d8;
       /* warm cream — from reference image */
@@ -10,8 +8,6 @@
       --quote-col: rgba(123, 63, 160, 0.18);
       --line-col: rgba(123, 63, 160, 0.35);
     }
-
- 
     /* ── SECTION ── */
     .testimonial-section {
       position: relative;
@@ -19,7 +15,6 @@
       overflow: hidden;
       background: var(--bg);
     }
-
     canvas#bg-canvas {
       position: absolute;
       inset: 0;
@@ -28,7 +23,6 @@
       pointer-events: none;
       z-index: 0;
     }
-
     /* Grain texture */
     .testimonial-section::before {
       content: '';
@@ -40,7 +34,6 @@
       pointer-events: none;
       z-index: 1;
     }
-
     /* Rotating dashed rings */
     .deco-ring {
       position: absolute;
@@ -48,7 +41,6 @@
       pointer-events: none;
       z-index: 1;
     }
-
     .deco-ring.r1 {
       width: 340px;
       height: 340px;
@@ -57,7 +49,6 @@
       left: -90px;
       animation: spin-cw 30s linear infinite;
     }
-
     .deco-ring.r1::after {
       content: '';
       position: absolute;
@@ -65,7 +56,6 @@
       border-radius: 50%;
       border: 1px solid rgba(123, 63, 160, 0.07);
     }
-
     .deco-ring.r2 {
       width: 260px;
       height: 260px;
@@ -74,13 +64,11 @@
       right: -60px;
       animation: spin-cw 22s linear infinite reverse;
     }
-
     @keyframes spin-cw {
       to {
         transform: rotate(360deg);
       }
     }
-
     /* Floating diamonds */
     .deco-dia {
       position: absolute;
@@ -89,7 +77,6 @@
       z-index: 1;
       pointer-events: none;
     }
-
     .deco-dia.d1 {
       width: 12px;
       height: 12px;
@@ -97,7 +84,6 @@
       left: 42%;
       animation: floatA 6s ease-in-out infinite;
     }
-
     .deco-dia.d2 {
       width: 8px;
       height: 8px;
@@ -105,7 +91,6 @@
       left: 72%;
       animation: floatB 8s ease-in-out infinite;
     }
-
     .deco-dia.d3 {
       width: 6px;
       height: 6px;
@@ -113,35 +98,28 @@
       right: 8%;
       animation: floatA 7s ease-in-out infinite 1s;
     }
-
     @keyframes floatA {
-
       0%,
       100% {
         transform: rotate(45deg) translateY(0);
         opacity: .5;
       }
-
       50% {
         transform: rotate(45deg) translateY(-14px);
         opacity: 1;
       }
     }
-
     @keyframes floatB {
-
       0%,
       100% {
         transform: rotate(45deg) translateY(0);
         opacity: .3;
       }
-
       50% {
         transform: rotate(45deg) translateY(10px);
         opacity: .8;
       }
     }
-
     /* ── LAYOUT ── */
     .testimonial-inner {
       position: relative;
@@ -153,7 +131,6 @@
       min-height: 420px;
       padding: 0px 0px 50px;
     }
-
     /* ── LOGO AREA ── */
     .logo-wrap {
       flex: 0 0 300px;
@@ -164,7 +141,6 @@
       margin-right: 64px;
       align-self: center;
     }
-
     /* pulsing glow ring behind logo */
     .logo-glow {
       position: absolute;
@@ -174,21 +150,17 @@
       background: radial-gradient(circle, rgba(123, 63, 160, 0.10) 0%, rgba(185, 140, 210, 0.05) 60%, transparent 100%);
       animation: glowPulse 4s ease-in-out infinite;
     }
-
     @keyframes glowPulse {
-
       0%,
       100% {
         transform: scale(1);
         opacity: 0.7;
       }
-
       50% {
         transform: scale(1.15);
         opacity: 1;
       }
     }
-
     /* outer dashed orbit ring */
     .logo-orbit {
       position: absolute;
@@ -198,7 +170,6 @@
       border: 1.2px dashed rgb(200 119 62);
       animation: spin-cw 18s linear infinite;
     }
-
     .logo-orbit::before {
       content: '';
       position: absolute;
@@ -210,7 +181,6 @@
       left: 50%;
       transform: translateX(-50%);
     }
-
     .logo-img {
       position: relative;
       width: 180px;
@@ -219,25 +189,20 @@
       filter: drop-shadow(0 4px 18px rgba(80, 30, 110, 0.18));
       animation: logoFloat 5s ease-in-out infinite;
     }
-
     @keyframes logoFloat {
-
       0%,
       100% {
         transform: translateY(0);
       }
-
       50% {
         transform: translateY(-8px);
       }
     }
-
     /* ── CONTENT ── */
     .testimonial-content {
       flex: 1;
       padding: 20px 0 40px;
     }
-
     .quote-top {
       font-family: Georgia, serif;
       font-size: 80px;
@@ -246,14 +211,12 @@
       display: block;
       margin-bottom: -10px;
     }
-
     .label-row {
       display: flex;
       align-items: center;
       gap: 14px;
       margin-bottom: 12px;
     }
-
     .label-txt {
       font-size: 12px;
       font-weight: 500;
@@ -261,14 +224,12 @@
       text-transform: uppercase;
       color: var(--text-muted);
     }
-
     .label-line {
       flex: 0 0 200px;
       height: 1.5px;
       background: rgb(213 159 116);
       border-radius: 2px;
     }
-
     .t-heading {
       font-family: 'Playfair Display', serif;
       font-size: clamp(22px, 2.4vw, 32px);
@@ -277,7 +238,6 @@
       line-height: 1.25;
       margin-bottom: 18px;
     }
-
     .t-body {
       font-size: clamp(13px, 1.05vw, 15px);
       color: #000;
@@ -285,7 +245,6 @@
       max-width: 700px;
       margin-bottom: 24px;
     }
-
     .quote-bot {
       font-family: Georgia, serif;
       font-size: 80px;
@@ -296,7 +255,6 @@
       margin-top: -20px;
       margin-bottom: 0px;
     }
-
     .p-name {
       font-family: 'Playfair Display', serif;
       font-size: 25px;
@@ -304,13 +262,11 @@
       color: var(--text-dark);
       margin-bottom: 3px;
     }
-
     .p-title {
       font-size: 20px;
       font-weight: 600;
       color: #c87f4e;
     }
-
     /* ── MOBILE ── */
     @media (max-width:768px) {
       .testimonial-inner {
@@ -319,7 +275,6 @@
         padding: 0px 30px 80px;
         min-height: unset;
       }
-
       .logo-wrap {
         order: 2;
         width: 100%;
@@ -327,40 +282,32 @@
         margin: 32px auto 16px;
         flex: none;
       }
-
       .logo-img {
         width: 140px;
       }
-
       .logo-glow {
         width: 190px;
         height: 190px;
       }
-
       .logo-orbit {
         width: 168px;
         height: 168px;
       }
-
       .testimonial-content {
         order: 1;
         padding-bottom: 16px;
         width: 100%;
       }
-
       .quote-top,
       .quote-bot {
         font-size: 56px;
       }
-
       .t-heading {
         font-size: 22px;
       }
-
       .t-body {
         font-size: 14px;
       }
-
       .deco-ring,
       .deco-dia {
         display: none;

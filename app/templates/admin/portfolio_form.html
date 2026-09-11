@@ -1,12 +1,9 @@
 {% extends "admin/base.html" %}
-
 {% block title %}{% if item %}Edit Project: {{ item.title }}{% else %}New Portfolio Project{% endif %}{% endblock %}
 {% block page_title %}{% if item %}Edit Portfolio Project{% else %}Add Portfolio Project{% endif %}{% endblock %}
-
 {% block topbar_actions %}
 <a href="{{ url_for('admin.portfolio') }}" class="btn btn-secondary btn-sm">&larr; Back to Portfolio</a>
 {% endblock %}
-
 {% block content %}
 <div class="card" style="max-width: 900px;">
   <div class="card-body">
@@ -16,37 +13,31 @@
           <label class="form-label" for="title">Project Title *</label>
           <input type="text" id="title" name="title" class="form-control" value="{{ item.title if item else '' }}" placeholder="e.g. Shaanvi Heritage" required />
         </div>
-
         <div class="form-group">
           <label class="form-label" for="client">Client Name</label>
           <input type="text" id="client" name="client" class="form-control" value="{{ item.client if item else '' }}" placeholder="e.g. Shaanvi Foods" />
         </div>
       </div>
-
       {% if item %}
       <div class="form-group">
         <label class="form-label" for="slug">URL Slug</label>
         <input type="text" id="slug" name="slug" class="form-control" value="{{ item.slug }}" placeholder="project-url-slug" />
       </div>
       {% endif %}
-
       <div class="form-row">
         <div class="form-group">
           <label class="form-label" for="category">Category</label>
           <input type="text" id="category" name="category" class="form-control" value="{{ item.category if item else 'Branding & Packaging' }}" placeholder="e.g. Branding, Photography, UI/UX" />
         </div>
-
         <div class="form-group">
           <label class="form-label" for="badge">Card Badge Label</label>
           <input type="text" id="badge" name="badge" class="form-control" value="{{ item.badge if item else '' }}" placeholder="e.g. Shaanvi" />
         </div>
-
         <div class="form-group">
           <label class="form-label" for="year">Project Year</label>
           <input type="text" id="year" name="year" class="form-control" value="{{ item.year if item else '2026' }}" />
         </div>
       </div>
-
       <!-- Cover Image -->
       <div class="form-group">
         <label class="form-label">Cover / Thumbnail Image</label>
@@ -62,28 +53,23 @@
         </div>
         <img id="portCoverPreview" class="img-preview" src="{{ item.cover_image if item and item.cover_image else '' }}" style="display: {{ 'block' if item and item.cover_image else 'none' }}; margin-top: 12px;" />
       </div>
-
       <div class="form-group">
         <label class="form-label" for="quote">Client Quote / Testimonial</label>
         <textarea id="quote" name="quote" class="form-textarea" style="min-height: 80px;" placeholder="&quot;We finally have a brand voice that feels as premium as our products…&quot;">{{ item.quote if item else '' }}</textarea>
       </div>
-
       <div class="form-group">
         <label class="form-label" for="short_desc">Short Description</label>
         <textarea id="short_desc" name="short_desc" class="form-textarea" style="min-height: 80px;" placeholder="Brief overview for cards and listings…">{{ item.short_desc if item else '' }}</textarea>
       </div>
-
       <div class="form-group">
         <label class="form-label" for="full_desc">Case Study Details / Full Overview</label>
         <textarea id="full_desc" name="full_desc" class="form-textarea" style="min-height: 180px; font-family: monospace; font-size: 13px;" placeholder="Detailed breakdown of challenges, solutions, and creative direction…">{{ item.full_desc if item else '' }}</textarea>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label class="form-label" for="project_url">Live Project URL / Page</label>
           <input type="text" id="project_url" name="project_url" class="form-control" value="{{ item.project_url if item else '' }}" placeholder="e.g. 1_shaanvi.html or https://..." />
         </div>
-
         <div class="form-group">
           <label class="form-label" for="status">Publication Status</label>
           <select id="status" name="status" class="form-select">
@@ -92,14 +78,12 @@
           </select>
         </div>
       </div>
-
       <div class="form-group" style="margin-top: 10px;">
         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
           <input type="checkbox" name="is_featured" value="1" {% if item and item.is_featured %}checked{% endif %} style="width: 18px; height: 18px;" />
           <span style="font-size: 14px; font-weight: 500;">Feature this project prominently on homepage</span>
         </label>
       </div>
-
       <div style="display: flex; gap: 12px; margin-top: 24px;">
         <button type="submit" class="btn btn-primary">Save Project</button>
         <a href="{{ url_for('admin.portfolio') }}" class="btn btn-secondary">Cancel</a>
@@ -108,4 +92,3 @@
   </div>
 </div>
 {% endblock %}
-

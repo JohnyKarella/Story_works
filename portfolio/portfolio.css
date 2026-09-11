@@ -1,5 +1,4 @@
 /* ─── PORTFOLIO CONSOLIDATED STYLES ─── */
-
 /* ─── VARIABLES ──────────────────────────── */
 :root {
     --bg: #f7f5f1;
@@ -13,14 +12,12 @@
     --bdstrong: rgba(20, 18, 16, .18);
     --r: 10px;
 }
-
 /* ─── BASE CLASSES ───────────────────────── */
 .portfolio-body-class {
     background: var(--bg);
     color: var(--ink);
     font-family: 'Outfit', sans-serif;
 }
-
 /* ─── WRAPPER ────────────────────────────── */
 .pw {
     width: 100%;
@@ -28,7 +25,6 @@
     margin: 0 auto;
     padding: 2rem 1.25rem; /* Padding inside wrapper to protect site-wide layout */
 }
-
 /* ─── HEADING ────────────────────────────── */
 .eye {
     font-family: 'DM Mono', monospace;
@@ -41,7 +37,6 @@
     align-items: center;
     gap: .55rem;
 }
-
 .eye::before {
     content: '';
     width: 22px;
@@ -49,7 +44,6 @@
     background: var(--accent);
     flex-shrink: 0;
 }
-
 .hd {
     font-family: 'Playfair Display', serif;
     font-size: clamp(1.15rem, 4vw, 2.4rem);
@@ -58,12 +52,10 @@
     color: var(--ink);
     margin-bottom: 1rem;
 }
-
 .hd em {
     font-style: italic;
     color: var(--accent);
 }
-
 /* ─── TOP TABS BAR ───────────────────────── */
 .cat-bar {
     background: var(--surface);
@@ -76,7 +68,6 @@
     margin-bottom: .8rem;
     box-shadow: 0 1px 4px rgba(20, 18, 16, .04);
 }
-
 .cat-tab {
     font-family: BDO Grotesk, sans-serif;
     font-size: 17px;
@@ -95,18 +86,15 @@
     flex-shrink: 1;
     min-width: 0;
 }
-
 .cat-tab:hover {
     background: var(--bg);
     color: var(--ink);
 }
-
 .cat-tab.active {
     background: var(--ink);
     color: #fff;
     box-shadow: 0 2px 7px rgba(20, 18, 16, .2);
 }
-
 .tpill {
     font-family: 'DM Mono', monospace;
     font-size: .52rem;
@@ -115,12 +103,10 @@
     background: rgba(255, 255, 255, .16);
     color: rgba(255, 255, 255, .78);
 }
-
 .cat-tab:not(.active) .tpill {
     background: var(--border);
     color: var(--muted);
 }
-
 /* ─── MAIN PANEL ─────────────────────────── */
 .panel {
     background: var(--surface);
@@ -131,19 +117,16 @@
     display: flex;
     flex-direction: column;
 }
-
 /* ─── SIDEBAR ────────────────────────────── */
 .sidebar {
     border-bottom: 1px solid var(--border);
     padding: .5rem;
 }
-
 .sb-inner {
     display: flex;
     flex-wrap: wrap;
     gap: .25rem;
 }
-
 .sb-head {
     display: none;
     font-family: 'Playfair Display', serif;
@@ -157,7 +140,6 @@
     align-items: center;
     gap: .35rem;
 }
-
 .sb-item {
     display: flex;
     align-items: center;
@@ -170,30 +152,24 @@
     flex-shrink: 1;
     min-width: 0;
 }
-
 .sb-item:hover {
     background: var(--bg);
     border-color: var(--border);
 }
-
 .sb-item.active {
     background: #141210cc;
     border-color: var(--ink);
 }
-
 .sb-item.active .sb-label {
     color: #fff;
 }
-
 .sb-item.active .sb-ico {
     background: rgba(255, 255, 255, .14);
 }
-
 .sb-item.active .sb-cnt {
     background: rgba(255, 255, 255, .18);
     color: rgba(255, 255, 255, .78);
 }
-
 .sb-ico {
     width: 26px;
     height: 26px;
@@ -206,7 +182,6 @@
     flex-shrink: 0;
     transition: background .16s;
 }
-
 .sb-label {
     font-family: BDO Grotesk, sans-serif;
     font-size: 15px;
@@ -215,7 +190,6 @@
     transition: color .16s;
     white-space: nowrap;
 }
-
 .sb-cnt {
     font-family: 'DM Mono', monospace;
     font-size: .54rem;
@@ -224,14 +198,12 @@
     padding: .05rem .3rem;
     border-radius: 20px;
 }
-
 /* ─── IMAGE PANEL & INFO BAR ─────────────── */
 .img-panel {
     flex: 1;
     padding: 20px;
     min-width: 0;
 }
-
 .info-bar {
     display: flex;
     align-items: center;
@@ -242,20 +214,17 @@
     border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
 }
-
 .ib-l {
     display: flex;
     align-items: center;
     gap: .4rem;
 }
-
 .ib-title {
     font-family: 'Playfair Display', serif;
     font-size: .88rem;
     font-weight: 700;
     color: var(--ink);
 }
-
 .ib-cnt {
     font-family: 'DM Mono', monospace;
     font-size: .56rem;
@@ -266,7 +235,6 @@
     border-radius: 20px;
     white-space: nowrap;
 }
-
 /* ─── GRID LOGIC ─────────────────────────── */
 .grid-set {
     display: none;
@@ -274,16 +242,13 @@
     gap: .5rem;
     transition: opacity .2s ease, transform .2s ease;
 }
-
 .grid-set.active {
     display: grid;
 }
-
 .grid-set.out {
     opacity: 0;
     transform: translateY(7px);
 }
-
 /* ─── PORTFOLIO CARD ─────────────────────── */
 .pc {
     border-radius: 8px;
@@ -296,11 +261,9 @@
     -webkit-tap-highlight-color: transparent;
     aspect-ratio: 4/3;
 }
-
 .pc:active {
     transform: scale(.97);
 }
-
 .pc img {
     position: absolute;
     inset: 0;
@@ -311,7 +274,6 @@
     filter: brightness(.84) saturate(.88);
     transition: transform .5s cubic-bezier(.23, 1, .32, 1), filter .35s;
 }
-
 .pc-lbl {
     position: absolute;
     bottom: 0;
@@ -325,7 +287,6 @@
     transition: opacity .22s;
     z-index: 1;
 }
-
 .pc-ov {
     position: absolute;
     inset: 0;
@@ -338,7 +299,6 @@
     opacity: 0;
     transition: opacity .28s;
 }
-
 .pc-badge {
     font-family: 'DM Mono', monospace;
     font-size: .48rem;
@@ -347,14 +307,12 @@
     color: var(--gold);
     margin-bottom: .16rem;
 }
-
 .pc-title {
     font-family: 'Playfair Display', serif;
     font-size: .82rem;
     color: #fff;
     line-height: 1.25;
 }
-
 .pc-quote {
     font-size: .6rem;
     font-style: italic;
@@ -363,7 +321,6 @@
     line-height: 1.42;
     display: none;
 }
-
 @media(hover:hover) {
     .pc:hover {
         transform: translateY(-3px);
@@ -376,7 +333,6 @@
     .pc:hover .pc-lbl { opacity: 0; }
     .pc:hover .pc-ov { opacity: 1; }
 }
-
 /* ─── LIGHTBOX ───────────────────────────── */
 .lb, .lightbox {
     position: fixed;
@@ -392,12 +348,10 @@
     opacity: 0;
     transition: opacity .3s ease;
 }
-
 .lb.open, .lightbox.active {
     display: flex;
     opacity: 1;
 }
-
 .lb-box {
     position: relative;
     width: 100%;
@@ -413,12 +367,10 @@
     transition: transform .32s cubic-bezier(.23, 1, .32, 1), opacity .26s;
     opacity: 0;
 }
-
 .lb.open .lb-box {
     transform: scale(1) translateY(0);
     opacity: 1;
 }
-
 .lb-img {
     flex: 1;
     min-height: 0;
@@ -428,15 +380,12 @@
     align-items: center;
     justify-content: center;
 }
-
 .lb-img img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
 }
-
 /* ─── RESPONSIVE BREAKPOINTS ─────────────── */
-
 @media (max-width: 768px) {
     .grid-set.active {
         grid-template-columns: 1fr;
@@ -445,12 +394,10 @@
         padding: .5rem;
     }
 }
-
 @media(min-width:820px) {
     .panel {
         flex-direction: row;
     }
-
     .sidebar {
         width: 220px;
         flex-shrink: 0;
@@ -459,52 +406,35 @@
         padding: .9rem .7rem;
         overflow-y: auto;
     }
-
     .sb-inner {
         flex-direction: column;
         flex-wrap: nowrap;
         gap: 10px;
     }
-
     .sb-head { display: flex; }
-
     .grid-set {
         grid-template-columns: repeat(3, 1fr);
         gap: .65rem;
     }
-
     .pc {
         aspect-ratio: unset;
         height: 185px;
     }
-
     .pc.feat {
         grid-row: span 2;
         height: 100%;
     }
-
     .pc.feat .pc-quote { display: block; }
-
     .pc.wide {
         grid-column: span 2;
     }
 }
-
 @media(min-width:1100px) {
     .sidebar { width: 240px; }
     .pc { height: 200px; }
 }
-
 /* State management helpers */
 .grid-set, .sb-group, .info-set { display: none; }
 .grid-set.active, .sb-group.active { display: grid; }
 .sb-group.active { display: contents; }
 .info-set.active { display: flex; }
-
-
-
-
-
-
-
-

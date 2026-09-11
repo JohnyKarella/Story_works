@@ -84,7 +84,7 @@ class Inquiry:
         return new_id
 
     @staticmethod
-    def get_all(status=None, search=None):
+    def get_all(status=None, search=None, date_from=None, date_to=None):
         conn = get_db()
         query = "SELECT * FROM inquiries WHERE 1=1"
         params = []
@@ -94,9 +94,17 @@ class Inquiry:
             params.append(status)
 
         if search:
-            query += " AND (first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR company LIKE ?)"
+            query += " AND (first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR company LIKE ? OR phone LIKE ? OR services LIKE ?)"
             s_param = f"%{search}%"
-            params.extend([s_param, s_param, s_param, s_param])
+            params.extend([s_param, s_param, s_param, s_param, s_param, s_param])
+
+        if date_from:
+            query += " AND DATE(created_at) >= DATE(?)"
+            params.append(date_from)
+
+        if date_to:
+            query += " AND DATE(created_at) <= DATE(?)"
+            params.append(date_to)
 
         query += " ORDER BY id DESC"
         rows = conn.execute(query, params).fetchall()
@@ -148,13 +156,17 @@ class Inquiry:
         total = conn.execute("SELECT COUNT(*) FROM inquiries").fetchone()[0]
         new_count = conn.execute("SELECT COUNT(*) FROM inquiries WHERE status = 'new'").fetchone()[0]
         contacted = conn.execute("SELECT COUNT(*) FROM inquiries WHERE status = 'contacted'").fetchone()[0]
+        in_progress = conn.execute("SELECT COUNT(*) FROM inquiries WHERE status = 'in_progress'").fetchone()[0]
         closed = conn.execute("SELECT COUNT(*) FROM inquiries WHERE status = 'closed'").fetchone()[0]
+        not_interested = conn.execute("SELECT COUNT(*) FROM inquiries WHERE status = 'not_interested'").fetchone()[0]
         conn.close()
         return {
             "total": total,
             "new": new_count,
             "contacted": contacted,
+            "in_progress": in_progress,
             "closed": closed,
+            "not_interested": not_interested,
         }
 
 

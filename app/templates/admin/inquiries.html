@@ -11,33 +11,65 @@
 {% endblock %}
 
 {% block content %}
-<div class="filter-bar">
-  <div class="filter-pills">
-    <a href="{{ url_for('admin.inquiries', status='all', search=search_query) }}" class="filter-pill {% if current_status == 'all' %}active{% endif %}">
+<!-- ── Search & Date Range Filter Bar (Below Title, Above Status Pills) ── -->
+<div style="margin-bottom: 20px;">
+  <form method="GET" action="{{ url_for('admin.inquiries') }}" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 14px 20px;">
+    <input type="hidden" name="status" value="{{ current_status }}" />
+
+    <!-- Search Input -->
+    <div style="position: relative; flex: 1; min-width: 260px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-dim);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" name="search" placeholder="Search leads by name, email, company, services…" value="{{ search_query }}" style="width: 100%; height: 40px; padding-left: 40px; padding-right: 14px; border-radius: var(--radius-md); background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); font-size: 13px;" />
+    </div>
+
+    <!-- Date Range: From & To Calendar Pickers -->
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">From</span>
+        <input type="date" name="date_from" value="{{ date_from }}" style="height: 40px; padding: 6px 12px; font-size: 13px; border-radius: var(--radius-md); background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); color-scheme: dark;" />
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">To</span>
+        <input type="date" name="date_to" value="{{ date_to }}" style="height: 40px; padding: 6px 12px; font-size: 13px; border-radius: var(--radius-md); background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); color-scheme: dark;" />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-sm" style="height: 40px; padding: 0 18px; display: inline-flex; align-items: center; gap: 6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Filter
+      </button>
+
+      {% if search_query or date_from or date_to %}
+      <a href="{{ url_for('admin.inquiries', status=current_status) }}" class="btn btn-secondary btn-sm" style="height: 40px; display: inline-flex; align-items: center; gap: 4px;" title="Reset filters">
+        &times; Reset
+      </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<!-- ── Status Filter Pills (Below Search & Dates, Above Table) ── -->
+<div class="filter-bar" style="margin-bottom: 20px;">
+  <div class="filter-pills" style="display: flex; flex-wrap: wrap; gap: 8px;">
+    <a href="{{ url_for('admin.inquiries', status='all', search=search_query, date_from=date_from, date_to=date_to) }}" class="filter-pill {% if current_status == 'all' %}active{% endif %}">
       All ({{ stats.total }})
     </a>
-    <a href="{{ url_for('admin.inquiries', status='new', search=search_query) }}" class="filter-pill {% if current_status == 'new' %}active{% endif %}">
+    <a href="{{ url_for('admin.inquiries', status='new', search=search_query, date_from=date_from, date_to=date_to) }}" class="filter-pill {% if current_status == 'new' %}active{% endif %}">
       New ({{ stats.new }})
     </a>
-    <a href="{{ url_for('admin.inquiries', status='contacted', search=search_query) }}" class="filter-pill {% if current_status == 'contacted' %}active{% endif %}">
+    <a href="{{ url_for('admin.inquiries', status='contacted', search=search_query, date_from=date_from, date_to=date_to) }}" class="filter-pill {% if current_status == 'contacted' %}active{% endif %}">
       Contacted ({{ stats.contacted }})
     </a>
-    <a href="{{ url_for('admin.inquiries', status='in_progress', search=search_query) }}" class="filter-pill {% if current_status == 'in_progress' %}active{% endif %}">
-      In Progress
+    <a href="{{ url_for('admin.inquiries', status='in_progress', search=search_query, date_from=date_from, date_to=date_to) }}" class="filter-pill {% if current_status == 'in_progress' %}active{% endif %}">
+      In Progress ({{ stats.in_progress }})
     </a>
-    <a href="{{ url_for('admin.inquiries', status='closed', search=search_query) }}" class="filter-pill {% if current_status == 'closed' %}active{% endif %}">
+    <a href="{{ url_for('admin.inquiries', status='closed', search=search_query, date_from=date_from, date_to=date_to) }}" class="filter-pill {% if current_status == 'closed' %}active{% endif %}">
       Closed ({{ stats.closed }})
     </a>
+    <a href="{{ url_for('admin.inquiries', status='not_interested', search=search_query, date_from=date_from, date_to=date_to) }}" class="filter-pill {% if current_status == 'not_interested' %}active{% endif %}">
+      Not Interested ({{ stats.not_interested }})
+    </a>
   </div>
-
-  <form method="GET" action="{{ url_for('admin.inquiries') }}" class="search-box">
-    <input type="hidden" name="status" value="{{ current_status }}" />
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-dim);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" name="search" placeholder="Search leads…" value="{{ search_query }}" />
-    {% if search_query %}
-    <a href="{{ url_for('admin.inquiries', status=current_status) }}" style="color: var(--text-dim); font-size: 14px; text-decoration: none;">&times;</a>
-    {% endif %}
-  </form>
 </div>
 
 <div class="card">
@@ -85,6 +117,7 @@
                     <option value="contacted" {% if item.status == 'contacted' %}selected{% endif %}>Contacted</option>
                     <option value="in_progress" {% if item.status == 'in_progress' %}selected{% endif %}>In Progress</option>
                     <option value="closed" {% if item.status == 'closed' %}selected{% endif %}>Closed</option>
+                    <option value="not_interested" {% if item.status == 'not_interested' %}selected{% endif %}>Not Interested</option>
                   </select>
                 </form>
               </td>
@@ -166,6 +199,7 @@
             <option value="contacted">Contacted</option>
             <option value="in_progress">In Progress</option>
             <option value="closed">Closed</option>
+            <option value="not_interested">Not Interested</option>
           </select>
           <button type="submit" class="btn btn-primary btn-sm">Update Status</button>
         </div>

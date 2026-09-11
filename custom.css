@@ -1410,3 +1410,40 @@ ul {
   from { opacity: 0; transform: translateY(20px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   CONTINUOUS CLIENT BRANDS MARQUEE (NO STOPPING, NO REFRESH)
+═══════════════════════════════════════════════════════════ */
+.brands_list-wrapper {
+  display: flex !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  position: relative !important;
+  user-select: none !important;
+  -webkit-mask: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%) !important;
+  mask: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%) !important;
+}
+
+.brands_list {
+  display: flex !important;
+  flex-shrink: 0 !important;
+  align-items: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  animation: brandsScrollInfinite 38s linear infinite !important;
+  will-change: transform;
+}
+
+.brands_list:hover {
+  animation-play-state: running !important;
+}
+
+@keyframes brandsScrollInfinite {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

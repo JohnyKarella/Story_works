@@ -449,6 +449,11 @@ a {
   color: #9ca3af;
 }
 
+.badge-not_interested {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
 .badge-published {
   background: rgba(16, 185, 129, 0.15);
   color: #34d399;

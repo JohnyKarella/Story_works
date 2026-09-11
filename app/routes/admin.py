@@ -121,13 +121,17 @@ def dashboard():
 def inquiries():
     status = request.args.get("status", "all")
     search = request.args.get("search", "").strip()
-    inquiries_list = Inquiry.get_all(status=status, search=search)
+    date_from = request.args.get("date_from", "").strip()
+    date_to = request.args.get("date_to", "").strip()
+    inquiries_list = Inquiry.get_all(status=status, search=search, date_from=date_from, date_to=date_to)
     stats = Inquiry.get_stats()
     return render_template(
         "admin/inquiries.html",
         inquiries=inquiries_list,
         current_status=status,
         search_query=search,
+        date_from=date_from,
+        date_to=date_to,
         stats=stats,
     )
 
@@ -136,7 +140,7 @@ def inquiries():
 @login_required
 def update_inquiry_status(inquiry_id):
     status = request.form.get("status")
-    if status in ["new", "contacted", "in_progress", "closed"]:
+    if status in ["new", "contacted", "in_progress", "closed", "not_interested"]:
         Inquiry.update_status(inquiry_id, status)
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return jsonify({"success": True, "status": status})
@@ -199,7 +203,11 @@ def api_unread_inquiries():
 @admin_bp.route("/inquiries/export")
 @login_required
 def export_inquiries_csv():
-    inquiries_list = Inquiry.get_all()
+    status = request.args.get("status", "all")
+    search = request.args.get("search", "").strip()
+    date_from = request.args.get("date_from", "").strip()
+    date_to = request.args.get("date_to", "").strip()
+    inquiries_list = Inquiry.get_all(status=status, search=search, date_from=date_from, date_to=date_to)
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow([

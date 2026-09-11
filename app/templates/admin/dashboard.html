@@ -685,20 +685,33 @@
     animation: counterGlowPulse 0.65s var(--ease-bounce) both;
   }
 
-  /* ── Interactive Table Rows ── */
+  /* ── Clean Table Layout without horizontal sliding / overflow ── */
   .admin-table {
+    width: 100%;
     border-collapse: separate;
     border-spacing: 0;
   }
 
-  .admin-table tbody tr {
-    transition: background-color 0.25s var(--ease-smooth),
-                box-shadow 0.25s var(--ease-smooth),
-                transform 0.25s var(--ease-smooth);
+  .admin-table th {
+    padding: 12px 14px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
   }
 
+  .admin-table td {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+
+  .admin-table tbody tr {
+    transition: background-color 0.25s var(--ease-smooth),
+                box-shadow 0.25s var(--ease-smooth);
+  }
+
+  /* Removed transform: translateX(4px) sliding */
   .admin-table tbody tr:hover {
-    transform: translateX(4px);
+    transform: none;
   }
 
   .admin-table tbody tr:hover td {
@@ -711,6 +724,29 @@
 
   .admin-table tbody tr:hover td:first-child {
     box-shadow: inset 4px 0 0 var(--primary);
+  }
+
+  /* Sleek modern scrollbar and overflow control to remove sliding */
+  .dashboard-inquiries-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  }
+
+  .dashboard-inquiries-table-wrap::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .dashboard-inquiries-table-wrap::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+  }
+
+  @media (min-width: 1024px) {
+    .dashboard-inquiries-table-wrap {
+      overflow-x: hidden;
+    }
   }
 
   .admin-table a {
@@ -961,31 +997,23 @@
   <div class="card-header">
     <div class="card-title">Recent Contact Inquiries</div>
     <div style="display: flex; align-items: center; gap: 8px;">
-      {% if recent_inquiries %}
-      <form method="POST" action="{{ url_for('admin.delete_all_inquiries') }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete ALL inquiries? This action cannot be undone.');">
-        <button type="submit" class="btn btn-danger btn-sm" title="Delete all inquiry records">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          Delete All
-        </button>
-      </form>
-      {% endif %}
       <a href="{{ url_for('admin.inquiries') }}" class="btn btn-secondary btn-sm btn-arrow-slide">
         <span>View All Inquiries</span> <span class="arrow-icon">&rarr;</span>
       </a>
     </div>
   </div>
 
-  <div class="table-responsive">
+  <div class="table-responsive dashboard-inquiries-table-wrap">
     <table class="admin-table">
       <thead>
         <tr>
-          <th>Name / Contact</th>
-          <th>Company</th>
-          <th>Budget</th>
-          <th>Services</th>
-          <th>Date</th>
-          <th>Status</th>
-          <th style="text-align: right;">Action</th>
+          <th style="min-width: 140px;">Name / Contact</th>
+          <th style="min-width: 80px;">Company</th>
+          <th style="min-width: 110px;">Budget</th>
+          <th style="min-width: 120px;">Services</th>
+          <th style="min-width: 85px;">Date</th>
+          <th style="min-width: 70px;">Status</th>
+          <th style="text-align: right; min-width: 100px;">Action</th>
         </tr>
       </thead>
       <tbody>

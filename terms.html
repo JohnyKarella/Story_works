@@ -11,107 +11,112 @@
   <link rel="stylesheet" href="new.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="assets/images/story_logo.png" rel="shortcut icon" type="image/x-icon" />
+  <meta http-equiv="refresh" content="0; url=index.html#terms" />
+  <script>
+    if (window.location.pathname.endsWith("terms.html") || window.location.pathname.endsWith("terms")) {
+      window.location.replace("index.html#terms");
+    }
+  </script>
   <style>
     body {
-      background: #080a0f;
-      color: #cbd5e1;
+      background: #f8fafc;
+      color: #374151;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       margin: 0;
       padding: 0;
       line-height: 1.7;
     }
     .terms-hero {
-      padding: 120px 24px 60px;
+      padding: 100px 24px 40px;
       text-align: center;
-      background: radial-gradient(circle at 50% 20%, rgba(244, 217, 111, 0.12) 0%, transparent 65%);
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
     }
     .terms-hero-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(244, 217, 111, 0.12);
-      color: #f4d96f;
-      border: 1px solid rgba(244, 217, 111, 0.25);
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
       padding: 6px 16px;
       border-radius: 100px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .terms-hero h1 {
-      color: #ffffff;
-      font-size: clamp(32px, 5vw, 48px);
+      color: #0f172a;
+      font-size: clamp(30px, 4vw, 42px);
       font-weight: 700;
-      margin: 0 0 12px;
-      letter-spacing: -1px;
+      margin: 0 0 10px;
+      letter-spacing: -0.5px;
     }
     .terms-hero p {
-      color: #94a3b8;
-      font-size: 15px;
-      font-style: italic;
+      color: #64748b;
+      font-size: 14px;
       margin: 0;
     }
     .terms-container {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 0 24px 100px;
+      max-width: 800px;
+      margin: 40px auto 80px;
+      padding: 0 24px;
     }
     .terms-card {
-      background: linear-gradient(135deg, rgba(20, 24, 33, 0.95) 0%, rgba(13, 16, 23, 0.98) 100%);
-      border: 1px solid rgba(244, 217, 111, 0.2);
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(244, 217, 111, 0.08);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 36px 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     }
     .terms-intro-text {
-      color: #e2e8f0;
-      font-size: 17px;
-      line-height: 1.8;
-      margin-bottom: 36px;
+      color: #374151;
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 28px;
     }
     .terms-intro-text strong {
-      color: #f4d96f;
+      color: #111827;
     }
     .terms-item {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-left: 3px solid #f4d96f;
-      border-radius: 12px;
-      padding: 24px 28px;
-      margin-bottom: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 3px solid #0284c7;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
     }
     .terms-item h2 {
-      color: #ffffff;
-      font-size: 19px;
-      font-weight: 600;
-      margin: 0 0 10px;
+      color: #0f172a;
+      font-size: 17px;
+      font-weight: 700;
+      margin: 0 0 8px;
     }
     .terms-item p {
-      color: #94a3b8;
-      font-size: 15px;
+      color: #475569;
+      font-size: 14.5px;
       margin: 0;
-      line-height: 1.75;
+      line-height: 1.65;
     }
     .terms-back-btn {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      background: linear-gradient(135deg, #f4d96f 0%, #d4af37 100%);
-      color: #0c0e14;
-      font-weight: 700;
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 600;
       font-size: 14px;
       padding: 12px 28px;
       border-radius: 100px;
       text-decoration: none;
       margin-top: 20px;
-      transition: all 0.25s ease;
-      box-shadow: 0 4px 15px rgba(244, 217, 111, 0.3);
+      transition: all 0.2s ease;
     }
     .terms-back-btn:hover {
+      background: #1e293b;
       transform: translateY(-2px);
-      box-shadow: 0 6px 22px rgba(244, 217, 111, 0.45);
     }
   </style>
 </head>
@@ -259,13 +264,14 @@
               <div class="footer_copyright">Designed and Developed by <a href="index.html" class="footer_template-link"><b><i>Storyworks Studio</i></b></a></div>
             </div>
             <div class="footer_template-links">
-              <a href="terms.html" class="footer_template-link">Terms &amp; Conditions</a>
+              <a href="#termsModal" class="footer_template-link" id="footerTermsLink">Terms &amp; Conditions</a>
             </div>
           </div>
         </div>
       </div>
     </footer>
   </div>
+  <script src="custom.js" type="text/javascript"></script>
 </body>
 </html>
 

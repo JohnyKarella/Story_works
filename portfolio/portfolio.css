@@ -1,0 +1,510 @@
+/* ─── PORTFOLIO CONSOLIDATED STYLES ─── */
+
+/* ─── VARIABLES ──────────────────────────── */
+:root {
+    --bg: #f7f5f1;
+    --surface: #ffffff;
+    --ink: #141210;
+    --mid: #4a4540;
+    --muted: #9a948c;
+    --accent: #c8753a;
+    --gold: #c9a050;
+    --border: rgba(20, 18, 16, .09);
+    --bdstrong: rgba(20, 18, 16, .18);
+    --r: 10px;
+}
+
+/* ─── BASE CLASSES ───────────────────────── */
+.portfolio-body-class {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Outfit', sans-serif;
+}
+
+/* ─── WRAPPER ────────────────────────────── */
+.pw {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem; /* Padding inside wrapper to protect site-wide layout */
+}
+
+/* ─── HEADING ────────────────────────────── */
+.eye {
+    font-family: 'DM Mono', monospace;
+    font-size: .6rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: .4rem;
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+}
+
+.eye::before {
+    content: '';
+    width: 22px;
+    height: 1px;
+    background: var(--accent);
+    flex-shrink: 0;
+}
+
+.hd {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.15rem, 4vw, 2.4rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 1rem;
+}
+
+.hd em {
+    font-style: italic;
+    color: var(--accent);
+}
+
+/* ─── TOP TABS BAR ───────────────────────── */
+.cat-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: .3rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: .8rem;
+    box-shadow: 0 1px 4px rgba(20, 18, 16, .04);
+}
+
+.cat-tab {
+    font-family: BDO Grotesk, sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    padding: .38rem clamp(.45rem, .8vw, .85rem);
+    border-radius: 7px;
+    border: none;
+    background: #f6f0de47;
+    color: var(--mid);
+    cursor: pointer;
+    transition: background .18s, color .18s, box-shadow .18s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: .28rem;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.cat-tab:hover {
+    background: var(--bg);
+    color: var(--ink);
+}
+
+.cat-tab.active {
+    background: var(--ink);
+    color: #fff;
+    box-shadow: 0 2px 7px rgba(20, 18, 16, .2);
+}
+
+.tpill {
+    font-family: 'DM Mono', monospace;
+    font-size: .52rem;
+    padding: .04rem .32rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .16);
+    color: rgba(255, 255, 255, .78);
+}
+
+.cat-tab:not(.active) .tpill {
+    background: var(--border);
+    color: var(--muted);
+}
+
+/* ─── MAIN PANEL ─────────────────────────── */
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+    box-shadow: 0 2px 14px rgba(20, 18, 16, .06);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ─── SIDEBAR ────────────────────────────── */
+.sidebar {
+    border-bottom: 1px solid var(--border);
+    padding: .5rem;
+}
+
+.sb-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem;
+}
+
+.sb-head {
+    display: none;
+    font-family: 'Playfair Display', serif;
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--ink);
+    padding: .1rem .35rem .65rem;
+    margin-bottom: .3rem;
+    border-bottom: 2px solid var(--ink);
+    width: 100%;
+    align-items: center;
+    gap: .35rem;
+}
+
+.sb-item {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .38rem .58rem;
+    border-radius: 7px;
+    cursor: pointer;
+    border: 1px solid #eaa72133;
+    transition: background .16s, border-color .16s;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.sb-item:hover {
+    background: var(--bg);
+    border-color: var(--border);
+}
+
+.sb-item.active {
+    background: #141210cc;
+    border-color: var(--ink);
+}
+
+.sb-item.active .sb-label {
+    color: #fff;
+}
+
+.sb-item.active .sb-ico {
+    background: rgba(255, 255, 255, .14);
+}
+
+.sb-item.active .sb-cnt {
+    background: rgba(255, 255, 255, .18);
+    color: rgba(255, 255, 255, .78);
+}
+
+.sb-ico {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .82rem;
+    flex-shrink: 0;
+    transition: background .16s;
+}
+
+.sb-label {
+    font-family: BDO Grotesk, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--mid);
+    transition: color .16s;
+    white-space: nowrap;
+}
+
+.sb-cnt {
+    font-family: 'DM Mono', monospace;
+    font-size: .54rem;
+    background: var(--bg);
+    color: var(--muted);
+    padding: .05rem .3rem;
+    border-radius: 20px;
+}
+
+/* ─── IMAGE PANEL & INFO BAR ─────────────── */
+.img-panel {
+    flex: 1;
+    padding: 20px;
+    min-width: 0;
+}
+
+.info-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-bottom: .7rem;
+    padding-bottom: .6rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.ib-l {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+}
+
+.ib-title {
+    font-family: 'Playfair Display', serif;
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.ib-cnt {
+    font-family: 'DM Mono', monospace;
+    font-size: .56rem;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: .16rem .5rem;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* ─── GRID LOGIC ─────────────────────────── */
+.grid-set {
+    display: none;
+    grid-template-columns: repeat(2, 1fr);
+    gap: .5rem;
+    transition: opacity .2s ease, transform .2s ease;
+}
+
+.grid-set.active {
+    display: grid;
+}
+
+.grid-set.out {
+    opacity: 0;
+    transform: translateY(7px);
+}
+
+/* ─── PORTFOLIO CARD ─────────────────────── */
+.pc {
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    transition: transform .25s cubic-bezier(.23, 1, .32, 1), box-shadow .25s;
+    -webkit-tap-highlight-color: transparent;
+    aspect-ratio: 4/3;
+}
+
+.pc:active {
+    transform: scale(.97);
+}
+
+.pc img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: brightness(.84) saturate(.88);
+    transition: transform .5s cubic-bezier(.23, 1, .32, 1), filter .35s;
+}
+
+.pc-lbl {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: .42rem .58rem;
+    background: linear-gradient(to top, rgba(14, 12, 10, .74), transparent);
+    font-size: .6rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, .92);
+    transition: opacity .22s;
+    z-index: 1;
+}
+
+.pc-ov {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: .75rem;
+    background: linear-gradient(to top, rgba(14, 12, 10, .9) 0%, rgba(14, 12, 10, .08) 55%, transparent 100%);
+    opacity: 0;
+    transition: opacity .28s;
+}
+
+.pc-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: .48rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .16rem;
+}
+
+.pc-title {
+    font-family: 'Playfair Display', serif;
+    font-size: .82rem;
+    color: #fff;
+    line-height: 1.25;
+}
+
+.pc-quote {
+    font-size: .6rem;
+    font-style: italic;
+    color: rgba(255, 255, 255, .56);
+    margin-top: .2rem;
+    line-height: 1.42;
+    display: none;
+}
+
+@media(hover:hover) {
+    .pc:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 22px rgba(20, 18, 16, .13);
+    }
+    .pc:hover img {
+        transform: scale(1.06);
+        filter: brightness(.46) saturate(.62);
+    }
+    .pc:hover .pc-lbl { opacity: 0; }
+    .pc:hover .pc-ov { opacity: 1; }
+}
+
+/* ─── LIGHTBOX ───────────────────────────── */
+.lb, .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgb(7 6 5 / 45%);
+    /* backdrop-filter: blur(14px); */
+    -webkit-backdrop-filter: blur(14px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity .3s ease;
+}
+
+.lb.open, .lightbox.active {
+    display: flex;
+    opacity: 1;
+}
+
+.lb-box {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #1b1916;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, .07);
+    transform: scale(.93) translateY(18px);
+    transition: transform .32s cubic-bezier(.23, 1, .32, 1), opacity .26s;
+    opacity: 0;
+}
+
+.lb.open .lb-box {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.lb-img {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lb-img img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* ─── RESPONSIVE BREAKPOINTS ─────────────── */
+
+@media (max-width: 768px) {
+    .grid-set.active {
+        grid-template-columns: 1fr;
+    }
+    .cat-bar {
+        padding: .5rem;
+    }
+}
+
+@media(min-width:820px) {
+    .panel {
+        flex-direction: row;
+    }
+
+    .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        border-bottom: none;
+        border-right: 1px solid var(--border);
+        padding: .9rem .7rem;
+        overflow-y: auto;
+    }
+
+    .sb-inner {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 10px;
+    }
+
+    .sb-head { display: flex; }
+
+    .grid-set {
+        grid-template-columns: repeat(3, 1fr);
+        gap: .65rem;
+    }
+
+    .pc {
+        aspect-ratio: unset;
+        height: 185px;
+    }
+
+    .pc.feat {
+        grid-row: span 2;
+        height: 100%;
+    }
+
+    .pc.feat .pc-quote { display: block; }
+
+    .pc.wide {
+        grid-column: span 2;
+    }
+}
+
+@media(min-width:1100px) {
+    .sidebar { width: 240px; }
+    .pc { height: 200px; }
+}
+
+/* State management helpers */
+.grid-set, .sb-group, .info-set { display: none; }
+.grid-set.active, .sb-group.active { display: grid; }
+.sb-group.active { display: contents; }
+.info-set.active { display: flex; }
+
+
+
+
+
+
+
+

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="swGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="50%" stop-color="#c8753a" />
+      <stop offset="100%" stop-color="#8b3a10" />
+    </linearGradient>
+    <linearGradient id="edgeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.08" />
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+  </defs>
+  <!-- Rounded Squircle Base -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#swGrad)" />
+  <!-- Crisp Inner Rim -->
+  <rect x="2.5" y="2.5" width="59" height="59" rx="15.5" fill="none" stroke="url(#edgeGrad)" stroke-width="1.5" />
+  <!-- Bold Storyworks "S" Emblem -->
+  <text x="32" y="45" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="38" font-weight="800" fill="#ffffff" text-anchor="middle" filter="url(#softShadow)">S</text>
+</svg>
+

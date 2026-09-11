@@ -1,0 +1,391 @@
+/* Home text testimonials */
+
+
+/* ── SECTION ── */
+.testi-section {
+    padding: 90px 0 100px;
+    background: #f5f3ee;
+    font-family: 'DM Sans', sans-serif;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ambient glow */
+.testi-section::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(245, 166, 35, .07), transparent 65%);
+    pointer-events: none;
+}
+
+/* ── HEADER ── */
+.testi-head {
+    text-align: center;
+    margin-bottom: 60px;
+    padding: 0 5vw;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .7s ease, transform .7s ease;
+}
+
+.testi-head.on {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.testi-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 14px;
+}
+
+.testi-label::before,
+.testi-label::after {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 1.5px;
+    background: linear-gradient(90deg, #F5A623, #e8882a);
+    border-radius: 2px;
+}
+
+.testi-head h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 4vw, 50px);
+    font-weight: 600;
+    letter-spacing: -.3px;
+    line-height: 1.15;
+    color: #1a1a1a;
+}
+
+.testi-head h2 em {
+    font-style: italic;
+    color: #F5A623;
+}
+
+/* ── STAGE ── */
+.testi-stage-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+}
+
+.testi-stage {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1200px;
+}
+
+/* ── CARD ── */
+.testi-card {
+    position: absolute;
+    width: clamp(300px, 52vw, 580px);
+    background: #fff;
+    border-radius: 22px;
+    padding: clamp(28px, 4vw, 44px) clamp(24px, 4vw, 44px) clamp(24px, 3.5vw, 38px);
+    border: 1px solid rgba(0, 0, 0, .07);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .10), 0 4px 16px rgba(0, 0, 0, .05);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    cursor: pointer;
+    user-select: none;
+
+    /* default: hidden behind */
+    opacity: 0;
+    transform: scale(.86) translateY(28px) translateZ(-180px);
+    transition:
+        transform .6s cubic-bezier(.25, 1, .5, 1),
+        opacity .6s ease,
+        box-shadow .4s ease,
+        z-index 0s .3s;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* PREV — peeking left behind */
+.testi-card.pos-prev {
+    opacity: .5;
+    transform: scale(.88) translateX(-30%) translateY(-4px) rotateY(30deg) translateZ(-40px);
+    z-index: 2;
+    pointer-events: auto;
+}
+
+/* NEXT — peeking right behind */
+.testi-card.pos-next {
+    opacity: .5;
+    transform: scale(.88) translateX(30%) translateY(4px) rotateY(-30deg) translateZ(-40px);
+    z-index: 2;
+    pointer-events: auto;
+}
+
+/* FAR cards */
+.testi-card.pos-far-prev {
+    opacity: .25;
+    transform: scale(.80) translateX(-50%) translateY(25px) rotateY(50deg) translateZ(-260px);
+    z-index: 1;
+}
+
+.testi-card.pos-far-next {
+    opacity: .25;
+    transform: scale(.80) translateX(50%) translateY(25px) rotateY(-50deg) translateZ(-260px);
+    z-index: 1;
+}
+
+/* ACTIVE — front and centre */
+.testi-card.pos-active {
+    opacity: 1;
+    transform: scale(1) translateX(0) translateY(0) rotateY(0deg) translateZ(0);
+    z-index: 10;
+    pointer-events: auto;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, .13), 0 6px 20px rgba(245, 166, 35, .1);
+    transition:
+        transform .6s cubic-bezier(.25, 1, .5, 1),
+        opacity .6s ease,
+        box-shadow .4s ease,
+        z-index 0s 0s;
+}
+
+/* ── gold accent top bar ── */
+.testi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 32px;
+    right: 32px;
+    height: 2.5px;
+    background: linear-gradient(90deg, #F5A623, #e8882a, transparent);
+    border-radius: 0 0 4px 4px;
+    opacity: 0;
+    transition: opacity .4s ease .3s;
+}
+
+.testi-card.pos-active::before {
+    opacity: 1;
+}
+
+/* ── QUOTE MARK ── */
+.testi-quote-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 72px;
+    line-height: .8;
+    color: #F5A623;
+    opacity: .25;
+    position: absolute;
+    top: 20px;
+    right: 32px;
+    pointer-events: none;
+}
+
+/* ── STARS ── */
+.testi-stars {
+    display: flex;
+    gap: 4px;
+}
+
+.testi-stars svg {
+    width: 16px;
+    height: 16px;
+    fill: #F5A623;
+    stroke: none;
+}
+
+/* ── REVIEW TEXT ── */
+.testi-text {
+    font-size: clamp(14px, 1.6vw, 15px);
+    line-height: 1.8;
+    color: #555;
+    font-weight: 300;
+    font-style: italic;
+    flex: 1;
+}
+
+/* ── DIVIDER ── */
+.testi-divider {
+    height: 1px;
+    background: linear-gradient(90deg, #F5A623, rgba(245, 166, 35, .0));
+    width: 0%;
+    transition: width .8s ease .5s;
+    border-radius: 2px;
+}
+
+.testi-card.pos-active .testi-divider {
+    width: 60%;
+}
+
+/* ── AUTHOR ── */
+.testi-author {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.testi-photo {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    /* background: linear-gradient(135deg, #e8d8c8, #d4c8b8); */
+    border: 2.5px solid rgba(245, 166, 35, .3);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #b0a090;
+}
+
+.testi-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.testi-author-info {}
+
+.testi-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 2px;
+}
+
+.testi-designation {
+    font-size: 12px;
+    color: #999;
+    font-weight: 300;
+    letter-spacing: .2px;
+}
+
+/* ── DOTS ── */
+.testi-dots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 0;
+}
+
+.testi-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, .15);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background .3s, transform .3s, width .3s;
+}
+
+.testi-dot.active {
+    background: #F5A623;
+    width: 24px;
+    border-radius: 4px;
+    transform: scaleY(1.1);
+}
+
+/* ── ARROWS ── */
+.testi-arrows {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.testi-arrow {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0, 0, 0, .1);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s, transform .25s cubic-bezier(.34, 1.5, .64, 1), box-shadow .2s;
+}
+
+.testi-arrow:hover {
+    border-color: rgba(245, 166, 35, .4);
+    background: rgba(245, 166, 35, .06);
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .07);
+}
+
+.testi-arrow svg {
+    width: 18px;
+    height: 18px;
+    stroke: #888;
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke .2s;
+}
+
+.testi-arrow:hover svg {
+    stroke: #e8882a;
+}
+
+/* controls row */
+.testi-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 0 5vw;
+    flex-wrap: wrap;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+    .testi-stage {
+        height: 420px;
+    }
+
+    .testi-card {
+        width: calc(100vw - 48px);
+        padding: 28px 24px 24px;
+    }
+
+    .testi-card.pos-prev {
+        transform: scale(.84) translateX(-8%) translateY(20px) rotateY(5deg) translateZ(-100px);
+    }
+
+    .testi-card.pos-next {
+        transform: scale(.84) translateX(8%) translateY(20px) rotateY(-5deg) translateZ(-100px);
+    }
+
+    .testi-card.pos-far-prev,
+    .testi-card.pos-far-next {
+        opacity: 0;
+    }
+}
+
+@media (max-width: 420px) {
+    .testi-section {
+        padding: 64px 0 72px;
+    }
+
+    .testi-stage {
+        height: 460px;
+    }
+}

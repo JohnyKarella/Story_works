@@ -1,0 +1,225 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Agency Services{% endblock %}
+
+{% block extra_js %}
+<script>
+function openEditService(serviceOrBtn) {
+  let service = serviceOrBtn;
+  if (serviceOrBtn instanceof HTMLElement) {
+    const d = serviceOrBtn.dataset;
+    service = {
+      id: d.id,
+      title: d.title || "",
+      slug: d.slug || "",
+      short_desc: d.shortDesc || "",
+      full_desc: d.fullDesc || "",
+      icon: d.icon || "",
+      display_order: d.order || 0,
+      is_active: d.active === "1" || d.active === "true"
+    };
+  }
+
+  const form = document.getElementById("editServiceForm");
+  if (!form || !service) return;
+
+  form.action = `/admin/services/${service.id}/edit`;
+
+  const setInputVal = (name, val) => {
+    const el = form.querySelector(`input[name="${name}"], textarea[name="${name}"]`);
+    if (el) el.value = val !== undefined && val !== null ? val : "";
+  };
+
+  setInputVal("title", service.title);
+  setInputVal("slug", service.slug);
+  setInputVal("short_desc", service.short_desc);
+  setInputVal("full_desc", service.full_desc);
+  setInputVal("icon", service.icon);
+  setInputVal("display_order", service.display_order || 0);
+
+  const activeCheckbox = form.querySelector('input[name="is_active"]');
+  if (activeCheckbox) {
+    activeCheckbox.checked = Boolean(service.is_active);
+  }
+
+  if (typeof openModal === "function") {
+    openModal("editServiceModal");
+  } else {
+    const modal = document.getElementById("editServiceModal");
+    if (modal) modal.classList.add("active");
+  }
+}
+window.openEditService = openEditService;
+</script>
+{% endblock %}
+
+{% block page_title %}Agency Services{% endblock %}
+
+{% block topbar_actions %}
+<button type="button" class="btn btn-primary btn-sm" onclick="openModal('newServiceModal')">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  Add Service
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width: 70px;">Order</th>
+          <th>Service Title</th>
+          <th>Summary</th>
+          <th>Status</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if services %}
+          {% for s in services %}
+            <tr>
+              <td style="color: var(--text-dim); font-weight: 600;">#{{ s.display_order }}</td>
+              <td>
+                <div style="font-weight: 600;">{{ s.title }}</div>
+                <div style="font-size: 11px; color: var(--text-dim);">slug: {{ s.slug }}</div>
+              </td>
+              <td style="font-size: 13px; color: var(--text-muted); max-width: 400px;">
+                {{ s.short_desc or '—' }}
+              </td>
+              <td>
+                {% if s.is_active %}
+                  <span class="badge badge-contacted">Active</span>
+                {% else %}
+                  <span class="badge badge-closed">Inactive</span>
+                {% endif %}
+              </td>
+              <td style="text-align: right; white-space: nowrap;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openEditService(this)"
+                        data-id="{{ s.id }}"
+                        data-title="{{ s.title|e }}"
+                        data-slug="{{ (s.slug or '')|e }}"
+                        data-short-desc="{{ (s.short_desc or '')|e }}"
+                        data-full-desc="{{ (s.full_desc or '')|e }}"
+                        data-icon="{{ (s.icon or '')|e }}"
+                        data-order="{{ s.display_order or 0 }}"
+                        data-active="{{ 1 if s.is_active else 0 }}">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: middle;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Edit
+                </button>
+                <a href="{{ url_for('admin.edit_service', service_id=s.id) }}" class="btn btn-secondary btn-sm" title="Open full edit page" style="margin-left: 4px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+                <form method="POST" action="{{ url_for('admin.delete_service', service_id=s.id) }}" style="display: inline; margin-left: 4px;" onsubmit="return confirm('Delete this service?');">
+                  <button type="submit" class="btn btn-danger btn-sm" title="Delete">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 48px;">
+              No services registered yet. Click "Add Service" to create one.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── New Service Modal ── -->
+<div class="modal-overlay" id="newServiceModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Add New Service</div>
+      <button class="modal-close" onclick="closeAllModals()">&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('admin.services') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Service Title *</label>
+          <input type="text" name="title" class="form-control" placeholder="e.g. Brand Identity & Strategy" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Short Description</label>
+          <input type="text" name="short_desc" class="form-control" placeholder="Brief 1-sentence value proposition" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Full Details & Deliverables</label>
+          <textarea name="full_desc" class="form-textarea" placeholder="Comprehensive breakdown of deliverables…"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Display Order</label>
+            <input type="number" name="display_order" class="form-control" value="0" />
+          </div>
+          <div class="form-group" style="display: flex; align-items: center; margin-top: 24px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" name="is_active" value="1" checked style="width: 18px; height: 18px;" />
+              <span style="font-size: 14px;">Active</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeAllModals()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Service</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── Edit Service Modal ── -->
+<div class="modal-overlay" id="editServiceModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Edit Service</div>
+      <button class="modal-close" onclick="closeAllModals()">&times;</button>
+    </div>
+    <form id="editServiceForm" method="POST">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Service Title *</label>
+          <input type="text" name="title" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">URL Slug</label>
+          <input type="text" name="slug" class="form-control" placeholder="service-slug (leave blank to auto-generate)" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Short Description (Summary)</label>
+          <input type="text" name="short_desc" class="form-control" placeholder="Brief value proposition" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Full Details & Deliverables</label>
+          <textarea name="full_desc" class="form-textarea" rows="4" placeholder="Comprehensive breakdown of deliverables…"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Icon / Category Tag</label>
+            <input type="text" name="icon" class="form-control" placeholder="e.g. strategy, website, photo" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Display Order</label>
+            <input type="number" name="display_order" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group" style="margin-top: 12px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" name="is_active" value="1" style="width: 18px; height: 18px; accent-color: var(--accent);" />
+            <span style="font-size: 14px; font-weight: 500;">Active (Visible on website)</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeAllModals()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,803 @@
+/* ABOUT2 */
+
+/* Service Flow */
+
+/* ===========================
+           Reset & Base Styles
+           =========================== */
+
+/* ===========================
+           Container
+           =========================== */
+.container_steps {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ===========================
+           Work Process Section
+           =========================== */
+.work-process-section {
+    padding: 80px 0 100px;
+    background: #f8f9fa70;
+    position: relative;
+}
+
+/* ===========================
+           Section Header
+           =========================== */
+.section-header {
+    text-align: center;
+    margin-bottom: 100px;
+}
+
+.section-title {
+    font-size: 48px;
+    font-weight: 400;
+    color: #2d3748;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+}
+
+.gradient-text {
+    background: linear-gradient(90deg, #e4c040 0%, #968033 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 400;
+}
+
+.section-subtitle {
+    font-size: 16px;
+    color: #6b7280;
+    font-weight: 400;
+}
+
+/* ===========================
+           Process Wrapper
+           =========================== */
+.process-wrapper {
+    position: relative;
+    padding: 0;
+}
+
+/* ===========================
+           Process Row
+           =========================== */
+.process-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 80px;
+    margin-bottom: 150px;
+    position: relative;
+    z-index: 2;
+}
+
+.process-row.reverse {
+    margin-bottom: 0;
+}
+
+/* ===========================
+           Process Item
+           =========================== */
+.process-item {
+    text-align: center;
+    position: relative;
+}
+
+/* ===========================
+           Process Number
+           =========================== */
+.process-number {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 auto 35px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.process-number::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: -12px;
+    right: -12px;
+    bottom: -12px;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.15;
+    filter: blur(15px);
+    z-index: -1;
+}
+
+.process-item:hover .process-number {
+    transform: scale(1.05);
+}
+
+/* Number Colors - Matching Screenshot */
+.process-number.green {
+    background: linear-gradient(0deg, #c8753a 0%, #e4c040 100%);
+}
+
+.process-number.coral {
+    background: linear-gradient(20deg, #c8753a 0%, #e4c040 100%);
+}
+
+.process-number.blue {
+    background: linear-gradient(40deg, #c8753a 0%, #e4c040 100%);
+}
+
+.process-number.magenta {
+    background: linear-gradient(60deg, #c8753a 0%, #e4c040 100%);
+}
+
+.process-number.cyan {
+    background: linear-gradient(80deg, #c8753a 0%, #e4c040 100%);
+}
+
+.process-number.light-blue {
+    background: linear-gradient(100deg, #c8753a 0%, #e4c040 100%);
+}
+
+/* ===========================
+           Process Title
+           =========================== */
+.process-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 18px;
+}
+
+/* ===========================
+           Process Description
+           =========================== */
+.process-description {
+    font-size: 16px;
+    color: #5c5c5c;
+    line-height: 1.5;
+    max-width: 340px;
+    margin: 0 auto;
+    font-weight: 500;
+}
+
+/* ===========================
+           SVG Path with Arrows
+           =========================== */
+.process-path {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    width: 110%;
+    height: calc(100% - -30px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.path-line {
+    stroke: #c5cdd6;
+    stroke-width: 2;
+    stroke-dasharray: 5, 5;
+    fill: none;
+    stroke-linecap: round;
+}
+
+/* Animated flowing line */
+.path-animated {
+    stroke: #e4c968;
+    stroke-width: 2.5;
+    stroke-dasharray: 5, 5;
+    fill: none;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px rgba(167, 139, 250, 0.4));
+}
+
+/* Arrow markers */
+.arrow-marker {
+    fill: #cbd5e0;
+}
+
+.arrow-marker-animated {
+    fill: #e4c040;
+    filter: drop-shadow(0 0 6px rgba(167, 139, 250, 0.6));
+}
+
+/* ===========================
+           Responsive Design
+           =========================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .section-title {
+        font-size: 40px;
+    }
+
+    .process-row {
+        gap: 60px;
+        margin-bottom: 120px;
+    }
+}
+
+/* Mobile Large */
+@media (max-width: 768px) {
+    .work-process-section {
+        padding: 60px 0;
+    }
+
+    .section-header {
+        margin-bottom: 60px;
+    }
+
+    .section-title {
+        font-size: 32px;
+    }
+
+    .section-subtitle {
+        font-size: 15px;
+    }
+
+    .process-row {
+        grid-template-columns: 1fr;
+        gap: 60px;
+        margin-bottom: 60px;
+    }
+
+    .process-path {
+        display: none;
+    }
+
+    .process-description {
+        max-width: 100%;
+    }
+
+    /* Make both rows act as one list */
+    .process-wrapper {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Reorder second row items */
+    .process-row.reverse {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .process-row.reverse .process-item:nth-child(1) {
+        order: 3;
+        /* 6 -> last */
+    }
+
+    .process-row.reverse .process-item:nth-child(2) {
+        order: 2;
+        /* 5 */
+    }
+
+    .process-row.reverse .process-item:nth-child(3) {
+        order: 1;
+        /* 4 -> first */
+    }
+
+
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+    .section-title {
+        font-size: 28px;
+    }
+
+    .process-number {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+    }
+
+    .process-title {
+        font-size: 20px;
+    }
+
+    .process-description {
+        font-size: 13px;
+    }
+}
+
+
+
+/* Services Card */
+
+
+
+.services-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.services-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.services-header .subtitle {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    color: #a855f7;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.services-header h1 {
+    font-size: 42px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0;
+}
+
+.services-header h1 .highlight {
+    color: #ef4444;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 20px;
+}
+
+/* Card Container with 3D Flip */
+.service-card-container {
+    perspective: 1000px;
+    height: 250px;
+}
+
+.service-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+}
+
+.service-card-container:hover .service-card-inner {
+    transform: rotateY(180deg);
+}
+
+.service-card-front,
+.service-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.service-card-front {
+    background: #f8f2db;
+    backdrop-filter: blur(10px);
+}
+
+.service-card-back {
+    background: linear-gradient(0deg, #f8f7f3, #fef8de);
+    backdrop-filter: blur(10px);
+    transform: rotateY(180deg);
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Icon Pattern Background - Continuous Scroll */
+.icon-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.icon-pattern-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 200%;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    animation: scrollUpContinuous 15s linear infinite;
+}
+
+@keyframes scrollUpContinuous {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-50%);
+    }
+}
+
+.icon-pattern-wrapper i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    opacity: 0.08;
+}
+
+/* Front Card Content */
+/* .card-content {
+    position: relative;
+    z-index: 1;
+    padding: 40px 30px;
+    text-align: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+} */
+
+/* Floating Icon Animation */
+.icon-wrapper {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    animation: floatIcon 3s ease-in-out infinite;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes floatIcon {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translateY(-15px);
+        opacity: 0.7;
+    }
+}
+
+/* Icon colors for each service */
+.service-card-container:nth-child(1) .icon-wrapper {
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+}
+
+.service-card-container:nth-child(1) .icon-pattern-wrapper i {
+    color: #3b82f6;
+}
+
+.service-card-container:nth-child(2) .icon-wrapper {
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+}
+
+.service-card-container:nth-child(2) .icon-pattern-wrapper i {
+    color: #ec4899;
+}
+
+.service-card-container:nth-child(3) .icon-wrapper {
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+}
+
+.service-card-container:nth-child(3) .icon-pattern-wrapper i {
+    color: #eab308;
+}
+
+.service-card-container:nth-child(4) .icon-wrapper {
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+}
+
+.service-card-container:nth-child(4) .icon-pattern-wrapper i {
+    color: #f97316;
+}
+
+.service-card-container:nth-child(5) .icon-wrapper {
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+}
+
+.service-card-container:nth-child(5) .icon-pattern-wrapper i {
+    color: #14b8a6;
+}
+
+.service-card-container:nth-child(6) .icon-wrapper {
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+}
+
+.service-card-container:nth-child(6) .icon-pattern-wrapper i {
+    color: #ef4444;
+}
+
+.service-card-container:nth-child(7) .icon-wrapper {
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+}
+
+.service-card-container:nth-child(7) .icon-pattern-wrapper i {
+    color: #a855f7;
+}
+
+.service-card-container:nth-child(8) .icon-wrapper {
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+}
+
+.service-card-container:nth-child(8) .icon-pattern-wrapper i {
+    color: #8b5cf6;
+}
+
+.service-card-container:nth-child(9) .icon-wrapper {
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+}
+
+.service-card-container:nth-child(9) .icon-pattern-wrapper i {
+    color: #3b82f6;
+}
+
+.icon-wrapper i {
+    font-size: 32px;
+    color: white;
+}
+
+.card-content h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1;
+    line-height: 1.4;
+    text-align: center;
+}
+
+/* Back Card Content */
+.service-card-back h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.service-card-back p {
+    font-size: 15px;
+    color: #000000;
+    line-height: 1.8;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.service-card-back .back-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.service-card-back .back-icon i {
+    font-size: 28px;
+    color: white;
+}
+
+.service-card-back .learn-more {
+    display: inline-block;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #a855f7, #9333ea);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+}
+
+.service-card-back .learn-more:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(168, 85, 247, 0.4);
+}
+
+/* Back card icon colors matching front */
+.service-card-container:nth-child(1) .service-card-back .back-icon {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.service-card-container:nth-child(2) .service-card-back .back-icon {
+    background: linear-gradient(135deg, #ec4899, #db2777);
+}
+
+.service-card-container:nth-child(3) .service-card-back .back-icon {
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+}
+
+.service-card-container:nth-child(4) .service-card-back .back-icon {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+}
+
+.service-card-container:nth-child(5) .service-card-back .back-icon {
+    background: linear-gradient(135deg, #14b8a6, #0d9488);
+}
+
+.service-card-container:nth-child(6) .service-card-back .back-icon {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.service-card-container:nth-child(7) .service-card-back .back-icon {
+    background: linear-gradient(135deg, #a855f7, #9333ea);
+}
+
+.service-card-container:nth-child(8) .service-card-back .back-icon {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.service-card-container:nth-child(9) .service-card-back .back-icon {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .services-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+    }
+
+    .services-header h1 {
+        font-size: 36px;
+    }
+
+    .service-card-container {
+        height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .services-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 10px;
+    }
+
+    .services-header h1 {
+        font-size: 32px;
+    }
+
+    .service-card-container {
+        height: 280px;
+    }
+
+    .card-content {
+        padding: 30px 20px;
+    }
+
+    .icon-wrapper {
+        width: 70px;
+        height: 70px;
+    }
+
+    .icon-wrapper i {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 576px) {
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .services-header h1 {
+        font-size: 28px;
+    }
+
+    .services-header .subtitle {
+        font-size: 12px;
+    }
+
+    .card-content h3 {
+        font-size: 18px;
+    }
+
+    .service-card-container {
+        height: 260px;
+    }
+}
+
+/* Animation on load */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.service-card-container {
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+}
+
+.service-card-container:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.service-card-container:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.service-card-container:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.service-card-container:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.service-card-container:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.service-card-container:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+.service-card-container:nth-child(7) {
+    animation-delay: 0.7s;
+}
+
+.service-card-container:nth-child(8) {
+    animation-delay: 0.8s;
+}
+
+.service-card-container:nth-child(9) {
+    animation-delay: 0.9s;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Footer */

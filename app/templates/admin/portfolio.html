@@ -1,0 +1,79 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Portfolio Projects{% endblock %}
+{% block page_title %}Portfolio Case Studies{% endblock %}
+
+{% block topbar_actions %}
+<a href="{{ url_for('admin.new_portfolio') }}" class="btn btn-primary btn-sm">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  New Project
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width: 80px;">Cover</th>
+          <th>Project & Client</th>
+          <th>Category</th>
+          <th>Badge</th>
+          <th>Year</th>
+          <th>Featured</th>
+          <th>Status</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if items %}
+          {% for p in items %}
+            <tr>
+              <td>
+                {% if p.cover_image %}
+                  <img src="{{ p.cover_image }}" alt="Cover" style="width: 60px; height: 42px; border-radius: 4px; object-fit: cover; background: var(--bg-input);" onerror="this.src='/assets/images/portfolio/hp/4.jpg'" />
+                {% else %}
+                  <div style="width: 60px; height: 42px; border-radius: 4px; background: var(--bg-input); display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 10px;">No Cover</div>
+                {% endif %}
+              </td>
+              <td>
+                <div style="font-weight: 600;">
+                  <a href="{{ url_for('admin.edit_portfolio', item_id=p.id) }}" style="color: var(--text-main);">{{ p.title }}</a>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">Client: {{ p.client or '—' }}</div>
+              </td>
+              <td><span style="font-size: 12px; color: var(--primary);">{{ p.category or '—' }}</span></td>
+              <td><span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--bg-main); border: 1px solid var(--border-color);">{{ p.badge or p.client }}</span></td>
+              <td style="font-size: 12px; color: var(--text-dim);">{{ p.year }}</td>
+              <td>
+                {% if p.is_featured %}
+                  <span style="color: #34d399; font-size: 12px; font-weight: 600;">★ Featured</span>
+                {% else %}
+                  <span style="color: var(--text-dim); font-size: 12px;">Standard</span>
+                {% endif %}
+              </td>
+              <td><span class="badge badge-{{ p.status }}">{{ p.status }}</span></td>
+              <td style="text-align: right; white-space: nowrap;">
+                <a href="{{ url_for('admin.edit_portfolio', item_id=p.id) }}" class="btn btn-secondary btn-sm">Edit</a>
+                <form method="POST" action="{{ url_for('admin.delete_portfolio', item_id=p.id) }}" style="display: inline;" onsubmit="return confirm('Delete this portfolio project?');">
+                  <button type="submit" class="btn btn-danger btn-sm" title="Delete">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 48px;">
+              No portfolio projects recorded yet. Click "New Project" to add your first case study.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+

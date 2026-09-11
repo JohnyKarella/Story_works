@@ -1,0 +1,49 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Subscribers{% endblock %}
+{% block page_title %}Newsletter Subscribers{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">All Subscribers ({{ subscribers|length }})</div>
+  </div>
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width: 70px;">#</th>
+          <th>Subscriber Email</th>
+          <th>Subscribed Date</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if subscribers %}
+          {% for sub in subscribers %}
+            <tr>
+              <td style="color: var(--text-dim);">#{{ sub.id }}</td>
+              <td style="font-weight: 600;">
+                <a href="mailto:{{ sub.email }}" style="color: var(--primary);">{{ sub.email }}</a>
+              </td>
+              <td style="color: var(--text-dim); font-size: 13px;">{{ sub.created_at }}</td>
+              <td style="text-align: right;">
+                <form method="POST" action="{{ url_for('admin.delete_subscriber', sub_id=sub.id) }}" style="display: inline;" onsubmit="return confirm('Remove this subscriber?');">
+                  <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 48px;">
+              No newsletter subscribers recorded yet.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+

@@ -168,7 +168,7 @@
       <span class="client-badge">
         <i class="fas fa-gem" style="margin-right: 4px;"></i> Client Partner
       </span>
-      {% if client.company %}
+      {% if client and client.company %}
         <span style="font-size: 13px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px;">
           <i class="fas fa-building" style="color: var(--primary); font-size: 11px;"></i> {{ client.company }}
         </span>
@@ -178,7 +178,7 @@
       </span>
     </div>
     <h2 style="font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 6px; letter-spacing: -0.4px;">
-      Welcome back, {{ client.full_name or client.username }}!
+      Welcome back, {{ (client.full_name or client.username) if client else 'Client' }}!
     </h2>
     <p style="font-size: 14px; color: var(--text-muted); max-width: 620px; line-height: 1.55;">
       Manage your creative campaigns, track studio progress, or brief us on a new project. Our strategy and design team is at your disposal.
@@ -207,7 +207,7 @@
         <span style="font-size: 11.5px; color: var(--text-dim); font-weight: 600;">All Submissions &rarr;</span>
       </div>
       <div style="font-size: 28px; font-weight: 800; color: #ffffff; line-height: 1.1; margin-bottom: 4px;">
-        {{ stats.total }}
+        {{ (stats.total or 0) if stats else 0 }}
       </div>
       <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
         Total Project Briefs
@@ -228,13 +228,13 @@
         <span style="font-size: 11.5px; color: #60a5fa; font-weight: 600;">Awaiting Review &rarr;</span>
       </div>
       <div style="font-size: 28px; font-weight: 800; color: #60a5fa; line-height: 1.1; margin-bottom: 4px;">
-        {{ stats.new }}
+        {{ (stats.new or 0) if stats else 0 }}
       </div>
       <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
         In Studio Review
       </div>
       <div class="kpi-bar">
-        <div class="kpi-bar-fill" style="width: {% if stats.total > 0 %}{{ (stats.new / stats.total * 100)|round }}{% else %}0{% endif %}%; background: #60a5fa;"></div>
+        <div class="kpi-bar-fill" style="width: {% if stats and stats.total and stats.total > 0 %}{{ (((stats.new or 0) / stats.total) * 100)|round }}{% else %}0{% endif %}%; background: #60a5fa;"></div>
       </div>
     </div>
   </a>
@@ -249,13 +249,13 @@
         <span style="font-size: 11.5px; color: #c084fc; font-weight: 600;">Active Flight &rarr;</span>
       </div>
       <div style="font-size: 28px; font-weight: 800; color: #c084fc; line-height: 1.1; margin-bottom: 4px;">
-        {{ stats.in_progress }}
+        {{ (stats.in_progress or 0) if stats else 0 }}
       </div>
       <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
         In Active Production
       </div>
       <div class="kpi-bar">
-        <div class="kpi-bar-fill" style="width: {% if stats.total > 0 %}{{ (stats.in_progress / stats.total * 100)|round }}{% else %}0{% endif %}%; background: #c084fc;"></div>
+        <div class="kpi-bar-fill" style="width: {% if stats and stats.total and stats.total > 0 %}{{ (((stats.in_progress or 0) / stats.total) * 100)|round }}{% else %}0{% endif %}%; background: #c084fc;"></div>
       </div>
     </div>
   </a>
@@ -270,13 +270,13 @@
         <span style="font-size: 11.5px; color: #34d399; font-weight: 600;">Delivered &rarr;</span>
       </div>
       <div style="font-size: 28px; font-weight: 800; color: #34d399; line-height: 1.1; margin-bottom: 4px;">
-        {{ stats.completed }}
+        {{ (stats.completed or 0) if stats else 0 }}
       </div>
       <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
         Completed Deliveries
       </div>
       <div class="kpi-bar">
-        <div class="kpi-bar-fill" style="width: {% if stats.total > 0 %}{{ (stats.completed / stats.total * 100)|round }}{% else %}0{% endif %}%; background: #34d399;"></div>
+        <div class="kpi-bar-fill" style="width: {% if stats and stats.total and stats.total > 0 %}{{ (((stats.completed or 0) / stats.total) * 100)|round }}{% else %}0{% endif %}%; background: #34d399;"></div>
       </div>
     </div>
   </a>
@@ -291,7 +291,7 @@
         <i class="fas fa-clock" style="color: var(--primary);"></i> Recent Project Briefs
       </h3>
       <a href="{{ url_for('client.requests') }}" style="font-size: 13px; color: var(--primary); font-weight: 600; text-decoration: none;">
-        View All ({{ stats.total }}) &rarr;
+        View All ({{ (stats.total or 0) if stats else 0 }}) &rarr;
       </a>
     </div>
 

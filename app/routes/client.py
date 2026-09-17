@@ -19,9 +19,18 @@ def client_login_required(f):
     """Decorator to require authenticated client session."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get("client_id"):
+        client_id = session.get("client_id")
+        if not client_id:
             flash("Please sign in to access your client portal.", "warning")
             return redirect(url_for("client.login", next=request.url))
+
+        client = User.get_by_id(client_id)
+        if not client:
+            for key in ["client_id", "client_username", "client_email", "client_name", "client_role"]:
+                session.pop(key, None)
+            flash("Your session has expired. Please sign in again.", "warning")
+            return redirect(url_for("client.login", next=request.url))
+
         return f(*args, **kwargs)
     return decorated_function
 
@@ -45,7 +54,10 @@ def inject_client_context():
 @client_bp.route("/register", methods=["GET", "POST"], strict_slashes=False)
 def register():
     if session.get("client_id"):
-        return redirect(url_for("client.dashboard"))
+        if User.get_by_id(session["client_id"]):
+            return redirect(url_for("client.dashboard"))
+        for key in ["client_id", "client_username", "client_email", "client_name", "client_role"]:
+            session.pop(key, None)
 
     if request.method == "POST":
         username = request.form.get("username", "").strip()
@@ -111,7 +123,10 @@ def register():
 @client_bp.route("/login", methods=["GET", "POST"], strict_slashes=False)
 def login():
     if session.get("client_id"):
-        return redirect(url_for("client.dashboard"))
+        if User.get_by_id(session["client_id"]):
+            return redirect(url_for("client.dashboard"))
+        for key in ["client_id", "client_username", "client_email", "client_name", "client_role"]:
+            session.pop(key, None)
 
     if request.method == "POST":
         identifier = request.form.get("identifier", "").strip()
@@ -165,11 +180,18 @@ def logout():
 @client_bp.route("/dashboard", strict_slashes=False)
 @client_login_required
 def dashboard():
-    client = User.get_by_id(session["client_id"])
-    stats = Inquiry.get_client_stats(client["id"], client["email"])
-    all_inquiries = Inquiry.get_for_client(client["id"], client["email"])
+    client_id = session.get("client_id")
+    client = User.get_by_id(client_id) if client_id else None
+    if not client:
+        for key in ["client_id", "client_username", "client_email", "client_name", "client_role"]:
+            session.pop(key, None)
+        flash("Please sign in to access your client portal.", "warning")
+        return redirect(url_for("client.login"))
+
+    stats = Inquiry.get_client_stats(client["id"], client.get("email"))
+    all_inquiries = Inquiry.get_for_client(client["id"], client.get("email")) or []
     recent_inquiries = all_inquiries[:5]
-    services = Service.get_all()
+    services = Service.get_all() or []
 
     return render_template(
         "client/dashboard.html",
@@ -187,9 +209,16 @@ def dashboard():
 @client_bp.route("/requests", strict_slashes=False)
 @client_login_required
 def requests():
-    client = User.get_by_id(session["client_id"])
+    client_id = session.get("client_id")
+    client = User.get_by_id(client_id) if client_id else None
+    if not client:
+        for key in ["client_id", "client_username", "client_email", "client_name", "client_role"]:
+            session.pop(key, None)
+        flash("Please sign in to access your client portal.", "warning")
+        return redirect(url_for("client.login"))
+
     status_filter = request.args.get("status", "all").strip().lower()
-    inquiries = Inquiry.get_for_client(client["id"], client["email"])
+    inquiries = Inquiry.get_for_client(client["id"], client.get("email")) or []
 
     if status_filter and status_filter != "all":
         if status_filter in ("in_progress", "contacted"):
@@ -199,7 +228,7 @@ def requests():
         else:
             inquiries = [i for i in inquiries if i.get("status") == status_filter]
 
-    stats = Inquiry.get_client_stats(client["id"], client["email"])
+    stats = Inquiry.get_client_stats(client["id"], client.get("email"))
 
     return render_template(
         "client/requests.html",
@@ -213,8 +242,15 @@ def requests():
 @client_bp.route("/request-service", methods=["GET", "POST"], strict_slashes=False)
 @client_login_required
 def request_service():
-    client = User.get_by_id(session["client_id"])
-    services = Service.get_all()
+    client_id = session.get("client_id")
+    client = User.get_by_id(client_id) if client_id else None
+    if not client:
+        for key in ["client_id", "client_username", "client_email", "client_name", "client_role"]:
+            session.pop(key, None)
+        flash("Please sign in to access your client portal.", "warning")
+        return redirect(url_for("client.login"))
+
+    services = Service.get_all() or []
     preselected = request.args.get("service", "").strip()
 
     if request.method == "POST":
@@ -276,8 +312,15 @@ def request_service():
 @client_bp.route("/services", strict_slashes=False)
 @client_login_required
 def services():
-    client = User.get_by_id(session["client_id"])
-    services_list = Service.get_all()
+    client_id = session.get("client_id")
+    client = User.get_by_id(client_id) if client_id else None
+    if not client:
+        for key in ["client_id", "client_username", "client_email", "client_name", "client_role"]:
+            session.pop(key, None)
+        flash("Please sign in to access your client portal.", "warning")
+        return redirect(url_for("client.login"))
+
+    services_list = Service.get_all() or []
     return render_template(
         "client/services.html",
         client=client,
@@ -292,8 +335,15 @@ def services():
 @client_bp.route("/profile", methods=["GET", "POST"], strict_slashes=False)
 @client_login_required
 def profile():
-    client = User.get_by_id(session["client_id"])
-    stats = Inquiry.get_client_stats(client["id"], client["email"])
+    client_id = session.get("client_id")
+    client = User.get_by_id(client_id) if client_id else None
+    if not client:
+        for key in ["client_id", "client_username", "client_email", "client_name", "client_role"]:
+            session.pop(key, None)
+        flash("Please sign in to access your client portal.", "warning")
+        return redirect(url_for("client.login"))
+
+    stats = Inquiry.get_client_stats(client["id"], client.get("email"))
 
     if request.method == "POST":
         action = request.form.get("action")

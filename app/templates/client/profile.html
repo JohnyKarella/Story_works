@@ -1,0 +1,234 @@
+{% extends "client/base.html" %}
+
+{% block title %}Profile & Security{% endblock %}
+{% block page_title %}Profile & Account Security{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 3fr 2fr; gap: 24px; align-items: start;">
+  <!-- Left Column: Profile Info & Stats -->
+  <div style="display: flex; flex-direction: column; gap: 24px;">
+    <!-- Profile Edit Card -->
+    <div class="card" style="margin-bottom: 0;">
+      <div class="card-header">
+        <h3 style="font-size: 16px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-id-card" style="color: var(--primary);"></i> Client Partner Information
+        </h3>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('client.profile') }}">
+          <input type="hidden" name="action" value="update_profile" />
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
+            <div class="form-group">
+              <label class="form-label" style="font-size: 13px; font-weight: 500; color: var(--text-dim); display: block; margin-bottom: 6px;">
+                Username (Account Identifier)
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                value="{{ client.username }}"
+                disabled
+                style="width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-muted); cursor: not-allowed;"
+              />
+              <span style="font-size: 11px; color: var(--text-dim); margin-top: 4px; display: block;">
+                Fixed unique identifier
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" style="font-size: 13px; font-weight: 500; color: var(--text-dim); display: block; margin-bottom: 6px;">
+                Email Address
+              </label>
+              <input
+                type="email"
+                class="form-control"
+                value="{{ client.email }}"
+                disabled
+                style="width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-muted); cursor: not-allowed;"
+              />
+              <span style="font-size: 11px; color: var(--text-dim); margin-top: 4px; display: block;">
+                Primary communication channel
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 18px;">
+            <label class="form-label" for="full_name" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Full Name <span style="color: var(--primary);">*</span>
+            </label>
+            <input
+              type="text"
+              id="full_name"
+              name="full_name"
+              class="form-control"
+              value="{{ client.full_name or '' }}"
+              required
+              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+            />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+            <div class="form-group">
+              <label class="form-label" for="company" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+                Company / Organization
+              </label>
+              <input
+                type="text"
+                id="company"
+                name="company"
+                class="form-control"
+                value="{{ client.company or '' }}"
+                placeholder="e.g. Acme Corp"
+                style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+                Phone / WhatsApp Number
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                class="form-control"
+                value="{{ client.phone or '' }}"
+                placeholder="e.g. +91 98765 43210"
+                style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="padding: 10px 22px; font-weight: 600;"
+          >
+            <i class="fas fa-save" style="margin-right: 6px;"></i> Save Profile Changes
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Account Overview Card -->
+    <div class="card" style="margin-bottom: 0;">
+      <div class="card-header">
+        <h3 style="font-size: 15px; font-weight: 600; color: var(--text-main);">
+          Account Status & Membership
+        </h3>
+      </div>
+      <div class="card-body" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+        <div style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Partner Since</div>
+          <div style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-top: 4px;">
+            {{ client.created_at[:10] if client.created_at else 'Recent' }}
+          </div>
+        </div>
+
+        <div style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Total Project Briefs</div>
+          <div style="font-size: 14px; font-weight: 600; color: var(--primary); margin-top: 4px;">
+            {{ stats.total }} Brief{% if stats.total != 1 %}s{% endif %}
+          </div>
+        </div>
+
+        <div style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Account Role</div>
+          <div style="font-size: 14px; font-weight: 600; color: var(--success); margin-top: 4px;">
+            <i class="fas fa-check-circle" style="margin-right: 4px;"></i> Verified Client
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Security & Password Update -->
+  <div style="display: flex; flex-direction: column; gap: 24px;">
+    <!-- Change Password Card -->
+    <div class="card" style="margin-bottom: 0;">
+      <div class="card-header">
+        <h3 style="font-size: 16px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-key" style="color: var(--primary);"></i> Change Password
+        </h3>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('client.profile') }}">
+          <input type="hidden" name="action" value="change_password" />
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="current_password" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Current Password <span style="color: var(--primary);">*</span>
+            </label>
+            <input
+              type="password"
+              id="current_password"
+              name="current_password"
+              class="form-control"
+              required
+              placeholder="Enter current password"
+              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+            />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="new_password" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              New Password <span style="color: var(--primary);">*</span>
+            </label>
+            <input
+              type="password"
+              id="new_password"
+              name="new_password"
+              class="form-control"
+              required
+              minlength="6"
+              placeholder="Min 6 characters"
+              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+            />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 22px;">
+            <label class="form-label" for="confirm_new_password" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Confirm New Password <span style="color: var(--primary);">*</span>
+            </label>
+            <input
+              type="password"
+              id="confirm_new_password"
+              name="confirm_new_password"
+              class="form-control"
+              required
+              minlength="6"
+              placeholder="Re-enter new password"
+              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="width: 100%; padding: 11px; font-weight: 600;"
+          >
+            <i class="fas fa-lock" style="margin-right: 6px;"></i> Update Password
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Security Information Notice -->
+    <div class="card" style="margin-bottom: 0;">
+      <div class="card-header">
+        <h4 style="font-size: 14px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-shield-alt" style="color: var(--success);"></i> Security & Privacy
+        </h4>
+      </div>
+      <div class="card-body" style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+        <p style="margin-bottom: 10px;">
+          Your credentials and submitted project briefs are encrypted and accessible exclusively by authorized Storyworks Studio directors.
+        </p>
+        <p>
+          To update your registered email address or transfer account ownership, please contact our studio administrator directly.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

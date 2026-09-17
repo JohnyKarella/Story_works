@@ -23,6 +23,37 @@ class User:
         conn.close()
         return dict(user) if user else None
     @staticmethod
+    def get_by_email(email):
+        conn = get_db()
+        user = conn.execute("SELECT * FROM users WHERE LOWER(email) = LOWER(?)", (email.strip(),)).fetchone()
+        conn.close()
+        return dict(user) if user else None
+    @staticmethod
+    def create(username, email, password, role="client", full_name="", company="", phone=""):
+        conn = get_db()
+        cursor = conn.cursor()
+        hashed = generate_password_hash(password)
+        cursor.execute(
+            """
+            INSERT INTO users (username, email, password_hash, role, full_name, company, phone)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (username.strip(), email.strip().lower(), hashed, role, full_name.strip(), company.strip(), phone.strip()),
+        )
+        user_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        return user_id
+    @staticmethod
+    def update_client_profile(user_id, full_name, company, phone):
+        conn = get_db()
+        conn.execute(
+            "UPDATE users SET full_name = ?, company = ?, phone = ? WHERE id = ?",
+            (full_name.strip(), company.strip(), phone.strip(), user_id),
+        )
+        conn.commit()
+        conn.close()
+    @staticmethod
     def verify_password(stored_hash, password):
         return check_password_hash(stored_hash, password)
     @staticmethod
@@ -52,10 +83,11 @@ class Inquiry:
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO inquiries (first_name, last_name, email, phone, company, budget, services, message, ip_address)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO inquiries (user_id, first_name, last_name, email, phone, company, budget, services, message, ip_address)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
+                data.get("user_id"),
                 data.get("first_name", "").strip(),
                 data.get("last_name", "").strip(),
                 data.get("email", "").strip(),
@@ -71,6 +103,34 @@ class Inquiry:
         conn.commit()
         conn.close()
         return new_id
+    @staticmethod
+    def get_for_client(user_id, email=None):
+        conn = get_db()
+        if email:
+            rows = conn.execute(
+                "SELECT * FROM inquiries WHERE user_id = ? OR LOWER(email) = LOWER(?) ORDER BY id DESC",
+                (user_id, email.strip()),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM inquiries WHERE user_id = ? ORDER BY id DESC",
+                (user_id,),
+            ).fetchall()
+        conn.close()
+        return [dict(r) for r in rows]
+    @staticmethod
+    def get_client_stats(user_id, email=None):
+        inquiries = Inquiry.get_for_client(user_id, email)
+        total = len(inquiries)
+        new_count = sum(1 for i in inquiries if i.get("status") == "new")
+        in_progress = sum(1 for i in inquiries if i.get("status") in ("in_progress", "contacted"))
+        completed = sum(1 for i in inquiries if i.get("status") in ("closed", "completed"))
+        return {
+            "total": total,
+            "new": new_count,
+            "in_progress": in_progress,
+            "completed": completed,
+        }
     @staticmethod
     def get_all(status=None, search=None, date_from=None, date_to=None):
         conn = get_db()

@@ -1,0 +1,229 @@
+{% extends "client/base.html" %}
+
+{% block title %}My Project Briefs{% endblock %}
+{% block page_title %}My Project Briefs{% endblock %}
+
+{% block topbar_actions %}
+<a href="{{ url_for('client.request_service') }}" class="btn btn-primary btn-sm">
+  <i class="fas fa-plus" style="margin-right: 6px;"></i> Submit New Brief
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Filter Chips -->
+<div style="display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; align-items: center;">
+  <span style="font-size: 13px; color: var(--text-dim); margin-right: 4px;">Filter by status:</span>
+  <a href="{{ url_for('client.requests') }}" class="filter-chip {% if active_status == 'all' or not active_status %}active{% endif %}">
+    All Briefs ({{ stats.total }})
+  </a>
+  <a href="{{ url_for('client.requests', status='new') }}" class="filter-chip {% if active_status == 'new' %}active{% endif %}">
+    <i class="fas fa-sparkles" style="margin-right: 6px; font-size: 11px;"></i> New ({{ stats.new }})
+  </a>
+  <a href="{{ url_for('client.requests', status='in_progress') }}" class="filter-chip {% if active_status == 'in_progress' %}active{% endif %}">
+    <i class="fas fa-spinner fa-spin" style="margin-right: 6px; font-size: 11px;"></i> In Progress ({{ stats.in_progress }})
+  </a>
+  <a href="{{ url_for('client.requests', status='completed') }}" class="filter-chip {% if active_status in ('completed', 'closed') %}active{% endif %}">
+    <i class="fas fa-check" style="margin-right: 6px; font-size: 11px;"></i> Completed ({{ stats.completed }})
+  </a>
+</div>
+
+<!-- Project Briefs Card -->
+<div class="card">
+  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <h3 style="font-size: 16px; font-weight: 600; color: var(--text-main);">
+      Submitted Project Briefs & Studio Status
+    </h3>
+    <span style="font-size: 13px; color: var(--text-muted);">
+      Showing {{ inquiries|length }} brief{% if inquiries|length != 1 %}s{% endif %}
+    </span>
+  </div>
+
+  <div class="card-body" style="padding: 0;">
+    {% if inquiries %}
+      <div class="table-responsive">
+        <table class="data-table" style="width: 100%;">
+          <thead>
+            <tr>
+              <th style="width: 130px;">Date</th>
+              <th>Requested Services & Scope</th>
+              <th style="width: 140px;">Budget</th>
+              <th style="width: 150px;">Studio Status</th>
+              <th style="width: 160px; text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in inquiries %}
+              <tr>
+                <td style="font-size: 13px; color: var(--text-muted); white-space: nowrap;">
+                  <div>{{ item.created_at[:10] if item.created_at else 'Recent' }}</div>
+                  <div style="font-size: 11px; color: var(--text-dim);">
+                    {{ item.created_at[11:16] if item.created_at and item.created_at|length > 15 else '' }}
+                  </div>
+                </td>
+                <td>
+                  <div style="font-weight: 600; color: var(--text-main); font-size: 14px; margin-bottom: 4px;">
+                    {{ item.services or 'Creative Strategy & Design' }}
+                  </div>
+                  <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; max-width: 450px;">
+                    {{ item.message[:160] }}{% if item.message|length > 160 %}...{% endif %}
+                  </div>
+                  {% if item.notes %}
+                    <div style="margin-top: 6px; font-size: 12px; color: var(--primary); display: flex; align-items: center; gap: 5px;">
+                      <i class="fas fa-comment-dots"></i> Studio reply received
+                    </div>
+                  {% endif %}
+                </td>
+                <td style="font-size: 13px; color: var(--text-muted);">
+                  {{ item.budget or 'Custom Scope' }}
+                </td>
+                <td>
+                  {% if item.status == 'new' %}
+                    <span class="status-badge status-new">
+                      <i class="fas fa-sparkles" style="margin-right: 4px;"></i> New
+                    </span>
+                  {% elif item.status == 'contacted' %}
+                    <span class="status-badge status-contacted">
+                      <i class="fas fa-phone-alt" style="margin-right: 4px;"></i> In Review
+                    </span>
+                  {% elif item.status == 'in_progress' %}
+                    <span class="status-badge status-in_progress">
+                      <i class="fas fa-circle-notch fa-spin" style="margin-right: 4px;"></i> In Progress
+                    </span>
+                  {% else %}
+                    <span class="status-badge status-completed">
+                      <i class="fas fa-check" style="margin-right: 4px;"></i> Completed
+                    </span>
+                  {% endif %}
+                </td>
+                <td style="text-align: right;">
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-sm"
+                    onclick="openBriefModal({{ item | tojson | forceescape }})"
+                  >
+                    <i class="fas fa-eye" style="margin-right: 4px;"></i> View Full Brief
+                  </button>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 56px 24px;">
+        <div style="font-size: 44px; color: var(--text-dim); margin-bottom: 14px;">
+          <i class="fas fa-inbox"></i>
+        </div>
+        <h4 style="font-size: 17px; font-weight: 600; color: var(--text-main); margin-bottom: 6px;">
+          No Project Briefs Found
+        </h4>
+        <p style="font-size: 13px; color: var(--text-muted); max-width: 440px; margin: 0 auto 20px;">
+          {% if active_status and active_status != 'all' %}
+            There are currently no briefs matching the "{{ active_status }}" filter. Try selecting "All Briefs".
+          {% else %}
+            You haven't submitted any creative briefs yet. Let's start building your next brand campaign!
+          {% endif %}
+        </p>
+        <a href="{{ url_for('client.request_service') }}" class="btn btn-primary btn-sm">
+          <i class="fas fa-plus" style="margin-right: 6px;"></i> Submit New Brief
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Brief Details Modal -->
+<div class="modal-overlay" id="briefModal">
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <h3 style="font-size: 17px; font-weight: 600; color: var(--text-main);" id="modalTitle">
+        Project Brief Details
+      </h3>
+      <button type="button" class="flash-close" onclick="closeBriefModal()">&times;</button>
+    </div>
+    <div class="modal-card-body">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+        <div>
+          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Submission Date</label>
+          <div id="modalDate" style="font-size: 14px; font-weight: 500; color: var(--text-main); margin-top: 2px;"></div>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Studio Review Status</label>
+          <div id="modalStatus" style="margin-top: 2px;"></div>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Services Requested</label>
+          <div id="modalServices" style="font-size: 14px; font-weight: 500; color: var(--text-main); margin-top: 2px;"></div>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Budget Estimate</label>
+          <div id="modalBudget" style="font-size: 14px; font-weight: 500; color: var(--text-main); margin-top: 2px;"></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 6px;">
+          Project Scope / Brief Requirements
+        </label>
+        <div id="modalMessage" style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); font-size: 14px; color: var(--text-main); white-space: pre-wrap; line-height: 1.6; border: 1px solid var(--border-color);"></div>
+      </div>
+
+      <div id="modalNotesWrap" style="display: none; margin-bottom: 16px;">
+        <label style="font-size: 12px; color: var(--primary); text-transform: uppercase; display: block; margin-bottom: 6px;">
+          <i class="fas fa-comment-dots" style="margin-right: 4px;"></i> Studio Direct Response & Progress Notes
+        </label>
+        <div id="modalNotes" style="background: rgba(200, 117, 58, 0.08); border: 1px solid rgba(200, 117, 58, 0.25); padding: 14px; border-radius: var(--radius-md); font-size: 14px; color: var(--text-main); white-space: pre-wrap; line-height: 1.6;"></div>
+      </div>
+
+      <div style="text-align: right; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeBriefModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function openBriefModal(data) {
+    document.getElementById("modalDate").textContent = data.created_at || "Recent";
+    document.getElementById("modalServices").textContent = data.services || "General Creative Strategy";
+    document.getElementById("modalBudget").textContent = data.budget || "Custom";
+    document.getElementById("modalMessage").textContent = data.message || "";
+
+    const statusEl = document.getElementById("modalStatus");
+    let badgeHtml = "";
+    if (data.status === 'new') {
+      badgeHtml = '<span class="status-badge status-new"><i class="fas fa-sparkles"></i> New</span>';
+    } else if (data.status === 'contacted') {
+      badgeHtml = '<span class="status-badge status-contacted"><i class="fas fa-phone-alt"></i> In Review</span>';
+    } else if (data.status === 'in_progress') {
+      badgeHtml = '<span class="status-badge status-in_progress"><i class="fas fa-circle-notch fa-spin"></i> In Progress</span>';
+    } else {
+      badgeHtml = '<span class="status-badge status-completed"><i class="fas fa-check"></i> Completed</span>';
+    }
+    statusEl.innerHTML = badgeHtml;
+
+    const notesWrap = document.getElementById("modalNotesWrap");
+    const notesEl = document.getElementById("modalNotes");
+    if (data.notes && data.notes.trim() !== "") {
+      notesEl.textContent = data.notes;
+      notesWrap.style.display = "block";
+    } else {
+      notesWrap.style.display = "none";
+    }
+
+    document.getElementById("briefModal").classList.add("active");
+  }
+
+  function closeBriefModal() {
+    document.getElementById("briefModal").classList.remove("active");
+  }
+
+  document.getElementById("briefModal").addEventListener("click", function (e) {
+    if (e.target === this) {
+      closeBriefModal();
+    }
+  });
+</script>
+{% endblock %}

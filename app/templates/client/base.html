@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Client Portal{% endblock %} — Storyworks Studio</title>
+  <!-- Brand Favicons -->
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='admin/favicon.svg') }}" />
+  <link rel="alternate icon" type="image/png" href="{{ url_for('static', filename='admin/favicon.png') }}" />
+  <link rel="shortcut icon" href="{{ url_for('static', filename='admin/favicon.ico') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin/admin.css') }}" />
+  <style>
+    /* Client Portal Specific Luxury Accents */
+    .client-badge {
+      background: rgba(200, 117, 58, 0.15);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 20px;
+      border: 1px solid rgba(200, 117, 58, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-badge.status-new {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .status-badge.status-contacted {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .status-badge.status-in_progress {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+    .status-badge.status-completed, .status-badge.status-closed {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .service-card-select {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .service-card-select:hover {
+      border-color: var(--primary);
+      background: var(--bg-card-hover);
+    }
+    .service-card-select.selected {
+      border-color: var(--primary);
+      background: rgba(200, 117, 58, 0.08);
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 650px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .modal-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .modal-card-body {
+      padding: 24px;
+    }
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .filter-chip:hover {
+      color: var(--text-main);
+      border-color: var(--primary);
+    }
+    .filter-chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-icon">S</div>
+        <div class="sidebar-brand">
+          <h2>Storyworks</h2>
+          <span>Client Portal</span>
+        </div>
+        <button type="button" class="sidebar-close-btn" id="sidebarClose" aria-label="Close menu">&times;</button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-category">Overview</div>
+        <a href="{{ url_for('client.dashboard') }}" class="nav-link {% if request.endpoint == 'client.dashboard' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Dashboard</span>
+        </a>
+
+        <div class="nav-category">Projects & Briefs</div>
+        <a href="{{ url_for('client.requests') }}" class="nav-link {% if request.endpoint == 'client.requests' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>My Project Briefs</span>
+        </a>
+        <a href="{{ url_for('client.request_service') }}" class="nav-link {% if request.endpoint == 'client.request_service' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <span>Submit New Brief</span>
+        </a>
+
+        <div class="nav-category">Agency Studio</div>
+        <a href="{{ url_for('client.services') }}" class="nav-link {% if request.endpoint == 'client.services' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          <span>Agency Services</span>
+        </a>
+
+        <div class="nav-category">Account</div>
+        <a href="{{ url_for('client.profile') }}" class="nav-link {% if request.endpoint == 'client.profile' %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile & Security</span>
+        </a>
+        <a href="/" target="_blank" class="nav-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>View Website</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="user-avatar" style="background: linear-gradient(135deg, var(--primary), #8b3d00);">
+            {{ (session.get('client_name') or session.get('client_username') or 'C')[:1].upper() }}
+          </div>
+          <div class="user-meta">
+            <div class="user-name" title="{{ session.get('client_name') or session.get('client_username') }}">
+              {{ session.get('client_name') or session.get('client_username') }}
+            </div>
+            <div class="user-role">
+              {% if current_client and current_client.company %}
+                {{ current_client.company }}
+              {% else %}
+                Client Partner
+              {% endif %}
+            </div>
+          </div>
+          <a href="{{ url_for('client.logout') }}" title="Sign out" style="color: var(--text-dim); margin-left: auto;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- ── Main Content ── -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="topbar-title">
+            <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          {% block topbar_actions %}
+          <a href="{{ url_for('client.request_service') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus" style="margin-right: 6px;"></i> Submit Brief
+          </a>
+          {% endblock %}
+        </div>
+      </header>
+
+      <main class="page-content">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+              {% for category, message in messages %}
+                <div class="flash-alert flash-{{ category }}">
+                  <div class="flash-icon">
+                    {% if category == 'success' %}
+                      <i class="fas fa-check-circle"></i>
+                    {% elif category == 'error' or category == 'danger' %}
+                      <i class="fas fa-exclamation-circle"></i>
+                    {% elif category == 'warning' %}
+                      <i class="fas fa-exclamation-triangle"></i>
+                    {% else %}
+                      <i class="fas fa-info-circle"></i>
+                    {% endif %}
+                  </div>
+                  <span class="flash-text">{{ message }}</span>
+                  <button type="button" class="flash-close" onclick="this.parentElement.remove();">&times;</button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+      </main>
+
+      <footer class="admin-footer">
+        <span>&copy; {{ site_settings.site_name or 'Storyworks Studio' }} Client Portal. Where Strategy Meets Storytelling.</span>
+        <span>Need studio support? <a href="mailto:{{ site_settings.contact_email or 'hello@storyworks.studio' }}" style="color: var(--primary);">{{ site_settings.contact_email or 'hello@storyworks.studio' }}</a></span>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // Mobile Sidebar Drawer Toggle
+    (function () {
+      const menuToggle = document.getElementById("menuToggle");
+      const sidebar = document.querySelector(".sidebar");
+      const backdrop = document.getElementById("sidebarBackdrop");
+      const sidebarClose = document.getElementById("sidebarClose");
+
+      function openSidebar() {
+        if (sidebar) sidebar.classList.add("open");
+        if (backdrop) backdrop.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeSidebar() {
+        if (sidebar) sidebar.classList.remove("open");
+        if (backdrop) backdrop.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      if (menuToggle) menuToggle.addEventListener("click", openSidebar);
+      if (backdrop) backdrop.addEventListener("click", closeSidebar);
+      if (sidebarClose) sidebarClose.addEventListener("click", closeSidebar);
+
+      // Auto dismiss flash alerts after 5 seconds
+      setTimeout(function () {
+        document.querySelectorAll(".flash-alert").forEach(function (el) {
+          el.style.opacity = "0";
+          setTimeout(function () { el.remove(); }, 300);
+        });
+      }, 5000);
+    })();
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

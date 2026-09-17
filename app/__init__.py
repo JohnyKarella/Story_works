@@ -18,10 +18,12 @@ def create_app(config_class=Config):
     # Register Blueprints
     from app.routes.api import api_bp
     from app.routes.admin import admin_bp
+    from app.routes.client import client_bp
     from app.routes.web import web_bp
     app.register_blueprint(api_bp)
     app.register_blueprint(admin_bp)
-    # web_bp is registered last to avoid capturing /api and /admin paths
+    app.register_blueprint(client_bp)
+    # web_bp is registered last to avoid capturing /api, /admin, and /client paths
     app.register_blueprint(web_bp)
     @app.after_request
     def add_no_cache_headers(response):

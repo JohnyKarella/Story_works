@@ -1,0 +1,199 @@
+{% extends "client/base.html" %}
+
+{% block title %}Submit Project Brief{% endblock %}
+{% block page_title %}Submit New Project Brief{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto;">
+  <div class="card">
+    <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding: 24px 28px;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+        <span class="client-badge">
+          <i class="fas fa-pencil-ruler" style="margin-right: 4px;"></i> Project Brief Intake
+        </span>
+      </div>
+      <h2 style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">
+        Brief Our Studio Team
+      </h2>
+      <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">
+        Provide details regarding your upcoming brand initiative, web experience, or marketing campaign. We’ll review your scope and align our creative resources.
+      </p>
+    </div>
+
+    <div class="card-body" style="padding: 28px;">
+      <form method="POST" action="{{ url_for('client.request_service') }}">
+        <!-- Section 1: Client & Contact Info -->
+        <h4 style="font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-user-circle" style="color: var(--primary);"></i> 1. Contact & Organization Details
+        </h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+          <div class="form-group">
+            <label class="form-label" for="first_name" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Your Name
+            </label>
+            <input
+              type="text"
+              id="first_name"
+              name="first_name"
+              class="form-control"
+              value="{{ form_data.first_name or client.full_name or client.username }}"
+              required
+              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="company" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Company / Brand Name
+            </label>
+            <input
+              type="text"
+              id="company"
+              name="company"
+              class="form-control"
+              value="{{ form_data.company or client.company or '' }}"
+              placeholder="e.g. Storyworks Partner Co."
+              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Notification Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control"
+              value="{{ form_data.email or client.email }}"
+              required
+              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phone" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Phone / WhatsApp
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              class="form-control"
+              value="{{ form_data.phone or client.phone or '' }}"
+              placeholder="e.g. +91 98765 43210"
+              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+            />
+          </div>
+        </div>
+
+        <!-- Section 2: Services Selection -->
+        <h4 style="font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-layer-group" style="color: var(--primary);"></i> 2. Select Agency Capabilities Needed
+        </h4>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Choose one or more capabilities that align with this project:
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 28px;">
+          {% for s in services %}
+            {% set is_selected = (preselected and preselected.lower() in s.title.lower()) %}
+            <label class="service-card-select {% if is_selected %}selected{% endif %}">
+              <input
+                type="checkbox"
+                name="services"
+                value="{{ s.title }}"
+                {% if is_selected %}checked{% endif %}
+                style="accent-color: var(--primary); margin-top: 3px;"
+                onchange="this.parentElement.classList.toggle('selected', this.checked)"
+              />
+              <div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                  <i class="{{ s.icon or 'fas fa-star' }}" style="color: var(--primary); font-size: 13px;"></i>
+                  {{ s.title }}
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
+                  {{ s.short_desc[:75] }}{% if s.short_desc|length > 75 %}...{% endif %}
+                </div>
+              </div>
+            </label>
+          {% endfor %}
+        </div>
+
+        <!-- Section 3: Timeline & Budget -->
+        <h4 style="font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-calendar-alt" style="color: var(--primary);"></i> 3. Project Budget & Timeline
+        </h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px;">
+          <div class="form-group">
+            <label class="form-label" for="budget" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Estimated Investment Range
+            </label>
+            <select
+              id="budget"
+              name="budget"
+              class="form-control"
+              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+            >
+              <option value="Flexible / Consultation">Flexible / Discuss during consultation</option>
+              <option value="₹75,000 – ₹2,00,000">₹75,000 – ₹2,00,000 (Sprint / Identity)</option>
+              <option value="₹2,00,000 – ₹5,00,000">₹2,00,000 – ₹5,00,000 (Comprehensive Project)</option>
+              <option value="₹5,00,000 – ₹10,00,000">₹5,00,000 – ₹10,00,000 (Full-Scale Experience)</option>
+              <option value="₹10,00,000+">₹10,00,000+ (Enterprise Transformation)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="timeline" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Target Delivery Timeline
+            </label>
+            <select
+              id="timeline"
+              name="timeline"
+              class="form-control"
+              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
+            >
+              <option value="Immediate (< 3 weeks)">Immediate Sprint (< 3 weeks)</option>
+              <option value="1 – 2 Months" selected>1 – 2 Months (Standard)</option>
+              <option value="3 – 4 Months">3 – 4 Months (Comprehensive)</option>
+              <option value="Ongoing Retainer">Ongoing Strategic Retainer</option>
+              <option value="Flexible Timeline">Flexible Timeline</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Section 4: Project Scope / Message -->
+        <h4 style="font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-align-left" style="color: var(--primary);"></i> 4. Scope, Objectives & Key Deliverables <span style="color: var(--primary);">*</span>
+        </h4>
+        <div class="form-group" style="margin-bottom: 30px;">
+          <textarea
+            id="message"
+            name="message"
+            rows="6"
+            class="form-control"
+            placeholder="Describe your project: What are your key objectives? Who is your target audience? Do you have existing brand assets, deadlines, or design references you admire?"
+            required
+            style="width: 100%; padding: 14px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); line-height: 1.6; font-size: 14px;"
+          >{{ form_data.message or '' }}</textarea>
+        </div>
+
+        <!-- Submit Actions -->
+        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 14px; padding-top: 18px; border-top: 1px solid var(--border-color);">
+          <a href="{{ url_for('client.requests') }}" class="btn btn-secondary" style="padding: 11px 20px;">
+            Cancel
+          </a>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="padding: 11px 26px; font-size: 15px; font-weight: 600; letter-spacing: 0.3px;"
+          >
+            <i class="fas fa-paper-plane" style="margin-right: 8px;"></i> Submit Project Brief
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

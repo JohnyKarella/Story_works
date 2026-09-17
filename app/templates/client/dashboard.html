@@ -1,0 +1,330 @@
+{% extends "client/base.html" %}
+
+{% block title %}Client Dashboard{% endblock %}
+{% block page_title %}Client Portal Dashboard{% endblock %}
+
+{% block content %}
+<!-- Welcome Banner -->
+<div style="background: linear-gradient(135deg, rgba(200, 117, 58, 0.15), rgba(12, 13, 14, 0.8)); border: 1px solid rgba(200, 117, 58, 0.3); border-radius: var(--radius-lg); padding: 28px 32px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+  <div>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+      <span class="client-badge">
+        <i class="fas fa-gem" style="margin-right: 4px;"></i> Client Partner
+      </span>
+      {% if client.company %}
+        <span style="font-size: 13px; color: var(--text-muted);">
+          &bull; {{ client.company }}
+        </span>
+      {% endif %}
+    </div>
+    <h2 style="font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px;">
+      Welcome back, {{ client.full_name or client.username }}!
+    </h2>
+    <p style="font-size: 14px; color: var(--text-muted); max-width: 620px;">
+      Manage your creative campaigns, track studio progress, or brief us on a new project. Our strategy and design team is at your disposal.
+    </p>
+  </div>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+    <a href="{{ url_for('client.request_service') }}" class="btn btn-primary" style="padding: 10px 18px; font-weight: 600;">
+      <i class="fas fa-plus-circle" style="margin-right: 6px;"></i> Submit New Brief
+    </a>
+    <a href="{{ url_for('client.services') }}" class="btn btn-secondary" style="padding: 10px 18px;">
+      <i class="fas fa-cubes" style="margin-right: 6px;"></i> Browse Services
+    </a>
+  </div>
+</div>
+
+<!-- KPI Stats Grid -->
+<div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 28px;">
+  <!-- Total Requests -->
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(200, 117, 58, 0.15); color: var(--primary);">
+      <i class="fas fa-folder-open"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value">{{ stats.total }}</div>
+      <div class="stat-label">Total Project Briefs</div>
+    </div>
+  </div>
+
+  <!-- In Studio Review -->
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+      <i class="fas fa-search"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value">{{ stats.new }}</div>
+      <div class="stat-label">In Studio Review</div>
+    </div>
+  </div>
+
+  <!-- In Progress -->
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">
+      <i class="fas fa-spinner fa-spin"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value">{{ stats.in_progress }}</div>
+      <div class="stat-label">In Progress / Active</div>
+    </div>
+  </div>
+
+  <!-- Completed -->
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <div class="stat-content">
+      <div class="stat-value">{{ stats.completed }}</div>
+      <div class="stat-label">Completed Projects</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content Grid: Recent Briefs & Studio Support -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start;">
+  <!-- Recent Briefs Section -->
+  <div class="card" style="margin-bottom: 0;">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="font-size: 16px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+        <i class="fas fa-clock" style="color: var(--primary);"></i> Recent Project Briefs
+      </h3>
+      <a href="{{ url_for('client.requests') }}" style="font-size: 13px; color: var(--primary); font-weight: 500;">
+        View All ({{ stats.total }}) &rarr;
+      </a>
+    </div>
+
+    <div class="card-body" style="padding: 0;">
+      {% if recent_inquiries %}
+        <div class="table-responsive">
+          <table class="data-table" style="width: 100%;">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Requested Services</th>
+                <th>Budget</th>
+                <th>Status</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in recent_inquiries %}
+                <tr>
+                  <td style="font-size: 13px; color: var(--text-muted); white-space: nowrap;">
+                    {{ item.created_at[:10] if item.created_at else 'Recent' }}
+                  </td>
+                  <td>
+                    <div style="font-weight: 500; color: var(--text-main); font-size: 14px;">
+                      {{ item.services or 'Creative Services' }}
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-dim); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                      {{ item.message }}
+                    </div>
+                  </td>
+                  <td style="font-size: 13px; color: var(--text-muted);">
+                    {{ item.budget or 'Custom' }}
+                  </td>
+                  <td>
+                    {% if item.status == 'new' %}
+                      <span class="status-badge status-new">
+                        <i class="fas fa-sparkles" style="margin-right: 4px;"></i> New
+                      </span>
+                    {% elif item.status == 'contacted' %}
+                      <span class="status-badge status-contacted">
+                        <i class="fas fa-phone-alt" style="margin-right: 4px;"></i> In Review
+                      </span>
+                    {% elif item.status == 'in_progress' %}
+                      <span class="status-badge status-in_progress">
+                        <i class="fas fa-circle-notch fa-spin" style="margin-right: 4px;"></i> In Progress
+                      </span>
+                    {% else %}
+                      <span class="status-badge status-completed">
+                        <i class="fas fa-check" style="margin-right: 4px;"></i> Completed
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td style="text-align: right;">
+                    <button
+                      type="button"
+                      class="btn btn-secondary btn-sm"
+                      onclick="openBriefModal({{ item | tojson | forceescape }})"
+                    >
+                      <i class="fas fa-eye" style="margin-right: 4px;"></i> Details
+                    </button>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 48px 24px;">
+          <div style="font-size: 40px; color: var(--text-dim); margin-bottom: 12px;">
+            <i class="fas fa-folder-plus"></i>
+          </div>
+          <h4 style="font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 6px;">
+            No Project Briefs Submitted Yet
+          </h4>
+          <p style="font-size: 13px; color: var(--text-muted); max-width: 400px; margin: 0 auto 18px;">
+            Ready to kick off a new branding, digital marketing, or web design project? Submit your requirements directly to our creative team.
+          </p>
+          <a href="{{ url_for('client.request_service') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Submit Your First Brief
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Studio Direct Support Card -->
+  <div style="display: flex; flex-direction: column; gap: 20px;">
+    <div class="card" style="margin-bottom: 0;">
+      <div class="card-header">
+        <h3 style="font-size: 15px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+          <i class="fas fa-headset" style="color: var(--primary);"></i> Studio Support
+        </h3>
+      </div>
+      <div class="card-body" style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+        <p style="margin-bottom: 14px;">
+          Our creative directors and project managers are available Monday through Saturday.
+        </p>
+        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-envelope" style="color: var(--primary); width: 16px;"></i>
+          <a href="mailto:{{ site_settings.contact_email or 'hello@storyworks.studio' }}" style="color: var(--text-main);">
+            {{ site_settings.contact_email or 'hello@storyworks.studio' }}
+          </a>
+        </div>
+        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-phone" style="color: var(--primary); width: 16px;"></i>
+          <span style="color: var(--text-main);">{{ site_settings.contact_phone or '+91 98765 43210' }}</span>
+        </div>
+        <div style="margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-map-marker-alt" style="color: var(--primary); width: 16px;"></i>
+          <span style="color: var(--text-main);">{{ site_settings.contact_address or 'Bengaluru, India' }}</span>
+        </div>
+        <a href="mailto:{{ site_settings.contact_email or 'hello@storyworks.studio' }}" class="btn btn-secondary" style="width: 100%; text-align: center; display: block; padding: 9px;">
+          <i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Email Studio Team
+        </a>
+      </div>
+    </div>
+
+    <!-- Quick Agency Services Snippet -->
+    <div class="card" style="margin-bottom: 0;">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-size: 15px; font-weight: 600; color: var(--text-main);">
+          Core Studio Services
+        </h3>
+        <a href="{{ url_for('client.services') }}" style="font-size: 12px; color: var(--primary);">View All</a>
+      </div>
+      <div class="card-body" style="padding: 12px 16px;">
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          {% for s in services[:4] %}
+            <a href="{{ url_for('client.request_service', service=s.title) }}" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: var(--radius-sm); background: var(--bg-input); transition: var(--transition);" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='var(--bg-input)'">
+              <span style="font-size: 13px; font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                <i class="{{ s.icon or 'fas fa-check' }}" style="color: var(--primary); font-size: 12px; width: 14px;"></i>
+                {{ s.title }}
+              </span>
+              <i class="fas fa-chevron-right" style="font-size: 11px; color: var(--text-dim);"></i>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Brief Details Modal -->
+<div class="modal-overlay" id="briefModal">
+  <div class="modal-card">
+    <div class="modal-card-header">
+      <h3 style="font-size: 17px; font-weight: 600; color: var(--text-main);" id="modalTitle">
+        Project Brief Details
+      </h3>
+      <button type="button" class="flash-close" onclick="closeBriefModal()">&times;</button>
+    </div>
+    <div class="modal-card-body">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+        <div>
+          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Submitted On</label>
+          <div id="modalDate" style="font-size: 14px; font-weight: 500; color: var(--text-main); margin-top: 2px;"></div>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Current Status</label>
+          <div id="modalStatus" style="margin-top: 2px;"></div>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Services Requested</label>
+          <div id="modalServices" style="font-size: 14px; font-weight: 500; color: var(--text-main); margin-top: 2px;"></div>
+        </div>
+        <div>
+          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Budget Estimate</label>
+          <div id="modalBudget" style="font-size: 14px; font-weight: 500; color: var(--text-main); margin-top: 2px;"></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 6px;">
+          Project Scope / Brief Requirements
+        </label>
+        <div id="modalMessage" style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); font-size: 14px; color: var(--text-main); white-space: pre-wrap; line-height: 1.6; border: 1px solid var(--border-color);"></div>
+      </div>
+
+      <div id="modalNotesWrap" style="display: none; margin-bottom: 16px;">
+        <label style="font-size: 12px; color: var(--primary); text-transform: uppercase; display: block; margin-bottom: 6px;">
+          <i class="fas fa-comment-dots" style="margin-right: 4px;"></i> Studio Response / Notes
+        </label>
+        <div id="modalNotes" style="background: rgba(200, 117, 58, 0.08); border: 1px solid rgba(200, 117, 58, 0.25); padding: 14px; border-radius: var(--radius-md); font-size: 14px; color: var(--text-main); white-space: pre-wrap; line-height: 1.6;"></div>
+      </div>
+
+      <div style="text-align: right; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeBriefModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function openBriefModal(data) {
+    document.getElementById("modalDate").textContent = data.created_at || "Recent";
+    document.getElementById("modalServices").textContent = data.services || "General Creative Strategy";
+    document.getElementById("modalBudget").textContent = data.budget || "Custom";
+    document.getElementById("modalMessage").textContent = data.message || "";
+
+    const statusEl = document.getElementById("modalStatus");
+    let badgeHtml = "";
+    if (data.status === 'new') {
+      badgeHtml = '<span class="status-badge status-new"><i class="fas fa-sparkles"></i> New</span>';
+    } else if (data.status === 'contacted') {
+      badgeHtml = '<span class="status-badge status-contacted"><i class="fas fa-phone-alt"></i> In Review</span>';
+    } else if (data.status === 'in_progress') {
+      badgeHtml = '<span class="status-badge status-in_progress"><i class="fas fa-circle-notch fa-spin"></i> In Progress</span>';
+    } else {
+      badgeHtml = '<span class="status-badge status-completed"><i class="fas fa-check"></i> Completed</span>';
+    }
+    statusEl.innerHTML = badgeHtml;
+
+    const notesWrap = document.getElementById("modalNotesWrap");
+    const notesEl = document.getElementById("modalNotes");
+    if (data.notes && data.notes.trim() !== "") {
+      notesEl.textContent = data.notes;
+      notesWrap.style.display = "block";
+    } else {
+      notesWrap.style.display = "none";
+    }
+
+    document.getElementById("briefModal").classList.add("active");
+  }
+
+  function closeBriefModal() {
+    document.getElementById("briefModal").classList.remove("active");
+  }
+
+  document.getElementById("briefModal").addEventListener("click", function (e) {
+    if (e.target === this) {
+      closeBriefModal();
+    }
+  });
+</script>
+{% endblock %}

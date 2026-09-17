@@ -22,8 +22,8 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get("user_id"):
-            flash("Please sign in to access the admin panel.", "warning")
+        if not session.get("user_id") or session.get("role") != "admin":
+            flash("Please sign in with an administrator account to access the admin panel.", "warning")
             return redirect(url_for("admin.login", next=request.url))
         return f(*args, **kwargs)
     return decorated_function
@@ -34,7 +34,7 @@ def allowed_file(filename):
 # ─────────────────────────────────────────────────────────────
 @admin_bp.route("/login", methods=["GET", "POST"], strict_slashes=False)
 def login():
-    if session.get("user_id"):
+    if session.get("user_id") and session.get("role") == "admin":
         return redirect(url_for("admin.dashboard"))
     if request.method == "POST":
         username = request.form.get("username", "").strip()
@@ -42,6 +42,9 @@ def login():
         remember = bool(request.form.get("remember"))
         user = User.get_by_username(username)
         if user and User.verify_password(user["password_hash"], password):
+            if user.get("role") != "admin":
+                flash("Access denied. This portal is for studio administrators only. If you are a client, please use the Client Portal.", "error")
+                return render_template("admin/login.html")
             session.permanent = remember
             session["user_id"] = user["id"]
             session["username"] = user["username"]
@@ -56,8 +59,11 @@ def login():
     return render_template("admin/login.html")
 @admin_bp.route("/logout")
 def logout():
-    session.clear()
-    flash("You have been signed out.", "info")
+    session.pop("user_id", None)
+    session.pop("username", None)
+    session.pop("email", None)
+    session.pop("role", None)
+    flash("You have been signed out of the Admin Suite.", "info")
     return redirect(url_for("admin.login"))
 # ─────────────────────────────────────────────────────────────
 # DASHBOARD

@@ -24,7 +24,10 @@ def init_db(app=None, run_seed=True):
         username TEXT UNIQUE NOT NULL,
         email TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
-        role TEXT DEFAULT 'admin',
+        role TEXT DEFAULT 'client',
+        full_name TEXT,
+        company TEXT,
+        phone TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_login TIMESTAMP
     );
@@ -33,6 +36,7 @@ def init_db(app=None, run_seed=True):
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS inquiries (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
         first_name TEXT NOT NULL,
         last_name TEXT,
         email TEXT NOT NULL,
@@ -117,13 +121,29 @@ def init_db(app=None, run_seed=True):
     );
     """)
     conn.commit()
+    # Migration: Ensure client-related columns exist in users table
+    cursor.execute("PRAGMA table_info(users)")
+    user_cols = {row["name"] for row in cursor.fetchall()}
+    if "full_name" not in user_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN full_name TEXT")
+    if "company" not in user_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN company TEXT")
+    if "phone" not in user_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN phone TEXT")
+
+    # Migration: Ensure user_id column exists in inquiries table
+    cursor.execute("PRAGMA table_info(inquiries)")
+    inquiry_cols = {row["name"] for row in cursor.fetchall()}
+    if "user_id" not in inquiry_cols:
+        cursor.execute("ALTER TABLE inquiries ADD COLUMN user_id INTEGER")
+    conn.commit()
     # Seed default admin if no user exists
     cursor.execute("SELECT COUNT(*) FROM users")
     if cursor.fetchone()[0] == 0:
         hashed = generate_password_hash(Config.DEFAULT_ADMIN_PASSWORD)
         cursor.execute(
-            "INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, ?)",
-            (Config.DEFAULT_ADMIN_USERNAME, Config.DEFAULT_ADMIN_EMAIL, hashed, "admin")
+            "INSERT INTO users (username, email, password_hash, role, full_name) VALUES (?, ?, ?, ?, ?)",
+            (Config.DEFAULT_ADMIN_USERNAME, Config.DEFAULT_ADMIN_EMAIL, hashed, "admin", "Studio Admin")
         )
         conn.commit()
         print(f"[*] Created default admin user: {Config.DEFAULT_ADMIN_USERNAME}")

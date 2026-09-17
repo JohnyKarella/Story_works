@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Registration — Storyworks Studio</title>
+  <!-- Brand Favicons -->
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='admin/favicon.svg') }}" />
+  <link rel="alternate icon" type="image/png" href="{{ url_for('static', filename='admin/favicon.png') }}" />
+  <link rel="shortcut icon" href="{{ url_for('static', filename='admin/favicon.ico') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin/admin.css') }}" />
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: radial-gradient(circle at top center, #1b1712 0%, #0c0d0e 70%);
+      padding: 32px 20px;
+    }
+    .register-container {
+      width: 100%;
+      max-width: 520px;
+    }
+    .register-card {
+      background: rgba(21, 22, 25, 0.95);
+      border: 1px solid rgba(200, 117, 58, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(12px);
+    }
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(200, 117, 58, 0.12);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(200, 117, 58, 0.25);
+    }
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 540px) {
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+    .password-wrap {
+      position: relative;
+    }
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .password-toggle:hover {
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <div class="register-card">
+      <div style="text-align: center; margin-bottom: 26px;">
+        <div class="brand-badge">
+          <i class="fas fa-sparkles"></i> New Client Partnership
+        </div>
+        <h1 style="font-size: 26px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; letter-spacing: -0.5px;">
+          Create Client Account
+        </h1>
+        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">
+          Choose your own credentials to register and immediately submit and track project briefs with our studio team.
+        </p>
+      </div>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div style="margin-bottom: 20px;">
+            {% for category, message in messages %}
+              <div class="flash-alert flash-{{ category }}" style="margin-bottom: 8px;">
+                <div class="flash-icon">
+                  {% if category == 'success' %}
+                    <i class="fas fa-check-circle"></i>
+                  {% elif category == 'error' or category == 'danger' %}
+                    <i class="fas fa-exclamation-circle"></i>
+                  {% else %}
+                    <i class="fas fa-info-circle"></i>
+                  {% endif %}
+                </div>
+                <span class="flash-text">{{ message }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('client.register') }}">
+        <div class="form-grid-2" style="margin-bottom: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="username" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Username <span style="color: var(--primary);">*</span>
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              class="form-control"
+              placeholder="e.g. johndoe"
+              value="{{ form_data.username or '' }}"
+              required
+              autofocus
+              style="width: 100%; padding: 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Email Address <span style="color: var(--primary);">*</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control"
+              placeholder="e.g. john@brand.com"
+              value="{{ form_data.email or '' }}"
+              required
+              style="width: 100%; padding: 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
+            />
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" for="full_name" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+            Full Name <span style="color: var(--primary);">*</span>
+          </label>
+          <input
+            type="text"
+            id="full_name"
+            name="full_name"
+            class="form-control"
+            placeholder="e.g. John Doe"
+            value="{{ form_data.full_name or '' }}"
+            required
+            style="width: 100%; padding: 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
+          />
+        </div>
+
+        <div class="form-grid-2" style="margin-bottom: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="company" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Company / Organization
+            </label>
+            <input
+              type="text"
+              id="company"
+              name="company"
+              class="form-control"
+              placeholder="e.g. Acme Corp"
+              value="{{ form_data.company or '' }}"
+              style="width: 100%; padding: 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phone" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              class="form-control"
+              placeholder="e.g. +91 98765 43210"
+              value="{{ form_data.phone or '' }}"
+              style="width: 100%; padding: 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
+            />
+          </div>
+        </div>
+
+        <div class="form-grid-2" style="margin-bottom: 24px;">
+          <div class="form-group">
+            <label class="form-label" for="password" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Choose Password <span style="color: var(--primary);">*</span>
+            </label>
+            <div class="password-wrap">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                placeholder="Min 6 characters"
+                required
+                minlength="6"
+                style="width: 100%; padding: 11px 36px 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
+              />
+              <button type="button" class="password-toggle" id="togglePassword1" aria-label="Toggle password visibility">
+                <i class="fas fa-eye" id="toggleIcon1"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirm_password" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+              Confirm Password <span style="color: var(--primary);">*</span>
+            </label>
+            <div class="password-wrap">
+              <input
+                type="password"
+                id="confirm_password"
+                name="confirm_password"
+                class="form-control"
+                placeholder="Repeat password"
+                required
+                minlength="6"
+                style="width: 100%; padding: 11px 36px 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
+              />
+              <button type="button" class="password-toggle" id="togglePassword2" aria-label="Toggle password visibility">
+                <i class="fas fa-eye" id="toggleIcon2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          style="width: 100%; padding: 13px; font-size: 15px; font-weight: 600; border-radius: var(--radius-md); letter-spacing: 0.3px;"
+        >
+          <i class="fas fa-user-plus" style="margin-right: 8px;"></i> Create My Client Account
+        </button>
+      </form>
+
+      <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-color); text-align: center; font-size: 13px; color: var(--text-muted);">
+        <p>
+          Already have a client account?
+          <a href="{{ url_for('client.login') }}" style="color: var(--primary); font-weight: 600;">
+            Sign In &rarr;
+          </a>
+        </p>
+        <div style="margin-top: 10px; font-size: 12px;">
+          <a href="/" style="color: var(--text-dim); text-decoration: underline;">
+            &larr; Return to Website
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setupToggle(btnId, inputId, iconId) {
+      const btn = document.getElementById(btnId);
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (btn && input && icon) {
+        btn.addEventListener("click", function () {
+          const type = input.getAttribute("type") === "password" ? "text" : "password";
+          input.setAttribute("type", type);
+          icon.classList.toggle("fa-eye");
+          icon.classList.toggle("fa-eye-slash");
+        });
+      }
+    }
+    setupToggle("togglePassword1", "password", "toggleIcon1");
+    setupToggle("togglePassword2", "confirm_password", "toggleIcon2");
+  </script>
+</body>
+</html>

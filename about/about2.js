@@ -32,8 +32,8 @@ window.addEventListener('load', function () {
     });
 });
 // Services Card
-// Service data
-const services = [
+// Default Service data fallback
+const defaultServices = [
     {
         icon: 'fas fa-chart-line',
         title: 'Brand Strategy',
@@ -65,36 +65,107 @@ const services = [
         description: 'We transform entries into arrivals through strategic blueprints and high-impact storytelling. By orchestrating the pivotal moments where brands meet the world, we ensure your debut is both seen and felt.'
     }
 ];
-// Generate cards
-const servicesGrid = document.getElementById('servicesGrid');
-services.forEach(service => {
-    const card = document.createElement('div');
-    card.className = 'service-card-container';
-    // Generate 60 icons for seamless scroll (6 columns × 10 rows)
-    let iconHTML = '';
-    for (let i = 0; i < 60; i++) {
-        iconHTML += `<i class="${service.icon}"></i>`;
+
+function getServiceIconClass(icon) {
+    if (!icon) return 'fas fa-star';
+    const trimmed = icon.trim();
+    if (trimmed.startsWith('fa-') || trimmed.startsWith('fas ') || trimmed.startsWith('fab ') || trimmed.startsWith('far ')) {
+        if (!trimmed.includes(' ')) {
+            return 'fas ' + trimmed;
+        }
+        return trimmed;
     }
-    card.innerHTML = `
-                <div class="service-card-inner">
-                    <div class="service-card-front">
-                        <div class="icon-pattern">
-                            <div class="icon-pattern-wrapper">
-                                ${iconHTML}
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="icon-wrapper">
-                                <i class="${service.icon}"></i>
-                            </div>
-                            <h3>${service.title}</h3>
+    const map = {
+        'strategy': 'fas fa-chart-line',
+        'chart-line': 'fas fa-chart-line',
+        'identity': 'fas fa-search',
+        'design': 'fas fa-search',
+        'search': 'fas fa-search',
+        'content': 'fas fa-thumbs-up',
+        'copywriting': 'fas fa-thumbs-up',
+        'thumbs-up': 'fas fa-thumbs-up',
+        'digital': 'fab fa-google',
+        'marketing': 'fab fa-google',
+        'google': 'fab fa-google',
+        'web': 'fas fa-laptop-code',
+        'laptop-code': 'fas fa-laptop-code',
+        'launch': 'fas fa-code',
+        'campaign': 'fas fa-code',
+        'code': 'fas fa-code',
+        'sparkles': 'fas fa-magic',
+        'layout': 'fas fa-laptop-code',
+        'camera': 'fas fa-camera',
+        'trending-up': 'fas fa-chart-line'
+    };
+    return map[trimmed.toLowerCase()] || `fas fa-${trimmed}`;
+}
+
+function renderServices(items) {
+    const servicesGrid = document.getElementById('servicesGrid');
+    if (!servicesGrid || !items || !items.length) return;
+    servicesGrid.innerHTML = '';
+
+    items.forEach(service => {
+        const card = document.createElement('div');
+        card.className = 'service-card-container';
+        const iconClass = getServiceIconClass(service.icon);
+
+        // Generate 60 icons for seamless scroll (6 columns × 10 rows)
+        let iconHTML = '';
+        for (let i = 0; i < 60; i++) {
+            iconHTML += `<i class="${iconClass}"></i>`;
+        }
+
+        let rawTitle = service.title || '';
+        let frontTitle = rawTitle;
+        if (!frontTitle.includes('<br>') && frontTitle.includes(' & ')) {
+            frontTitle = frontTitle.replace(' & ', ' &<br> ');
+        }
+        const backTitle = rawTitle.replace(/<br\s*[\/]?>/gi, ' ');
+        const description = service.short_desc || service.description || service.full_desc || '';
+
+        card.innerHTML = `
+            <div class="service-card-inner">
+                <div class="service-card-front">
+                    <div class="icon-pattern">
+                        <div class="icon-pattern-wrapper">
+                            ${iconHTML}
                         </div>
                     </div>
-                    <div class="service-card-back">
-                        <h3>${service.title.replace('<br>', ' ')}</h3>
-                        <p>${service.description}</p>
+                    <div class="card-content">
+                        <div class="icon-wrapper">
+                            <i class="${iconClass}"></i>
+                        </div>
+                        <h3>${frontTitle}</h3>
                     </div>
                 </div>
-            `;
-    servicesGrid.appendChild(card);
-});
+                <div class="service-card-back">
+                    <h3>${backTitle}</h3>
+                    <p>${description}</p>
+                </div>
+            </div>
+        `;
+        servicesGrid.appendChild(card);
+    });
+}
+
+// Generate cards immediately from default fallback, then hydrate from live API
+const servicesGrid = document.getElementById('servicesGrid');
+if (servicesGrid) {
+    renderServices(defaultServices);
+
+    fetch('/api/services')
+        .then(res => {
+            if (!res.ok) throw new Error('Network response not ok');
+            return res.json();
+        })
+        .then(data => {
+            if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+                renderServices(data.data);
+            }
+        })
+        .catch(err => {
+            console.warn('Live services load notice:', err.message);
+        });
+}
+

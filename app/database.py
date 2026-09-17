@@ -143,7 +143,29 @@ def init_db(app=None, run_seed=True):
             "INSERT OR IGNORE INTO settings (key, value, category) VALUES (?, ?, ?)",
             (key, val, cat)
         )
-    conn.commit()
+    # Ensure standard services match website offerings
+    cursor.execute("SELECT slug FROM services")
+    existing_slugs = {row[0] for row in cursor.fetchall()}
+    if "brand-strategy-identity" in existing_slugs or len(existing_slugs) == 0:
+        # Clear legacy seeded services if present
+        cursor.execute("DELETE FROM services WHERE slug IN ('brand-strategy-identity', 'web-design-digital-experiences', 'photography-visual-craft', 'local-seo-performance-marketing')")
+        standard_services = [
+            ("Brand Strategy", "brand-strategy", "We move beyond aesthetics to architect the strategic soul of your business. By synthesizing market intelligence with intuition, we build the narrative frameworks that drive your brand’s future.", "We move beyond aesthetics to architect the strategic soul of your business. By synthesizing market intelligence with intuition, we build the narrative frameworks that drive your brand’s future.", "fas fa-chart-line", 1, 1),
+            ("Brand Identity & Design", "brand-identity-design", "We craft visual legacies through intentional design, from signature logos to multi-sensory systems. Every touchpoint is engineered for flawless consistency, creating a timeless invitation into your brand’s world.", "We craft visual legacies through intentional design, from signature logos to multi-sensory systems. Every touchpoint is engineered for flawless consistency, creating a timeless invitation into your brand’s world.", "fas fa-search", 2, 1),
+            ("Content & Copywriting", "content-copywriting", "Our narratives do more than fill space; they command attention and build lasting rapport. We translate complex value propositions into persuasive human stories that sell a philosophy, not just a product.", "Our narratives do more than fill space; they command attention and build lasting rapport. We translate complex value propositions into persuasive human stories that sell a philosophy, not just a product.", "fas fa-thumbs-up", 3, 1),
+            ("Digital Marketing", "digital-marketing", "Our approach integrates high-intent SEO and strategic social storytelling into performance-driven ecosystems that grow your community and your revenue in equal measure.", "Our approach integrates high-intent SEO and strategic social storytelling into performance-driven ecosystems that grow your community and your revenue in equal measure.", "fab fa-google", 4, 1),
+            ("Web & Experience Design", "web-experience-design", "We view the digital interface as a premier storefront. Our team designs high-conversion digital environments where elegant minimalism meets functional rigor, ensuring every click feels intuitive and every interaction reinforces trust.", "We view the digital interface as a premier storefront. Our team designs high-conversion digital environments where elegant minimalism meets functional rigor, ensuring every click feels intuitive and every interaction reinforces trust.", "fas fa-laptop-code", 5, 1),
+            ("Launch & Campaign Strategy", "launch-campaign-strategy", "We transform entries into arrivals through strategic blueprints and high-impact storytelling. By orchestrating the pivotal moments where brands meet the world, we ensure your debut is both seen and felt.", "We transform entries into arrivals through strategic blueprints and high-impact storytelling. By orchestrating the pivotal moments where brands meet the world, we ensure your debut is both seen and felt.", "fas fa-code", 6, 1),
+        ]
+        for title, slug, sdesc, fdesc, icon, order, active in standard_services:
+            cursor.execute(
+                """
+                INSERT OR IGNORE INTO services (title, slug, short_desc, full_desc, icon, display_order, is_active)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (title, slug, sdesc, fdesc, icon, order, active),
+            )
+        conn.commit()
     # Auto-seed initial content if database was freshly created
     if run_seed:
         cursor.execute("SELECT COUNT(*) FROM blogs")

@@ -70,8 +70,15 @@ window.openEditService = openEditService;
             <tr>
               <td style="color: var(--text-dim); font-weight: 600;">#{{ s.display_order }}</td>
               <td>
-                <div style="font-weight: 600;">{{ s.title }}</div>
-                <div style="font-size: 11px; color: var(--text-dim);">slug: {{ s.slug }}</div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(200, 117, 58, 0.14); border: 1px solid rgba(200, 117, 58, 0.3); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 15px; flex-shrink: 0;">
+                    <i class="{{ s.icon or 'fas fa-star' }}"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight: 600;">{{ s.title }}</div>
+                    <div style="font-size: 11px; color: var(--text-dim);">slug: {{ s.slug }}</div>
+                  </div>
+                </div>
               </td>
               <td style="font-size: 13px; color: var(--text-muted); max-width: 400px;">
                 {{ s.short_desc or '—' }}
@@ -141,15 +148,20 @@ window.openEditService = openEditService;
         </div>
         <div class="form-row">
           <div class="form-group">
+            <label class="form-label">FontAwesome Icon Class</label>
+            <input type="text" name="icon" class="form-control" placeholder="e.g. fas fa-chart-line, fas fa-search, fab fa-google" value="fas fa-chart-line" />
+            <small style="color: var(--text-dim); font-size: 11px;">e.g. fas fa-chart-line, fas fa-search, fas fa-thumbs-up, fab fa-google, fas fa-laptop-code, fas fa-code</small>
+          </div>
+          <div class="form-group">
             <label class="form-label">Display Order</label>
-            <input type="number" name="display_order" class="form-control" value="0" />
+            <input type="number" name="display_order" class="form-control" value="1" />
           </div>
-          <div class="form-group" style="display: flex; align-items: center; margin-top: 24px;">
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-              <input type="checkbox" name="is_active" value="1" checked style="width: 18px; height: 18px;" />
-              <span style="font-size: 14px;">Active</span>
-            </label>
-          </div>
+        </div>
+        <div class="form-group" style="margin-top: 12px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" name="is_active" value="1" checked style="width: 18px; height: 18px; accent-color: var(--accent);" />
+            <span style="font-size: 14px; font-weight: 500;">Active (Visible on website)</span>
+          </label>
         </div>
       </div>
       <div class="modal-footer">
@@ -186,8 +198,9 @@ window.openEditService = openEditService;
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Icon / Category Tag</label>
-            <input type="text" name="icon" class="form-control" placeholder="e.g. strategy, website, photo" />
+            <label class="form-label">FontAwesome Icon Class</label>
+            <input type="text" name="icon" class="form-control" placeholder="e.g. fas fa-chart-line, fas fa-search, fab fa-google" />
+            <small style="color: var(--text-dim); font-size: 11px;">e.g. fas fa-chart-line, fas fa-search, fas fa-thumbs-up, fab fa-google, fas fa-laptop-code, fas fa-code</small>
           </div>
           <div class="form-group">
             <label class="form-label">Display Order</label>

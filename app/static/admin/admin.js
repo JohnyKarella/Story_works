@@ -22,14 +22,46 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-  // Mobile menu toggle if button exists
+  // Mobile menu toggle & drawer handling
   const menuToggle = document.getElementById("menuToggle");
   const sidebar = document.querySelector(".sidebar");
-  if (menuToggle && sidebar) {
-    menuToggle.addEventListener("click", () => {
-      sidebar.classList.toggle("open");
+  const sidebarBackdrop = document.getElementById("sidebarBackdrop");
+  const sidebarClose = document.getElementById("sidebarClose");
+
+  function toggleSidebar(open) {
+    if (!sidebar) return;
+    const shouldOpen = open !== undefined ? open : !sidebar.classList.contains("open");
+    if (shouldOpen) {
+      sidebar.classList.add("open");
+      if (sidebarBackdrop) sidebarBackdrop.classList.add("active");
+      document.body.style.overflow = "hidden";
+    } else {
+      sidebar.classList.remove("open");
+      if (sidebarBackdrop) sidebarBackdrop.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  }
+
+  if (menuToggle) {
+    menuToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleSidebar();
     });
   }
+  if (sidebarClose) {
+    sidebarClose.addEventListener("click", () => toggleSidebar(false));
+  }
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener("click", () => toggleSidebar(false));
+  }
+  // Auto-close sidebar on nav link click on mobile
+  document.querySelectorAll(".sidebar .nav-link").forEach((link) => {
+    link.addEventListener("click", () => {
+      if (window.innerWidth <= 992) {
+        toggleSidebar(false);
+      }
+    });
+  });
   // Initialize real-time new message pop-up notification listener
   initAdminNotificationPoller();
 });

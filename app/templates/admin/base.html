@@ -9,6 +9,7 @@
   <link rel="alternate icon" type="image/png" href="{{ url_for('static', filename='admin/favicon.png') }}" />
   <link rel="shortcut icon" href="{{ url_for('static', filename='admin/favicon.ico') }}" />
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='admin/favicon.png') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="{{ url_for('static', filename='admin/admin.css') }}" />
   {% block head %}{% endblock %}
 </head>
@@ -22,6 +23,7 @@
           <h2>Storyworks</h2>
           <span>Admin Suite</span>
         </div>
+        <button type="button" class="sidebar-close-btn" id="sidebarClose" aria-label="Close menu">&times;</button>
       </div>
       <nav class="sidebar-nav">
         <div class="nav-category">Main</div>
@@ -76,11 +78,21 @@
         </div>
       </div>
     </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
     <!-- ── Main Content ── -->
     <div class="main-wrapper">
       <header class="topbar">
-        <div class="topbar-title">
-          <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+        <div class="topbar-left">
+          <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="topbar-title">
+            <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+          </div>
         </div>
         <div class="topbar-actions">
           {% block topbar_actions %}{% endblock %}

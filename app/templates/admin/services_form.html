@@ -29,12 +29,13 @@
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label" for="icon">Icon / Category Keyword</label>
-          <input type="text" id="icon" name="icon" class="form-control" value="{{ service.icon if service else '' }}" placeholder="e.g. strategy, design, photo, marketing" />
+          <label class="form-label" for="icon">FontAwesome Icon Class</label>
+          <input type="text" id="icon" name="icon" class="form-control" value="{{ service.icon if service else 'fas fa-chart-line' }}" placeholder="e.g. fas fa-chart-line, fas fa-search, fab fa-google" />
+          <small style="color: var(--text-dim); font-size: 11px;">e.g. fas fa-chart-line, fas fa-search, fas fa-thumbs-up, fab fa-google, fas fa-laptop-code, fas fa-code</small>
         </div>
         <div class="form-group">
           <label class="form-label" for="display_order">Display Order</label>
-          <input type="number" id="display_order" name="display_order" class="form-control" value="{{ service.display_order if service else 0 }}" />
+          <input type="number" id="display_order" name="display_order" class="form-control" value="{{ service.display_order if service else 1 }}" />
         </div>
       </div>
       <div class="form-group" style="margin-top: 10px;">

@@ -14,28 +14,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-dark: #08090a;
-      --bg-card: rgba(19, 20, 24, 0.82);
-      --bg-card-hover: rgba(24, 25, 31, 0.92);
-      --bg-input: rgba(13, 14, 17, 0.76);
-      --bg-input-focus: rgba(18, 19, 24, 0.96);
+      --bg-dark: #060708;
+      --bg-card: rgba(14, 15, 18, 0.82);
+      --bg-card-inner: rgba(18, 19, 24, 0.92);
+      --bg-input: rgba(10, 11, 14, 0.75);
+      --bg-input-focus: rgba(16, 17, 22, 0.98);
       --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.18);
-      --border-focus: #c8753a;
+      --border-hover: rgba(200, 117, 58, 0.35);
       --primary: #c8753a;
       --primary-hover: #e08343;
       --primary-light: #ff9d5c;
       --primary-gradient: linear-gradient(135deg, #e58747 0%, #c8753a 50%, #9c4c1a 100%);
-      --primary-glow: rgba(200, 117, 58, 0.32);
-      --primary-glow-strong: rgba(200, 117, 58, 0.58);
+      --primary-glow: rgba(200, 117, 58, 0.35);
+      --primary-glow-strong: rgba(200, 117, 58, 0.65);
+      --gold: #d4af37;
       --accent-amber: #f59e0b;
       --text-main: #f9fafb;
       --text-muted: #9ca3af;
       --text-dim: #6b7280;
-      --radius-card: 24px;
+      --radius-card: 26px;
       --radius-input: 13px;
       --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
-      --shadow-card: 0 35px 80px -15px rgba(0, 0, 0, 0.85), 0 0 0 1px var(--border-subtle);
     }
     * {
       box-sizing: border-box;
@@ -50,15 +49,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 28px 20px;
       line-height: 1.5;
       position: relative;
       overflow-x: hidden;
       overflow-y: auto;
     }
 
-    /* ── Ambient Background Canvas ── */
-    .ambient-canvas {
+    /* ── Interactive Particle Constellation Canvas ── */
+    #ambientCanvas {
       position: fixed;
       top: 0;
       left: 0;
@@ -66,62 +65,74 @@
       height: 100%;
       pointer-events: none;
       z-index: 0;
-      overflow: hidden;
-    }
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(95px);
-      opacity: 0.55;
-      animation: floatOrb 22s infinite alternate ease-in-out;
-      will-change: transform;
-    }
-    .orb-1 {
-      width: 520px;
-      height: 520px;
-      background: radial-gradient(circle, rgba(200, 117, 58, 0.32) 0%, rgba(200, 117, 58, 0) 70%);
-      top: -120px;
-      left: 50%;
-      transform: translateX(-50%);
-      animation-duration: 18s;
-    }
-    .orb-2 {
-      width: 440px;
-      height: 440px;
-      background: radial-gradient(circle, rgba(139, 69, 19, 0.28) 0%, rgba(139, 69, 19, 0) 70%);
-      bottom: -100px;
-      left: 15%;
-      animation-duration: 24s;
-      animation-delay: -6s;
-    }
-    .orb-3 {
-      width: 380px;
-      height: 380px;
-      background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0) 70%);
-      top: 35%;
-      right: 10%;
-      animation-duration: 20s;
-      animation-delay: -11s;
-    }
-    @keyframes floatOrb {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(30px, -40px) scale(1.08); }
-      100% { transform: translate(-25px, 25px) scale(0.95); }
     }
 
-    /* ── High-End Dot Grid Overlay ── */
-    .grid-overlay {
+    /* ── Atmospheric Radial Glow Mesh ── */
+    .radial-glow-mesh {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-      background-size: 28px 28px;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 15%, rgba(200, 117, 58, 0.22) 0%, transparent 50%),
+        radial-gradient(circle at 10% 80%, rgba(212, 175, 55, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 60%, rgba(139, 69, 19, 0.25) 0%, transparent 45%);
       pointer-events: none;
       z-index: 1;
-      mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
-      -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+      filter: blur(40px);
+      animation: ambientPulse 12s infinite alternate ease-in-out;
+    }
+    @keyframes ambientPulse {
+      0% { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.06); }
+    }
+
+    /* ── Dot Grid Overlay ── */
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.2px, transparent 1.2px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 2;
+      mask-image: radial-gradient(circle at center, black 35%, transparent 80%);
+      -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 80%);
+    }
+
+    /* ── Floating Decorative Capability Badges ── */
+    .floating-pill {
+      position: absolute;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px;
+      border-radius: 30px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.75);
+      background: rgba(18, 19, 24, 0.7);
+      border: 1px solid rgba(200, 117, 58, 0.35);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(200, 117, 58, 0.15);
+      pointer-events: none;
+      z-index: 4;
+      white-space: nowrap;
+    }
+    .pill-1 {
+      top: -24px;
+      right: -20px;
+      animation: floatBadge1 7s ease-in-out infinite alternate;
+    }
+    .pill-2 {
+      bottom: -18px;
+      left: -22px;
+      animation: floatBadge2 8s ease-in-out infinite alternate;
+    }
+    @keyframes floatBadge1 {
+      0% { transform: translateY(0px) rotate(2deg); }
+      100% { transform: translateY(-16px) rotate(-2deg); }
+    }
+    @keyframes floatBadge2 {
+      0% { transform: translateY(0px) rotate(-2deg); }
+      100% { transform: translateY(14px) rotate(2deg); }
     }
 
     /* ── Main Container ── */
@@ -129,78 +140,151 @@
       position: relative;
       z-index: 10;
       width: 100%;
-      max-width: 470px;
-      animation: fadeInUp 0.75s var(--ease-smooth);
+      max-width: 480px;
+      animation: containerEntrance 0.85s var(--ease-smooth);
+    }
+    @keyframes containerEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
-    /* ── Card Styles ── */
-    .login-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-card);
-      padding: 42px 38px 36px;
-      box-shadow: var(--shadow-card);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+    /* ── Card with Animated Glowing Border Beam ── */
+    .card-border-wrap {
       position: relative;
+      border-radius: var(--radius-card);
+      padding: 1.5px;
+      background: rgba(255, 255, 255, 0.08);
       overflow: hidden;
-      transition: transform 0.4s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth), border-color 0.4s ease;
+      box-shadow: 0 40px 90px -15px rgba(0, 0, 0, 0.9), 0 0 40px rgba(200, 117, 58, 0.15);
     }
-    .login-card::before {
+    /* Rotating Laser Beam Animation */
+    .card-border-wrap::before {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent 0%, rgba(200, 117, 58, 0.8) 50%, transparent 100%);
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+        transparent 0deg,
+        transparent 70deg,
+        rgba(200, 117, 58, 0.9) 95deg,
+        rgba(255, 180, 110, 1) 100deg,
+        rgba(200, 117, 58, 0.9) 105deg,
+        transparent 130deg,
+        transparent 360deg
+      );
+      animation: laserBorderRotate 7s linear infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+    @keyframes laserBorderRotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
-    /* ── Header / Branding ── */
-    .brand-header {
-      text-align: center;
-      margin-bottom: 24px;
+    .login-card {
+      position: relative;
+      z-index: 1;
+      background: var(--bg-card);
+      border-radius: calc(var(--radius-card) - 1.5px);
+      padding: 42px 38px 36px;
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      overflow: hidden;
+      transition: transform 0.35s var(--ease-smooth);
+    }
+
+    /* Interactive Mouse Spotlight Tracking Glow */
+    .card-spotlight {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200, 117, 58, 0.16) 0%, transparent 70%);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 0;
+    }
+
+    /* ── Logo with Pulsing Rings ── */
+    .logo-container {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 16px;
     }
     .logo-badge-wrap {
+      position: relative;
+      z-index: 2;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 58px;
-      height: 58px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(200, 117, 58, 0.25) 0%, rgba(139, 69, 19, 0.15) 100%);
-      border: 1px solid rgba(200, 117, 58, 0.45);
-      box-shadow: 0 10px 24px var(--primary-glow);
-      margin-bottom: 16px;
-      position: relative;
+      width: 60px;
+      height: 60px;
+      border-radius: 19px;
+      background: linear-gradient(135deg, rgba(200, 117, 58, 0.3) 0%, rgba(139, 69, 19, 0.2) 100%);
+      border: 1px solid rgba(200, 117, 58, 0.55);
+      box-shadow: 0 12px 28px var(--primary-glow-strong);
     }
     .logo-icon {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 800;
-      color: #ffffff;
       background: var(--primary-gradient);
       -webkit-background-clip: text;
-      background-clip: text;
       -webkit-text-fill-color: transparent;
       letter-spacing: -0.5px;
+    }
+    /* Animated Concentric Breathing Rings */
+    .pulse-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1px solid rgba(200, 117, 58, 0.45);
+      pointer-events: none;
+      animation: pulseRings 3.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+    }
+    .pulse-ring-1 { width: 72px; height: 72px; animation-delay: 0s; }
+    .pulse-ring-2 { width: 90px; height: 90px; animation-delay: 1.1s; }
+    @keyframes pulseRings {
+      0% { transform: translate(-50%, -50%) scale(0.7); opacity: 0.8; }
+      100% { transform: translate(-50%, -50%) scale(1.45); opacity: 0; }
+    }
+
+    /* ── Brand Header ── */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
     }
     .portal-tag {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      background: rgba(200, 117, 58, 0.12);
-      border: 1px solid rgba(200, 117, 58, 0.3);
+      gap: 7px;
+      background: linear-gradient(90deg, rgba(200, 117, 58, 0.15), rgba(212, 175, 55, 0.12));
+      border: 1px solid rgba(200, 117, 58, 0.35);
       color: var(--primary-light);
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.9px;
       text-transform: uppercase;
-      padding: 4px 12px;
+      padding: 5px 14px;
       border-radius: 30px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 15px rgba(200, 117, 58, 0.15);
     }
     .brand-header h1 {
-      font-size: 24px;
+      font-size: 25px;
       font-weight: 700;
       color: var(--text-main);
       letter-spacing: -0.5px;
@@ -212,26 +296,28 @@
       line-height: 1.5;
     }
 
-    /* ── Tab Switcher: Sign In vs Register ── */
+    /* ── Tab Switcher: Sign In vs Create Account ── */
     .portal-tabs {
       display: flex;
-      background: rgba(13, 14, 17, 0.6);
+      background: rgba(10, 11, 14, 0.7);
       border: 1px solid var(--border-subtle);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 4px;
       margin-bottom: 24px;
       gap: 4px;
+      position: relative;
+      z-index: 1;
     }
     .tab-btn {
       flex: 1;
       text-align: center;
-      padding: 9px 14px;
+      padding: 10px 14px;
       font-size: 13px;
       font-weight: 600;
       color: var(--text-muted);
       text-decoration: none;
-      border-radius: 9px;
-      transition: all 0.2s ease;
+      border-radius: 10px;
+      transition: all 0.25s ease;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -241,15 +327,17 @@
       color: var(--text-main);
     }
     .tab-btn.active {
-      background: rgba(200, 117, 58, 0.16);
+      background: linear-gradient(135deg, rgba(200, 117, 58, 0.22), rgba(139, 69, 19, 0.22));
       color: #ffffff;
-      border: 1px solid rgba(200, 117, 58, 0.35);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border: 1px solid rgba(200, 117, 58, 0.4);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
     }
 
-    /* ── Flash Alerts ── */
+    /* ── Flash Messages ── */
     .flash-container {
       margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
     }
     .flash-alert {
       display: flex;
@@ -272,18 +360,17 @@
       border: 1px solid rgba(16, 185, 129, 0.3);
       color: #6ee7b7;
     }
-    .flash-alert.warning {
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      color: #fcd34d;
-    }
     .flash-alert.info {
       background: rgba(59, 130, 246, 0.12);
       border: 1px solid rgba(59, 130, 246, 0.3);
       color: #93c5fd;
     }
 
-    /* ── Form Inputs ── */
+    /* ── Form Inputs with Glowing Amber Accent ── */
+    form {
+      position: relative;
+      z-index: 1;
+    }
     .form-group {
       margin-bottom: 20px;
       position: relative;
@@ -310,7 +397,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.2s ease;
+      transition: color 0.25s ease, transform 0.25s ease;
     }
     .input-icon svg {
       width: 17px;
@@ -333,19 +420,19 @@
     }
     .form-control:hover {
       border-color: var(--border-hover);
-      background: rgba(16, 17, 21, 0.85);
+      background: rgba(16, 17, 21, 0.88);
     }
     .form-control:focus {
-      border-color: var(--border-focus);
+      border-color: var(--primary);
       background: var(--bg-input-focus);
       box-shadow: 0 0 0 4px var(--primary-glow);
     }
-    .form-control:focus + .input-icon,
+    .form-control:focus ~ .input-icon,
     .input-wrapper:focus-within .input-icon {
       color: var(--primary-light);
+      transform: scale(1.1);
     }
 
-    /* Password Input & Eye Toggle */
     .password-wrapper .form-control {
       padding-right: 44px;
     }
@@ -365,14 +452,13 @@
     }
     .eye-toggle-btn:hover {
       color: var(--text-main);
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
     }
     .eye-toggle-btn svg {
       width: 18px;
       height: 18px;
     }
 
-    /* Caps Lock Alert */
     .caps-warning {
       display: none;
       align-items: center;
@@ -388,7 +474,7 @@
       fill: currentColor;
     }
 
-    /* ── Controls Row (Remember me + Register link) ── */
+    /* ── Controls Row ── */
     .controls-row {
       display: flex;
       align-items: center;
@@ -454,7 +540,7 @@
       width: 100%;
       background: var(--primary-gradient);
       color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: var(--radius-input);
       padding: 14px 20px;
       font-weight: 700;
@@ -462,7 +548,7 @@
       font-family: inherit;
       cursor: pointer;
       overflow: hidden;
-      box-shadow: 0 10px 25px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      box-shadow: 0 12px 28px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.3);
       transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth), filter 0.2s;
     }
     .btn-submit::after {
@@ -475,7 +561,7 @@
       background: linear-gradient(
         60deg,
         rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.35) 50%,
+        rgba(255, 255, 255, 0.4) 50%,
         rgba(255, 255, 255, 0) 100%
       );
       transform: rotate(25deg);
@@ -484,15 +570,14 @@
     }
     .btn-submit:hover {
       transform: translateY(-2px);
-      box-shadow: 0 16px 36px var(--primary-glow-strong), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      filter: brightness(1.06);
+      box-shadow: 0 18px 40px var(--primary-glow-strong), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      filter: brightness(1.08);
     }
     .btn-submit:hover::after {
       left: 130%;
     }
     .btn-submit:active {
       transform: translateY(1px) scale(0.985);
-      box-shadow: 0 6px 16px var(--primary-glow);
     }
     .btn-submit:disabled {
       opacity: 0.75;
@@ -518,7 +603,7 @@
       to { transform: rotate(360deg); }
     }
 
-    /* ── Footer Info & Links ── */
+    /* ── Card Footer ── */
     .card-footer {
       margin-top: 26px;
       padding-top: 22px;
@@ -526,6 +611,8 @@
       text-align: center;
       font-size: 13px;
       color: var(--text-muted);
+      position: relative;
+      z-index: 1;
     }
     .sub-links {
       display: flex;
@@ -544,269 +631,404 @@
       color: var(--primary-light);
     }
 
-    /* ── Animations ── */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(24px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       20%, 60% { transform: translateX(-6px); }
       40%, 80% { transform: translateX(6px); }
     }
 
-    @media (max-width: 480px) {
-      .login-card {
-        padding: 34px 24px;
-        border-radius: 20px;
-      }
-      .brand-header h1 {
-        font-size: 22px;
-      }
+    @media (max-width: 520px) {
+      .floating-pill { display: none; }
+      .login-card { padding: 34px 22px; }
+      .brand-header h1 { font-size: 22px; }
     }
   </style>
 </head>
 <body>
-  <!-- Ambient glowing aura orbs -->
-  <div class="ambient-canvas" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-  </div>
+  <!-- Interactive Particle Constellation Canvas -->
+  <canvas id="ambientCanvas"></canvas>
 
-  <!-- High-end dot grid mask -->
+  <!-- Atmospheric Glow Mesh -->
+  <div class="radial-glow-mesh" aria-hidden="true"></div>
+
+  <!-- Dot Grid Pattern -->
   <div class="grid-overlay" aria-hidden="true"></div>
 
-  <!-- Main Login Card -->
+  <!-- Main Login Card Container -->
   <div class="login-container">
-    <div class="login-card" id="cardContainer">
-      <!-- Brand Header -->
-      <div class="brand-header">
-        <div class="logo-badge-wrap">
-          <div class="logo-icon">S</div>
-        </div>
-        <br>
-        <div class="portal-tag">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          Storyworks Client Portal
-        </div>
-        <h1>Client Sign In</h1>
-        <p>Access your creative project briefs, track milestones, and collaborate with our studio team.</p>
-      </div>
+    <!-- Floating Capability Badges (Exclusive Client Portal Accent) -->
+    <div class="floating-pill pill-1">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--primary-light)" stroke-width="2.5">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+      </svg>
+      <span>Creative & Strategy Intake</span>
+    </div>
+    <div class="floating-pill pill-2">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 14 14"></polyline>
+      </svg>
+      <span>Milestone Tracking</span>
+    </div>
 
-      <!-- Tab Switcher -->
-      <div class="portal-tabs">
-        <a href="{{ url_for('client.login') }}" class="tab-btn active">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-            <polyline points="10 17 15 12 10 7"></polyline>
-            <line x1="15" y1="12" x2="3" y2="12"></line>
-          </svg>
-          Sign In
-        </a>
-        <a href="{{ url_for('client.register') }}" class="tab-btn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="8.5" cy="7" r="4"></circle>
-            <line x1="20" y1="8" x2="20" y2="14"></line>
-            <line x1="23" y1="11" x2="17" y2="11"></line>
-          </svg>
-          Create Account
-        </a>
-      </div>
+    <!-- Glowing Orbiting Laser Border Beam Container -->
+    <div class="card-border-wrap" id="cardContainer">
+      <div class="login-card">
+        <!-- Interactive Mouse Follow Spotlight Glow -->
+        <div class="card-spotlight" id="cardSpotlight"></div>
 
-      <!-- Flash Messages -->
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div class="flash-container">
-            {% for category, msg in messages %}
-              <div class="flash-alert {{ category }}">
-                <span>{{ msg }}</span>
-              </div>
-            {% endfor %}
-          </div>
-        {% endif %}
-      {% endwith %}
-
-      <!-- Client Sign In Form -->
-      <form id="clientLoginForm" method="POST" action="{{ url_for('client.login', next=request.args.get('next')) }}">
-        <div class="form-group">
-          <label class="form-label" for="identifier">
-            <span>Username or Email Address</span>
-          </label>
-          <div class="input-wrapper">
-            <div class="input-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
+        <!-- Brand Header with Concentric Breathing Rings -->
+        <div class="brand-header">
+          <div class="logo-container">
+            <div class="pulse-ring pulse-ring-1"></div>
+            <div class="pulse-ring pulse-ring-2"></div>
+            <div class="logo-badge-wrap">
+              <div class="logo-icon">S</div>
             </div>
-            <input
-              type="text"
-              id="identifier"
-              name="identifier"
-              class="form-control"
-              placeholder="e.g. alex@company.com or alexsmith"
-              required
-              autofocus
-              autocomplete="username"
-            />
           </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="password">
-            <span>Password</span>
-          </label>
-          <div class="input-wrapper password-wrapper">
-            <div class="input-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-              </svg>
-            </div>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              class="form-control"
-              placeholder="Enter your password"
-              required
-              autocomplete="current-password"
-            />
-            <button
-              type="button"
-              class="eye-toggle-btn"
-              id="eyeToggleBtn"
-              onclick="togglePasswordVisibility()"
-              aria-label="Toggle password visibility"
-              title="Show / hide password"
-            >
-              <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
-                <circle cx="12" cy="3" r="3"></circle>
-              </svg>
-              <svg id="eyeSlashIcon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                <line x1="1" y1="1" x2="23" y2="23"></line>
-              </svg>
-            </button>
-          </div>
-          <!-- Caps Lock Alert -->
-          <div class="caps-warning" id="capsWarning">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2L4 10h5v8h6v-8h5L12 2zm-6 18h12v2H6v-2z"></path>
+          <br>
+          <div class="portal-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            <span>Caps Lock is ON</span>
+            Storyworks Client Portal
           </div>
+          <h1>Client Sign In</h1>
+          <p>Access your creative project briefs, track milestones, and collaborate with our studio team.</p>
         </div>
 
-        <div class="controls-row">
-          <label class="custom-checkbox">
-            <input type="checkbox" name="remember" id="remember" value="1" />
-            <span class="checkmark-box">
-              <svg viewBox="0 0 24 24" fill="none">
-                <polyline points="20 6 9 17 4 12"></polyline>
+        <!-- Tab Switcher -->
+        <div class="portal-tabs">
+          <a href="{{ url_for('client.login') }}" class="tab-btn active">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              <polyline points="10 17 15 12 10 7"></polyline>
+              <line x1="15" y1="12" x2="3" y2="12"></line>
+            </svg>
+            Sign In
+          </a>
+          <a href="{{ url_for('client.register') }}" class="tab-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="8.5" cy="7" r="4"></circle>
+              <line x1="20" y1="8" x2="20" y2="14"></line>
+              <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+            Create Account
+          </a>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-container">
+              {% for category, msg in messages %}
+                <div class="flash-alert {{ category }}">
+                  <span>{{ msg }}</span>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Client Sign In Form -->
+        <form id="clientLoginForm" method="POST" action="{{ url_for('client.login', next=request.args.get('next')) }}">
+          <div class="form-group">
+            <label class="form-label" for="identifier">
+              <span>Username or Email Address</span>
+            </label>
+            <div class="input-wrapper">
+              <div class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <input
+                type="text"
+                id="identifier"
+                name="identifier"
+                class="form-control"
+                placeholder="e.g. alex@company.com or alexsmith"
+                required
+                autofocus
+                autocomplete="username"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">
+              <span>Password</span>
+            </label>
+            <div class="input-wrapper password-wrapper">
+              <div class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </div>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-control"
+                placeholder="Enter your password"
+                required
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="eye-toggle-btn"
+                id="eyeToggleBtn"
+                onclick="togglePasswordVisibility()"
+                aria-label="Toggle password visibility"
+                title="Show / hide password"
+              >
+                <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+                  <circle cx="12" cy="3" r="3"></circle>
+                </svg>
+                <svg id="eyeSlashIcon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+            <!-- Caps Lock Warning -->
+            <div class="caps-warning" id="capsWarning">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2L4 10h5v8h6v-8h5L12 2zm-6 18h12v2H6v-2z"></path>
               </svg>
+              <span>Caps Lock is ON</span>
+            </div>
+          </div>
+
+          <div class="controls-row">
+            <label class="custom-checkbox">
+              <input type="checkbox" name="remember" id="remember" value="1" />
+              <span class="checkmark-box">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+              <span>Remember me</span>
+            </label>
+            <a href="{{ url_for('client.register') }}" class="register-link">
+              Need an account?
+            </a>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <span class="btn-content">
+              <span class="btn-spinner" id="btnSpinner"></span>
+              <span id="btnText">Sign In to Client Portal</span>
             </span>
-            <span>Remember me</span>
-          </label>
-          <a href="{{ url_for('client.register') }}" class="register-link">
-            Need an account?
-          </a>
-        </div>
+          </button>
+        </form>
 
-        <button type="submit" class="btn-submit" id="submitBtn">
-          <span class="btn-content">
-            <span class="btn-spinner" id="btnSpinner"></span>
-            <span id="btnText">Sign In to Client Portal</span>
-          </span>
-        </button>
-      </form>
-
-      <!-- Footer Info -->
-      <div class="card-footer">
-        <p>
-          New client partner?
-          <a href="{{ url_for('client.register') }}" class="register-link" style="margin-left: 4px;">
-            Create client account &rarr;
-          </a>
-        </p>
-        <div class="sub-links">
-          <a href="/">&larr; Return to Website</a>
-          <span style="color: var(--border-subtle);">&bull;</span>
-          <a href="{{ url_for('admin.login') }}">Admin Suite</a>
+        <!-- Footer -->
+        <div class="card-footer">
+          <p>
+            New client partner?
+            <a href="{{ url_for('client.register') }}" class="register-link" style="margin-left: 4px;">
+              Create client account &rarr;
+            </a>
+          </p>
+          <div class="sub-links">
+            <a href="/">&larr; Return to Website</a>
+            <span style="color: var(--border-subtle);">&bull;</span>
+            <a href="{{ url_for('admin.login') }}">Admin Suite</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- ── Interactive JavaScript Engine ── -->
   <script>
-    // ── Toggle Password Visibility ──
+    // ── 1. Interactive Constellation & Amber Star Dust Canvas ──
+    (function () {
+      const canvas = document.getElementById("ambientCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      let width, height;
+      let particles = [];
+      const particleCount = 45;
+      let mouseX = null;
+      let mouseY = null;
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      window.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+      window.addEventListener("mouseleave", () => {
+        mouseX = null;
+        mouseY = null;
+      });
+
+      class Particle {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.size = Math.random() * 2.2 + 0.8;
+          this.speedX = (Math.random() - 0.5) * 0.45;
+          this.speedY = (Math.random() - 0.5) * 0.45;
+          this.alpha = Math.random() * 0.5 + 0.2;
+          this.color = Math.random() > 0.4 ? "200, 117, 58" : "212, 175, 55";
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+
+          // Mouse gentle gravitational pull
+          if (mouseX !== null && mouseY !== null) {
+            const dx = mouseX - this.x;
+            const dy = mouseY - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 150) {
+              this.x += (dx / dist) * 0.35;
+              this.y += (dy / dist) * 0.35;
+            }
+          }
+
+          if (this.x < 0 || this.x > width) this.speedX *= -1;
+          if (this.y < 0 || this.y > height) this.speedY *= -1;
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = `rgba(${this.color}, 0.8)`;
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Draw connecting filaments
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 115) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              const lineAlpha = (1 - dist / 115) * 0.18;
+              ctx.strokeStyle = `rgba(200, 117, 58, ${lineAlpha})`;
+              ctx.lineWidth = 0.8;
+              ctx.shadowBlur = 0;
+              ctx.stroke();
+            }
+          }
+        }
+
+        particles.forEach((p) => {
+          p.update();
+          p.draw();
+        });
+
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+
+    // ── 2. Interactive Spotlight Follow & 3D Card Parallax Tilt ──
+    (function () {
+      const cardContainer = document.getElementById("cardContainer");
+      const spotlight = document.getElementById("cardSpotlight");
+      if (!cardContainer) return;
+
+      document.addEventListener("mousemove", (e) => {
+        const rect = cardContainer.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if (spotlight) {
+          spotlight.style.left = `${x}px`;
+          spotlight.style.top = `${y}px`;
+          spotlight.style.opacity = "1";
+        }
+
+        if (window.innerWidth >= 768) {
+          const cardCenterX = rect.left + rect.width / 2;
+          const cardCenterY = rect.top + rect.height / 2;
+          const deltaX = (e.clientX - cardCenterX) / 40;
+          const deltaY = (e.clientY - cardCenterY) / 40;
+          cardContainer.style.transform = `perspective(1000px) rotateY(${deltaX}deg) rotateX(${-deltaY}deg) translateY(-2px)`;
+        }
+      });
+
+      document.addEventListener("mouseleave", () => {
+        if (spotlight) spotlight.style.opacity = "0";
+        cardContainer.style.transform = "perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(0px)";
+      });
+    })();
+
+    // ── 3. Toggle Password Visibility ──
     function togglePasswordVisibility() {
-      const pwd = document.getElementById('password');
-      const eye = document.getElementById('eyeIcon');
-      const slash = document.getElementById('eyeSlashIcon');
-      const btn = document.getElementById('eyeToggleBtn');
-      if (pwd.type === 'password') {
-        pwd.type = 'text';
-        eye.style.display = 'none';
-        slash.style.display = 'block';
-        btn.setAttribute('aria-label', 'Hide password');
+      const pwd = document.getElementById("password");
+      const eye = document.getElementById("eyeIcon");
+      const slash = document.getElementById("eyeSlashIcon");
+      const btn = document.getElementById("eyeToggleBtn");
+      if (pwd.type === "password") {
+        pwd.type = "text";
+        eye.style.display = "none";
+        slash.style.display = "block";
+        btn.setAttribute("aria-label", "Hide password");
       } else {
-        pwd.type = 'password';
-        eye.style.display = 'block';
-        slash.style.display = 'none';
-        btn.setAttribute('aria-label', 'Show password');
+        pwd.type = "password";
+        eye.style.display = "block";
+        slash.style.display = "none";
+        btn.setAttribute("aria-label", "Show password");
       }
     }
 
-    // ── Caps Lock Detector ──
-    const pwdInput = document.getElementById('password');
-    const capsWarning = document.getElementById('capsWarning');
+    // ── 4. Caps Lock Detector ──
+    const pwdInput = document.getElementById("password");
+    const capsWarning = document.getElementById("capsWarning");
     if (pwdInput && capsWarning) {
-      pwdInput.addEventListener('keyup', (e) => {
-        if (e.getModifierState && e.getModifierState('CapsLock')) {
-          capsWarning.style.display = 'flex';
+      pwdInput.addEventListener("keyup", (e) => {
+        if (e.getModifierState && e.getModifierState("CapsLock")) {
+          capsWarning.style.display = "flex";
         } else {
-          capsWarning.style.display = 'none';
+          capsWarning.style.display = "none";
         }
       });
-      pwdInput.addEventListener('blur', () => {
-        capsWarning.style.display = 'none';
+      pwdInput.addEventListener("blur", () => {
+        capsWarning.style.display = "none";
       });
     }
 
-    // ── Submit Loading Animation ──
-    const form = document.getElementById('clientLoginForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const btnSpinner = document.getElementById('btnSpinner');
-    const btnText = document.getElementById('btnText');
+    // ── 5. Submit Button Loading Spinner ──
+    const form = document.getElementById("clientLoginForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const btnSpinner = document.getElementById("btnSpinner");
+    const btnText = document.getElementById("btnText");
     if (form && submitBtn) {
-      form.addEventListener('submit', () => {
+      form.addEventListener("submit", () => {
         submitBtn.disabled = true;
-        if (btnSpinner) btnSpinner.style.display = 'inline-block';
-        if (btnText) btnText.textContent = 'Signing in...';
-      });
-    }
-
-    // ── Subtle 3D Card Parallax Tilt on Mouse Move ──
-    const card = document.getElementById('cardContainer');
-    if (card) {
-      document.addEventListener('mousemove', (e) => {
-        if (window.innerWidth < 768) return;
-        const rect = card.getBoundingClientRect();
-        const cardCenterX = rect.left + rect.width / 2;
-        const cardCenterY = rect.top + rect.height / 2;
-        const deltaX = (e.clientX - cardCenterX) / 45;
-        const deltaY = (e.clientY - cardCenterY) / 45;
-        card.style.transform = `perspective(1000px) rotateY(${deltaX}deg) rotateX(${-deltaY}deg) translateY(-2px)`;
-      });
-      document.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(0px)';
+        if (btnSpinner) btnSpinner.style.display = "inline-block";
+        if (btnText) btnText.textContent = "Signing in...";
       });
     }
   </script>

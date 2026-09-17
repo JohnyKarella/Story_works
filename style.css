@@ -3513,8 +3513,8 @@
     }
     .footer_template-link {
       color: var(--_colors---grey--300);
-      font-size: .75rem;
-      font-weight: 500;
+      font-size: 1.05rem;
+      font-weight: 600;
       transition: background-color .2s;
     }
     .footer_template-link:hover {

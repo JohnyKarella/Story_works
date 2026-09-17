@@ -1104,7 +1104,7 @@ ul {
 }
 .terms-modal-header h2 {
   color: #111827;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   margin: 0;
   letter-spacing: -0.3px;
@@ -1132,11 +1132,11 @@ ul {
   height: 18px;
 }
 .terms-modal-body {
-  padding: 22px 28px 32px 28px;
+  padding: 24px 30px 34px 30px;
   overflow-y: auto;
   color: #374151;
-  font-size: 14px;
-  line-height: 1.65;
+  font-size: 15.5px;
+  line-height: 1.7;
   scrollbar-width: thin;
   scrollbar-color: #9ca3af #f3f4f6;
 }
@@ -1155,34 +1155,55 @@ ul {
 }
 .terms-updated {
   color: #6b7280;
-  font-size: 13px;
+  font-size: 14px;
   margin: 0 0 16px 0;
 }
 .terms-intro {
   color: #374151;
-  font-size: 14px;
-  line-height: 1.65;
+  font-size: 15.5px;
+  line-height: 1.7;
   margin: 0 0 22px 0;
 }
 .terms-heading {
   color: #111827;
-  font-size: 15.5px;
+  font-size: 17.5px;
   font-weight: 700;
-  margin: 22px 0 8px 0;
+  margin: 24px 0 10px 0;
 }
 .terms-heading:first-of-type {
   margin-top: 0;
 }
 .terms-text {
   color: #374151;
-  font-size: 14px;
-  line-height: 1.65;
-  margin: 0 0 16px 0;
+  font-size: 15.5px;
+  line-height: 1.7;
+  margin: 0 0 18px 0;
 }
 .terms-link {
   color: #111827;
   text-decoration: underline;
   font-weight: 500;
+}
+/* ── Increased Terms & Conditions Footer Link Size ── */
+#footerTermsLink,
+a#footerTermsLink,
+.footer_template-links a,
+.footer_template-links .footer_template-link,
+a.footer_template-link#footerTermsLink {
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0.2px !important;
+  color: #4b5563 !important;
+  transition: color 0.2s ease, transform 0.15s ease !important;
+  display: inline-block !important;
+}
+#footerTermsLink:hover,
+a#footerTermsLink:hover,
+.footer_template-links a:hover,
+.footer_template-links .footer_template-link:hover {
+  color: #111827 !important;
+  text-decoration: underline !important;
 }
 .terms-link:hover {
   color: #000000;

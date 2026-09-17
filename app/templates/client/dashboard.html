@@ -157,6 +157,94 @@
     background: rgba(255, 255, 255, 0.06);
     color: var(--text-muted);
   }
+
+  .timeline-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: rgba(200, 117, 58, 0.12);
+    color: var(--primary);
+    border: 1px solid rgba(200, 117, 58, 0.28);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+  }
+
+  /* ── Interactive Modal Timeline Milestone Stepper ── */
+  .modal-timeline-box {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    margin-bottom: 22px;
+  }
+  .modal-timeline-track {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    position: relative;
+    margin-top: 14px;
+  }
+  .modal-timeline-track::before {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: 12%;
+    right: 12%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 1;
+  }
+  .modal-timeline-step {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+  .timeline-node-circle {
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 8px auto;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    color: var(--text-dim);
+    transition: all 0.2s ease;
+  }
+  .modal-timeline-step.completed .timeline-node-circle {
+    background: #10b981;
+    border-color: #10b981;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+  }
+  .modal-timeline-step.active .timeline-node-circle {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(200, 117, 58, 0.45);
+  }
+  .timeline-step-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .modal-timeline-step.active .timeline-step-title {
+    color: var(--primary);
+  }
+  .modal-timeline-step.completed .timeline-step-title {
+    color: #34d399;
+  }
+  .timeline-step-subtitle {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
 </style>
 {% endblock %}
 
@@ -234,7 +322,7 @@
         In Studio Review
       </div>
       <div class="kpi-bar">
-        <div class="kpi-bar-fill" style="width: {% if stats and stats.total and stats.total > 0 %}{{ (((stats.new or 0) / stats.total) * 100)|round }}{% else %}0{% endif %}%; background: #60a5fa;"></div>
+        <div class="kpi-bar-fill"{% if stats and stats.total and stats.total > 0 %} style="width: {{ (((stats.new or 0) / stats.total) * 100)|round }}%; background: #60a5fa;"{% else %} style="width: 0%; background: #60a5fa;"{% endif %}></div>
       </div>
     </div>
   </a>
@@ -255,7 +343,7 @@
         In Active Production
       </div>
       <div class="kpi-bar">
-        <div class="kpi-bar-fill" style="width: {% if stats and stats.total and stats.total > 0 %}{{ (((stats.in_progress or 0) / stats.total) * 100)|round }}{% else %}0{% endif %}%; background: #c084fc;"></div>
+        <div class="kpi-bar-fill"{% if stats and stats.total and stats.total > 0 %} style="width: {{ (((stats.in_progress or 0) / stats.total) * 100)|round }}%; background: #c084fc;"{% else %} style="width: 0%; background: #c084fc;"{% endif %}></div>
       </div>
     </div>
   </a>
@@ -276,7 +364,7 @@
         Completed Deliveries
       </div>
       <div class="kpi-bar">
-        <div class="kpi-bar-fill" style="width: {% if stats and stats.total and stats.total > 0 %}{{ (((stats.completed or 0) / stats.total) * 100)|round }}{% else %}0{% endif %}%; background: #34d399;"></div>
+        <div class="kpi-bar-fill"{% if stats and stats.total and stats.total > 0 %} style="width: {{ (((stats.completed or 0) / stats.total) * 100)|round }}%; background: #34d399;"{% else %} style="width: 0%; background: #34d399;"{% endif %}></div>
       </div>
     </div>
   </a>
@@ -301,20 +389,24 @@
           <table class="data-table" style="width: 100%;">
             <thead>
               <tr>
-                <th style="width: 120px;">Date</th>
+                <th style="width: 150px;">Date & Exact Time</th>
                 <th>Requested Services & Scope</th>
-                <th style="width: 130px;">Budget</th>
-                <th style="width: 140px;">Status</th>
-                <th style="width: 110px; text-align: right;">Action</th>
+                <th style="width: 160px;">Investment & Timeline</th>
+                <th style="width: 140px;">Milestone Status</th>
+                <th style="width: 130px; text-align: right;">Action</th>
               </tr>
             </thead>
             <tbody>
               {% for item in recent_inquiries %}
                 <tr>
                   <td style="font-size: 13px; color: var(--text-muted); white-space: nowrap;">
-                    <div style="font-weight: 600; color: var(--text-main);">{{ item.created_at[:10] if item.created_at else 'Recent' }}</div>
-                    <div style="font-size: 11.5px; color: var(--text-dim); margin-top: 2px;">
-                      <i class="far fa-clock" style="margin-right: 3px;"></i>{{ item.created_at[11:16] if item.created_at and item.created_at|length > 15 else '' }}
+                    <div style="font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 5px;">
+                      <i class="far fa-calendar-alt" style="color: var(--primary); font-size: 12px;"></i>
+                      {{ item.created_at | format_date }}
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-dim); margin-top: 3px; display: flex; align-items: center; gap: 5px;">
+                      <i class="far fa-clock" style="font-size: 11px;"></i>
+                      <span>{{ item.created_at | format_time }}</span>
                     </div>
                   </td>
                   <td>
@@ -335,7 +427,10 @@
                     </div>
                   </td>
                   <td style="font-size: 13px; color: var(--text-muted);">
-                    <span style="font-weight: 600; color: var(--text-main);">{{ item.budget or 'Custom Scope' }}</span>
+                    <div style="font-weight: 600; color: var(--text-main); margin-bottom: 4px;">{{ item.budget or 'Custom Scope' }}</div>
+                    <span class="timeline-pill" title="Target turnaround timeline">
+                      <i class="far fa-hourglass"></i> {{ item.timeline or '1 – 2 Months' }}
+                    </span>
                   </td>
                   <td>
                     {% if item.status == 'new' %}
@@ -363,7 +458,7 @@
                       data-brief="{{ item | tojson | forceescape }}"
                       onclick="openBriefModal(this.dataset.brief)"
                     >
-                      <i class="fas fa-eye" style="margin-right: 4px;"></i> Details
+                      <i class="fas fa-eye" style="margin-right: 4px;"></i> Full Timeline
                     </button>
                   </td>
                 </tr>
@@ -424,9 +519,26 @@
           <span style="color: var(--text-main);">{{ site_settings.contact_address or 'Bengaluru, India' }}</span>
         </div>
 
-        <a href="mailto:{{ site_settings.contact_email or 'hello@storyworks.studio' }}" class="btn btn-secondary" style="width: 100%; text-align: center; display: block; padding: 10px;">
+        <a href="mailto:{{ site_settings.contact_email or 'hello@storyworks.studio' }}" class="btn btn-secondary" style="width: 100%; text-align: center; display: block; padding: 10px; margin-bottom: 16px;">
           <i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Email Studio Team
         </a>
+
+        <!-- ── Client Account Timeline Box ── -->
+        <div style="padding-top: 14px; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-dim);">
+          <div style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px; display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-user-shield" style="color: var(--primary);"></i> Client Account Timeline
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+            <span><i class="far fa-calendar-check" style="color: var(--primary); margin-right: 5px;"></i> Member Since:</span>
+            <strong style="color: var(--text-main);">{{ client.created_at | format_dt if client and client.created_at else 'Active Partner' }}</strong>
+          </div>
+          {% if client and client.last_login %}
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span><i class="fas fa-history" style="color: #10b981; margin-right: 5px;"></i> Last Active:</span>
+            <strong style="color: #34d399;">{{ client.last_login | format_dt }}</strong>
+          </div>
+          {% endif %}
+        </div>
       </div>
     </div>
 
@@ -455,51 +567,126 @@
   </div>
 </div>
 
-<!-- Brief Details Modal -->
+<!-- Brief Details Modal with Exact Project Timeline -->
 <div class="modal-overlay" id="briefModal">
-  <div class="modal-card">
+  <div class="modal-card" style="max-width: 680px;">
     <div class="modal-card-header">
-      <h3 style="font-size: 17px; font-weight: 700; color: var(--text-main);" id="modalTitle">
-        Project Brief Details
-      </h3>
+      <div>
+        <h3 style="font-size: 17px; font-weight: 700; color: var(--text-main);" id="modalTitle">
+          Project Brief & Execution Timeline
+        </h3>
+        <span style="font-size: 12px; color: var(--text-dim);" id="modalBriefId"></span>
+      </div>
       <button type="button" class="flash-close" onclick="closeBriefModal()">&times;</button>
     </div>
     <div class="modal-card-body">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
-        <div>
-          <label style="font-size: 11.5px; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Submitted On</label>
-          <div id="modalDate" style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-top: 2px;"></div>
+      <!-- ── 1. Interactive Project Milestone Stepper ── -->
+      <div class="modal-timeline-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 12px; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-route" style="color: var(--primary);"></i> Project Milestone Stepper
+          </span>
+          <span id="modalTimelineTarget" class="timeline-pill">
+            <i class="far fa-hourglass"></i> Target: 1 – 2 Months
+          </span>
         </div>
-        <div>
-          <label style="font-size: 11.5px; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Current Status</label>
-          <div id="modalStatus" style="margin-top: 2px;"></div>
+
+        <div class="modal-timeline-track" id="modalTimelineTrack">
+          <!-- 1. Scoping / Logged -->
+          <div class="modal-timeline-step completed" id="step1">
+            <div class="timeline-node-circle">
+              <i class="fas fa-file-invoice"></i>
+            </div>
+            <div class="timeline-step-title">1. Logged</div>
+            <div class="timeline-step-subtitle" id="step1Time">Submitted</div>
+          </div>
+
+          <!-- 2. Studio Strategy -->
+          <div class="modal-timeline-step" id="step2">
+            <div class="timeline-node-circle">
+              <i class="fas fa-compass"></i>
+            </div>
+            <div class="timeline-step-title">2. Strategy</div>
+            <div class="timeline-step-subtitle" id="step2Status">In Review</div>
+          </div>
+
+          <!-- 3. Active Flight -->
+          <div class="modal-timeline-step" id="step3">
+            <div class="timeline-node-circle">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div class="timeline-step-title">3. Production</div>
+            <div class="timeline-step-subtitle" id="step3Status">In Flight</div>
+          </div>
+
+          <!-- 4. Final Delivery -->
+          <div class="modal-timeline-step" id="step4">
+            <div class="timeline-node-circle">
+              <i class="fas fa-flag-checkered"></i>
+            </div>
+            <div class="timeline-step-title">4. Delivery</div>
+            <div class="timeline-step-subtitle" id="step4Status">Handover</div>
+          </div>
         </div>
-        <div>
-          <label style="font-size: 11.5px; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Services Requested</label>
-          <div id="modalServices" style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-top: 2px;"></div>
+      </div>
+
+      <!-- ── 2. Exact Timestamps & Project Metrics Grid ── -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <div style="background: var(--bg-card); padding: 12px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <label style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 3px;">
+            <i class="far fa-clock" style="color: var(--primary);"></i> Exact Submitted At
+          </label>
+          <div id="modalDate" style="font-size: 13.5px; font-weight: 700; color: var(--text-main);"></div>
         </div>
-        <div>
-          <label style="font-size: 11.5px; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Budget Estimate</label>
-          <div id="modalBudget" style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-top: 2px;"></div>
+
+        <div style="background: var(--bg-card); padding: 12px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <label style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 3px;">
+            <i class="fas fa-sync-alt" style="color: #60a5fa;"></i> Studio Status
+          </label>
+          <div id="modalStatus" style="margin-top: 1px;"></div>
         </div>
+
+        <div style="background: var(--bg-card); padding: 12px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <label style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 3px;">
+            <i class="fas fa-coins" style="color: #34d399;"></i> Investment Budget
+          </label>
+          <div id="modalBudget" style="font-size: 13.5px; font-weight: 700; color: #34d399;"></div>
+        </div>
+
+        <div style="background: var(--bg-card); padding: 12px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <label style="font-size: 11px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 3px;">
+            <i class="far fa-hourglass" style="color: #c084fc;"></i> Target Turnaround
+          </label>
+          <div id="modalTimelineValue" style="font-size: 13.5px; font-weight: 700; color: #c084fc;"></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 18px;">
+        <label style="font-size: 11.5px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 6px;">
+          Requested Capabilities
+        </label>
+        <div id="modalServices" style="font-size: 13.5px; font-weight: 600; color: var(--text-main); background: var(--bg-input); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);"></div>
       </div>
 
       <div style="margin-bottom: 20px;">
         <label style="font-size: 11.5px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 6px;">
           Project Scope / Brief Requirements
         </label>
-        <div id="modalMessage" style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); font-size: 14px; color: var(--text-main); white-space: pre-wrap; line-height: 1.6; border: 1px solid var(--border-color);"></div>
+        <div id="modalMessage" style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); font-size: 13.5px; color: var(--text-main); white-space: pre-wrap; line-height: 1.6; border: 1px solid var(--border-color); max-height: 220px; overflow-y: auto;"></div>
       </div>
 
       <div id="modalNotesWrap" style="display: none; margin-bottom: 16px;">
         <label style="font-size: 11.5px; color: var(--primary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 6px;">
-          <i class="fas fa-comment-dots" style="margin-right: 4px;"></i> Studio Response / Notes
+          <i class="fas fa-comment-dots" style="margin-right: 4px;"></i> Studio Response & Strategic Notes
         </label>
-        <div id="modalNotes" style="background: rgba(200, 117, 58, 0.08); border: 1px solid rgba(200, 117, 58, 0.25); padding: 14px; border-radius: var(--radius-md); font-size: 14px; color: var(--text-main); white-space: pre-wrap; line-height: 1.6;"></div>
+        <div id="modalNotes" style="background: rgba(200, 117, 58, 0.08); border: 1px solid rgba(200, 117, 58, 0.25); padding: 14px; border-radius: var(--radius-md); font-size: 13.5px; color: var(--text-main); white-space: pre-wrap; line-height: 1.6;"></div>
       </div>
 
-      <div style="text-align: right; margin-top: 20px;">
-        <button type="button" class="btn btn-secondary" onclick="closeBriefModal()">Close</button>
+      <div style="text-align: right; margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 12px; color: var(--text-dim);">
+          <i class="fas fa-lock" style="margin-right: 4px;"></i> Private Client Brief Vault
+        </span>
+        <button type="button" class="btn btn-secondary" onclick="closeBriefModal()">Close Window</button>
       </div>
     </div>
   </div>
@@ -508,23 +695,96 @@
 
 {% block scripts %}
 <script>
+  function formatExactDateTime(isoStr) {
+    if (!isoStr) return "Recent";
+    try {
+      // Handles both "2026-09-17 14:35:00" and ISO formats
+      let parsed = new Date(isoStr.replace(" ", "T"));
+      if (isNaN(parsed.getTime())) {
+        return isoStr;
+      }
+      return parsed.toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+      });
+    } catch (e) {
+      return isoStr;
+    }
+  }
+
   function openBriefModal(data) {
     if (typeof data === "string") {
       data = JSON.parse(data);
     }
-    document.getElementById("modalDate").textContent = data.created_at || "Recent";
+
+    const formattedExact = formatExactDateTime(data.created_at);
+    document.getElementById("modalTitle").textContent = "Project Brief #" + (data.id || "") + " — Timeline";
+    document.getElementById("modalBriefId").textContent = "Tracking Reference: SW-" + (data.id ? String(data.id).padStart(5, '0') : "00000");
+    document.getElementById("modalDate").textContent = formattedExact;
     document.getElementById("modalServices").textContent = data.services || "General Creative Strategy";
     document.getElementById("modalBudget").textContent = data.budget || "Custom Scope";
     document.getElementById("modalMessage").textContent = data.message || "";
 
+    const timelineVal = data.timeline || "1 – 2 Months (Standard)";
+    document.getElementById("modalTimelineTarget").innerHTML = '<i class="far fa-hourglass"></i> Target: ' + timelineVal;
+    document.getElementById("modalTimelineValue").textContent = timelineVal;
+
+    // Update 4-stage milestone stepper physics
+    const step1 = document.getElementById("step1");
+    const step2 = document.getElementById("step2");
+    const step3 = document.getElementById("step3");
+    const step4 = document.getElementById("step4");
+
+    // Reset classes
+    [step1, step2, step3, step4].forEach(s => {
+      s.className = "modal-timeline-step";
+    });
+
+    // Step 1 is always completed upon submission
+    step1.classList.add("completed");
+    document.getElementById("step1Time").textContent = (data.created_at ? data.created_at.substring(11, 16) : "Logged");
+
+    const st = (data.status || 'new').toLowerCase();
+    if (st === 'new') {
+      step2.classList.add("active");
+      document.getElementById("step2Status").textContent = "In Queue";
+      document.getElementById("step3Status").textContent = "Pending";
+      document.getElementById("step4Status").textContent = "Pending";
+    } else if (st === 'contacted') {
+      step2.classList.add("completed");
+      step3.classList.add("active");
+      document.getElementById("step2Status").textContent = "Reviewed";
+      document.getElementById("step3Status").textContent = "Pre-Flight";
+      document.getElementById("step4Status").textContent = "Pending";
+    } else if (st === 'in_progress') {
+      step2.classList.add("completed");
+      step3.classList.add("completed");
+      step4.classList.add("active");
+      document.getElementById("step2Status").textContent = "Strategy OK";
+      document.getElementById("step3Status").textContent = "In Flight";
+      document.getElementById("step4Status").textContent = "Finishing";
+    } else {
+      // closed or completed
+      step2.classList.add("completed");
+      step3.classList.add("completed");
+      step4.classList.add("completed");
+      document.getElementById("step2Status").textContent = "Complete";
+      document.getElementById("step3Status").textContent = "Complete";
+      document.getElementById("step4Status").textContent = "Delivered";
+    }
+
     const statusEl = document.getElementById("modalStatus");
     let badgeHtml = "";
-    if (data.status === 'new') {
-      badgeHtml = '<span class="status-badge status-new"><i class="fas fa-sparkles"></i> New</span>';
-    } else if (data.status === 'contacted') {
+    if (st === 'new') {
+      badgeHtml = '<span class="status-badge status-new"><i class="fas fa-sparkles"></i> New Brief</span>';
+    } else if (st === 'contacted') {
       badgeHtml = '<span class="status-badge status-contacted"><i class="fas fa-phone-alt"></i> In Review</span>';
-    } else if (data.status === 'in_progress') {
-      badgeHtml = '<span class="status-badge status-in_progress"><i class="fas fa-circle-notch fa-spin"></i> In Progress</span>';
+    } else if (st === 'in_progress') {
+      badgeHtml = '<span class="status-badge status-in_progress"><i class="fas fa-circle-notch fa-spin"></i> In Production</span>';
     } else {
       badgeHtml = '<span class="status-badge status-completed"><i class="fas fa-check"></i> Completed</span>';
     }

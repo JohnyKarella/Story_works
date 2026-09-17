@@ -25,6 +25,32 @@ def create_app(config_class=Config):
     app.register_blueprint(client_bp)
     # web_bp is registered last to avoid capturing /api, /admin, and /client paths
     app.register_blueprint(web_bp)
+
+    # ── Exact Timeline & Datetime Filters ──
+    @app.template_filter("format_dt")
+    def format_dt_filter(value, fmt="%d %b %Y, %I:%M %p"):
+        if not value:
+            return "—"
+        try:
+            from datetime import datetime
+            if isinstance(value, str):
+                clean_str = value.replace("T", " ")[:19]
+                dt = datetime.strptime(clean_str, "%Y-%m-%d %H:%M:%S")
+            elif isinstance(value, datetime):
+                dt = value
+            else:
+                return str(value)
+            return dt.strftime(fmt)
+        except Exception:
+            return str(value)
+
+    @app.template_filter("format_date")
+    def format_date_filter(value):
+        return format_dt_filter(value, "%d %b %Y")
+
+    @app.template_filter("format_time")
+    def format_time_filter(value):
+        return format_dt_filter(value, "%I:%M %p")
     @app.after_request
     def add_no_cache_headers(response):
         response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"

@@ -367,17 +367,30 @@
                                     <label for="company">Company / Brand Name</label>
                                     <input type="text" id="company" name="company" placeholder="Your Brand Name" />
                                 </div>
-                                <div class="field">
-                                    <label for="budget">Approximate Budget</label>
-                                    <select id="budget" name="budget">
-                                        <option value="" disabled selected>Select a range</option>
-                                        <option>Under ₹25,000</option>
-                                        <option>₹25,000 – ₹75,000</option>
-                                        <option>₹75,000 – ₹2,00,000</option>
-                                        <option>₹2,00,000 – ₹5,00,000</option>
-                                        <option>₹5,00,000+</option>
-                                        <option>Let's Discuss</option>
-                                    </select>
+                                <div class="field-row">
+                                    <div class="field">
+                                        <label for="budget">Approximate Budget</label>
+                                        <select id="budget" name="budget">
+                                            <option value="" disabled selected>Select a range</option>
+                                            <option>Under ₹25,000</option>
+                                            <option>₹25,000 – ₹75,000</option>
+                                            <option>₹75,000 – ₹2,00,000</option>
+                                            <option>₹2,00,000 – ₹5,00,000</option>
+                                            <option>₹5,00,000+</option>
+                                            <option>Let's Discuss</option>
+                                        </select>
+                                    </div>
+                                    <div class="field">
+                                        <label for="timeline">Target Delivery Timeline</label>
+                                        <select id="timeline" name="timeline">
+                                            <option value="" disabled selected>Select turnaround</option>
+                                            <option value="Immediate Sprint (< 3 Weeks)">Immediate Sprint (&lt; 3 Weeks)</option>
+                                            <option value="1 – 2 Months (Standard)" selected>1 – 2 Months (Standard)</option>
+                                            <option value="3 – 4 Months (Comprehensive)">3 – 4 Months (Comprehensive)</option>
+                                            <option value="Ongoing Studio Retainer">Ongoing Studio Retainer</option>
+                                            <option value="Flexible / Not Fixed">Flexible / Not Fixed</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="field">
                                     <label for="message">Tell Us About Your Project *</label>
@@ -1090,6 +1103,7 @@
                 var phoneInput = document.getElementById("phone");
                 var companyInput = document.getElementById("company");
                 var budgetSelect = document.getElementById("budget");
+                var timelineSelect = document.getElementById("timeline");
                 var messageInput = document.getElementById("message");
                 var formInlineError = document.getElementById("formInlineError");
                 var contactModal = document.getElementById("contactSuccessModal");
@@ -1172,6 +1186,7 @@
                     var phoneVal = phoneInput ? phoneInput.value.trim() : "";
                     var companyVal = companyInput ? companyInput.value.trim() : "";
                     var budgetVal = budgetSelect ? budgetSelect.value : "";
+                    var timelineVal = timelineSelect ? timelineSelect.value : "1 – 2 Months (Standard)";
                     var messageVal = messageInput ? messageInput.value.trim() : "";
                     var firstInvalid = null;
                     if (!messageVal) {
@@ -1212,6 +1227,7 @@
                         phone: phoneVal,
                         company: companyVal,
                         budget: budgetVal,
+                        timeline: timelineVal,
                         services: servicesStr,
                         message: messageVal
                     };

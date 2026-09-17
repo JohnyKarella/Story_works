@@ -81,10 +81,19 @@ class Inquiry:
     def create(data):
         conn = get_db()
         cursor = conn.cursor()
+        timeline = (data.get("timeline") or "").strip()
+        msg = data.get("message", "") or ""
+        if not timeline and "[Target Timeline:" in msg:
+            import re
+            m = re.search(r"\[Target Timeline:\s*([^\]]+)\]", msg)
+            if m:
+                timeline = m.group(1).strip()
+
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor.execute(
             """
-            INSERT INTO inquiries (user_id, first_name, last_name, email, phone, company, budget, services, message, ip_address)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO inquiries (user_id, first_name, last_name, email, phone, company, budget, timeline, services, message, ip_address, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 data.get("user_id"),
@@ -94,9 +103,12 @@ class Inquiry:
                 data.get("phone", "").strip(),
                 data.get("company", "").strip(),
                 data.get("budget", "").strip(),
+                timeline,
                 data.get("services", ""),
-                data.get("message", "").strip(),
+                msg.strip(),
                 data.get("ip_address", ""),
+                now,
+                now,
             ),
         )
         new_id = cursor.lastrowid
@@ -134,41 +146,66 @@ class Inquiry:
     @staticmethod
     def get_all(status=None, search=None, date_from=None, date_to=None):
         conn = get_db()
-        query = "SELECT * FROM inquiries WHERE 1=1"
+        query = """
+            SELECT i.*, 
+                   u.username AS client_username, 
+                   u.full_name AS client_full_name, 
+                   u.company AS client_company,
+                   u.phone AS client_phone,
+                   u.created_at AS client_created_at, 
+                   u.last_login AS client_last_login 
+            FROM inquiries i 
+            LEFT JOIN users u ON i.user_id = u.id 
+            WHERE 1=1
+        """
         params = []
         if status and status != "all":
-            query += " AND status = ?"
+            query += " AND i.status = ?"
             params.append(status)
         if search:
-            query += " AND (first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR company LIKE ? OR phone LIKE ? OR services LIKE ?)"
+            query += " AND (i.first_name LIKE ? OR i.last_name LIKE ? OR i.email LIKE ? OR i.company LIKE ? OR i.phone LIKE ? OR i.services LIKE ? OR u.username LIKE ?)"
             s_param = f"%{search}%"
-            params.extend([s_param, s_param, s_param, s_param, s_param, s_param])
+            params.extend([s_param, s_param, s_param, s_param, s_param, s_param, s_param])
         if date_from:
-            query += " AND DATE(created_at) >= DATE(?)"
+            query += " AND DATE(i.created_at) >= DATE(?)"
             params.append(date_from)
         if date_to:
-            query += " AND DATE(created_at) <= DATE(?)"
+            query += " AND DATE(i.created_at) <= DATE(?)"
             params.append(date_to)
-        query += " ORDER BY id DESC"
+        query += " ORDER BY i.id DESC"
         rows = conn.execute(query, params).fetchall()
         conn.close()
         return [dict(r) for r in rows]
     @staticmethod
     def get_by_id(inquiry_id):
         conn = get_db()
-        row = conn.execute("SELECT * FROM inquiries WHERE id = ?", (inquiry_id,)).fetchone()
+        query = """
+            SELECT i.*, 
+                   u.username AS client_username, 
+                   u.full_name AS client_full_name, 
+                   u.company AS client_company,
+                   u.phone AS client_phone,
+                   u.created_at AS client_created_at, 
+                   u.last_login AS client_last_login 
+            FROM inquiries i 
+            LEFT JOIN users u ON i.user_id = u.id 
+            WHERE i.id = ?
+        """
+        row = conn.execute(query, (inquiry_id,)).fetchone()
         conn.close()
         return dict(row) if row else None
     @staticmethod
     def update_status(inquiry_id, status):
         conn = get_db()
-        conn.execute("UPDATE inquiries SET status = ? WHERE id = ?", (status, inquiry_id))
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn.execute("UPDATE inquiries SET status = ?, updated_at = ? WHERE id = ?", (status, now, inquiry_id))
         conn.commit()
         conn.close()
     @staticmethod
     def update_notes(inquiry_id, notes):
         conn = get_db()
-        conn.execute("UPDATE inquiries SET notes = ? WHERE id = ?", (notes, inquiry_id))
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn.execute("UPDATE inquiries SET notes = ?, updated_at = ? WHERE id = ?", (notes, now, inquiry_id))
         conn.commit()
         conn.close()
     @staticmethod

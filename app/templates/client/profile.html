@@ -329,7 +329,7 @@
     </div>
   </div>
 
-  <!-- Card 2: Partner Since -->
+  <!-- Card 2: Partner Since Exact DateTime -->
   <div class="profile-stat-card">
     <div class="profile-stat-icon" style="background: rgba(200, 117, 58, 0.15); color: var(--primary);">
       <i class="fas fa-calendar-check"></i>
@@ -337,33 +337,47 @@
     <div class="profile-stat-info">
       <div class="stat-label">Partner Since</div>
       <div class="stat-value">
-        {{ client.created_at[:10] if client.created_at else 'Recent Partner' }}
+        <div style="font-size: 15.5px; font-weight: 700; color: var(--text-main);">{{ client.created_at | format_date if client.created_at else 'Active Partner' }}</div>
+        <div style="font-size: 11.5px; color: var(--text-dim); margin-top: 2px;">
+          <i class="far fa-clock" style="font-size: 11px;"></i> {{ client.created_at | format_time if client.created_at else '' }}
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Card 3: Total Briefs -->
+  <!-- Card 3: Last Active Session -->
   <div class="profile-stat-card">
     <div class="profile-stat-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
-      <i class="fas fa-folder-open"></i>
+      <i class="fas fa-history"></i>
     </div>
     <div class="profile-stat-info">
-      <div class="stat-label">Total Briefs</div>
-      <div class="stat-value" style="color: #60a5fa;">
-        {{ stats.total }} Submitted Brief{% if stats.total != 1 %}s{% endif %}
+      <div class="stat-label">Last Active Session</div>
+      <div class="stat-value">
+        {% if client.last_login %}
+          <div style="font-size: 15px; font-weight: 700; color: #60a5fa;">{{ client.last_login | format_date }}</div>
+          <div style="font-size: 11.5px; color: var(--text-dim); margin-top: 2px;">
+            <i class="far fa-clock" style="font-size: 11px;"></i> {{ client.last_login | format_time }}
+          </div>
+        {% else %}
+          <div style="font-size: 15px; font-weight: 700; color: #60a5fa;">Online Now</div>
+          <div style="font-size: 11.5px; color: var(--text-dim); margin-top: 2px;">Active Session</div>
+        {% endif %}
       </div>
     </div>
   </div>
 
-  <!-- Card 4: Studio Dispatches -->
+  <!-- Card 4: Briefs & Production -->
   <div class="profile-stat-card">
     <div class="profile-stat-icon" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">
       <i class="fas fa-layer-group"></i>
     </div>
     <div class="profile-stat-info">
-      <div class="stat-label">Studio Production</div>
-      <div class="stat-value" style="color: #c084fc;">
-        {{ (stats.new or 0) + (stats.in_progress or 0) }} In Active Flight
+      <div class="stat-label">Studio Briefs</div>
+      <div class="stat-value">
+        <div style="font-size: 15.5px; font-weight: 700; color: #c084fc;">{{ stats.total }} Brief{% if stats.total != 1 %}s{% endif %}</div>
+        <div style="font-size: 11.5px; color: var(--text-dim); margin-top: 2px;">
+          {{ (stats.new or 0) + (stats.in_progress or 0) }} In Active Flight
+        </div>
       </div>
     </div>
   </div>
@@ -645,6 +659,97 @@
             <strong style="color: var(--text-main); display: block; margin-bottom: 2px;">Account Support</strong>
             To modify your primary registered email address or transfer ownership, please contact our team at
             <a href="mailto:hello@storyworks.studio" style="color: var(--primary); font-weight: 600; text-decoration: none;">hello@storyworks.studio</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Client Account Journey & Activity Timeline Card ── -->
+    <div class="card" style="margin-bottom: 0;">
+      <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding: 18px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.14); border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; justify-content: center; color: #34d399;">
+            <i class="fas fa-route"></i>
+          </div>
+          <div>
+            <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text-main); margin: 0;">
+              Client Account Timeline
+            </h4>
+            <span style="font-size: 11.5px; color: var(--text-muted);">Exact milestones of your studio partnership</span>
+          </div>
+        </div>
+        <span class="verified-badge">
+          <i class="fas fa-shield-check"></i> Active
+        </span>
+      </div>
+      <div class="card-body" style="padding: 20px;">
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Milestone 1: Registered -->
+          <div style="display: flex; gap: 14px; align-items: flex-start;">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: #10b981; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);">
+              <i class="fas fa-user-plus"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
+                <strong style="color: var(--text-main); font-size: 13.5px;">Account Registered</strong>
+                <span style="font-size: 11.5px; color: var(--primary); font-weight: 600;">{{ client.created_at | format_dt if client.created_at else 'Confirmed' }}</span>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); margin: 2px 0 0;">
+                Credentials created with username <span style="color: var(--primary); font-weight: 600;">@{{ client.username }}</span>.
+              </p>
+            </div>
+          </div>
+
+          <!-- Milestone 2: Verified Partner -->
+          <div style="display: flex; gap: 14px; align-items: flex-start;">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: #10b981; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
+                <strong style="color: var(--text-main); font-size: 13.5px;">Verified Security Access</strong>
+                <span style="font-size: 11.5px; color: #34d399; font-weight: 600;">Active Partner</span>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); margin: 2px 0 0;">
+                Full permissions to submit briefs and track studio production.
+              </p>
+            </div>
+          </div>
+
+          <!-- Milestone 3: Project Briefs -->
+          <div style="display: flex; gap: 14px; align-items: flex-start;">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: {% if stats and stats.total > 0 %}#3b82f6{% else %}var(--bg-input){% endif %}; color: {% if stats and stats.total > 0 %}#fff{% else %}var(--text-dim){% endif %}; border: 2px solid {% if stats and stats.total > 0 %}#3b82f6{% else %}var(--border-color){% endif %}; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">
+              <i class="fas fa-folder-open"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
+                <strong style="color: var(--text-main); font-size: 13.5px;">Submitted Project Briefs</strong>
+                <span style="font-size: 11.5px; color: #60a5fa; font-weight: 600;">{{ stats.total }} Brief{% if stats.total != 1 %}s{% endif %}</span>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); margin: 2px 0 0;">
+                {% if stats and stats.total > 0 %}
+                  {{ stats.total }} project brief{% if stats.total != 1 %}s{% endif %} logged with target turnaround schedules.
+                {% else %}
+                  No briefs submitted yet. Ready to submit a new brief?
+                {% endif %}
+              </p>
+            </div>
+          </div>
+
+          <!-- Milestone 4: Last Active Session -->
+          <div style="display: flex; gap: 14px; align-items: flex-start;">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; box-shadow: 0 0 10px rgba(200, 117, 58, 0.4);">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px;">
+                <strong style="color: var(--text-main); font-size: 13.5px;">Last Active Session</strong>
+                <span style="font-size: 11.5px; color: var(--primary); font-weight: 600;">{{ client.last_login | format_dt if client.last_login else 'Active Now' }}</span>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); margin: 2px 0 0;">
+                Authenticated session in client management portal.
+              </p>
+            </div>
           </div>
         </div>
       </div>

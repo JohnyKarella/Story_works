@@ -280,5 +280,113 @@ class BackendTestCase(unittest.TestCase):
         )
         self.assertEqual(res.status_code, 200)
         self.assertIn(b"Access denied", res.data)
+
+    def test_exact_timeline_and_client_tracking(self):
+        """Verify inquiry timeline column, updated_at tracking, client join, and exact datetime filters."""
+        # 1. Test Jinja filters
+        filters = self.app.jinja_env.filters
+        self.assertIn("format_dt", filters)
+        self.assertIn("format_date", filters)
+        self.assertIn("format_time", filters)
+        
+        sample_dt = "2026-09-17 14:35:00"
+        formatted_dt = filters["format_dt"](sample_dt)
+        formatted_date = filters["format_date"](sample_dt)
+        formatted_time = filters["format_time"](sample_dt)
+        
+        self.assertEqual(formatted_dt, "17 Sep 2026, 02:35 PM")
+        self.assertEqual(formatted_date, "17 Sep 2026")
+        self.assertEqual(formatted_time, "02:35 PM")
+
+        # 2. Test API contact with explicit timeline
+        res = self.client.post(
+            "/api/contact",
+            json={
+                "fname": "Karan",
+                "lname": "Verma",
+                "email": "karan@vermatech.com",
+                "phone": "+91 91234 56789",
+                "company": "Verma Tech",
+                "budget": "₹2,00,000 – ₹5,00,000",
+                "timeline": "Immediate Sprint (< 3 Weeks)",
+                "services": "Web Development, Brand Strategy",
+                "message": "We need an immediate high-performance web platform.",
+            },
+        )
+        self.assertEqual(res.status_code, 201)
+        inquiry_id = res.get_json()["inquiry_id"]
+
+        inquiry = Inquiry.get_by_id(inquiry_id)
+        self.assertIsNotNone(inquiry)
+        self.assertEqual(inquiry["timeline"], "Immediate Sprint (< 3 Weeks)")
+        self.assertIsNotNone(inquiry["updated_at"])
+
+        # 3. Test status update updates updated_at
+        old_updated_at = inquiry["updated_at"]
+        Inquiry.update_status(inquiry_id, "in_progress")
+        updated_inquiry = Inquiry.get_by_id(inquiry_id)
+        self.assertEqual(updated_inquiry["status"], "in_progress")
+        self.assertIsNotNone(updated_inquiry["updated_at"])
+
+        # 4. Test client registration and inquiry linking with client timeline
+        import time
+        t = int(time.time() * 1000)
+        c_user = f"timeline_user_{t}"
+        c_email = f"timeline_{t}@client.com"
+        client_id = User.create(
+            username=c_user,
+            email=c_email,
+            password="securePassword123!",
+            role="client",
+            full_name="Timeline Client",
+            company="Timeline Global",
+            phone="+91 98888 77777"
+        )
+        User.record_login(client_id)
+
+        # Create inquiry linked to this client
+        client_inq_id = Inquiry.create({
+            "first_name": "Timeline",
+            "last_name": "Client",
+            "email": c_email,
+            "company": "Timeline Global",
+            "budget": "₹5,00,000+",
+            "timeline": "3 – 4 Months (Comprehensive)",
+            "services": "Full Package",
+            "message": "Complete brand overhaul and national marketing campaign.",
+            "user_id": client_id,
+        })
+
+        # Test Inquiry.get_by_id returns client account details for admin timeline
+        inq_with_client = Inquiry.get_by_id(client_inq_id)
+        self.assertEqual(inq_with_client["client_username"], c_user)
+        self.assertEqual(inq_with_client["client_full_name"], "Timeline Client")
+        self.assertEqual(inq_with_client["timeline"], "3 – 4 Months (Comprehensive)")
+        self.assertIsNotNone(inq_with_client["client_created_at"])
+        self.assertIsNotNone(inq_with_client["client_last_login"])
+
+        # 5. Test client portal requests and dashboard pages render successfully
+        with self.client.session_transaction() as sess:
+            sess["client_id"] = client_id
+            sess["client_username"] = c_user
+            sess["client_email"] = c_email
+            sess["client_role"] = "client"
+
+        res = self.client.get("/client/dashboard")
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b"Timeline Global", res.data)
+        self.assertIn(b"Client Account Timeline", res.data)
+
+        res = self.client.get("/client/requests")
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b"Date & Exact Time", res.data)
+        self.assertIn(b"Project Milestone Stepper", res.data)
+
+        res = self.client.get("/client/profile")
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b"Partner Since", res.data)
+        self.assertIn(b"Client Account Timeline", res.data)
+
+
 if __name__ == "__main__":
     unittest.main()

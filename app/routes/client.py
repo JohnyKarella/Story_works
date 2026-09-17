@@ -287,6 +287,7 @@ def request_service():
             "phone": phone,
             "company": company,
             "budget": budget,
+            "timeline": timeline,
             "services": ", ".join(selected_services) if selected_services else "General Creative Strategy",
             "message": formatted_message,
             "ip_address": request.remote_addr or "",

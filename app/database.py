@@ -43,12 +43,14 @@ def init_db(app=None, run_seed=True):
         phone TEXT,
         company TEXT,
         budget TEXT,
+        timeline TEXT,
         services TEXT,
         message TEXT NOT NULL,
         status TEXT DEFAULT 'new',
         notes TEXT,
         ip_address TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
     # 3. Blogs table
@@ -131,11 +133,26 @@ def init_db(app=None, run_seed=True):
     if "phone" not in user_cols:
         cursor.execute("ALTER TABLE users ADD COLUMN phone TEXT")
 
-    # Migration: Ensure user_id column exists in inquiries table
+    # Migration: Ensure user_id, timeline, and updated_at columns exist in inquiries table
     cursor.execute("PRAGMA table_info(inquiries)")
     inquiry_cols = {row["name"] for row in cursor.fetchall()}
     if "user_id" not in inquiry_cols:
         cursor.execute("ALTER TABLE inquiries ADD COLUMN user_id INTEGER")
+    if "timeline" not in inquiry_cols:
+        cursor.execute("ALTER TABLE inquiries ADD COLUMN timeline TEXT")
+    if "updated_at" not in inquiry_cols:
+        cursor.execute("ALTER TABLE inquiries ADD COLUMN updated_at TIMESTAMP")
+
+    # Backfill timeline from message if present
+    try:
+        cursor.execute("""
+            UPDATE inquiries 
+            SET timeline = SUBSTR(message, INSTR(message, '[Target Timeline: ') + 17, 
+                                  INSTR(message, ']') - (INSTR(message, '[Target Timeline: ') + 17))
+            WHERE (timeline IS NULL OR timeline = '') AND message LIKE '%[Target Timeline:%'
+        """)
+    except Exception:
+        pass
     conn.commit()
     # Seed default admin if no user exists
     cursor.execute("SELECT COUNT(*) FROM users")

@@ -905,15 +905,34 @@
               <td>
                 <div style="font-weight: 600;">{{ item.first_name }} {{ item.last_name or '' }}</div>
                 <div style="font-size: 12px; color: var(--text-muted);"><a href="mailto:{{ item.email }}">{{ item.email }}</a></div>
+                {% if item.client_username or item.user_id %}
+                  <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 2px 7px; border-radius: 12px; background: rgba(200, 117, 58, 0.16); color: var(--primary); font-weight: 600; text-transform: uppercase; margin-top: 3px;">
+                    <i class="fas fa-user-check"></i> @{{ item.client_username or 'Client' }}
+                  </span>
+                {% endif %}
               </td>
               <td>{{ item.company or '—' }}</td>
-              <td><span style="font-size: 12px; color: var(--primary); font-weight: 600;">{{ item.budget or '—' }}</span></td>
+              <td>
+                <div style="font-size: 12px; color: var(--primary); font-weight: 600;">{{ item.budget or '—' }}</div>
+                {% if item.timeline %}
+                  <div style="margin-top: 3px;">
+                    <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 1px 6px; border-radius: 10px; background: rgba(200, 117, 58, 0.12); color: var(--primary); border: 1px solid rgba(200, 117, 58, 0.25); white-space: nowrap;">
+                      <i class="far fa-hourglass"></i> {{ item.timeline }}
+                    </span>
+                  </div>
+                {% endif %}
+              </td>
               <td>
                 <div style="font-size: 12px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   {{ item.services or '—' }}
                 </div>
               </td>
-              <td style="font-size: 12px; color: var(--text-dim);">{{ item.created_at[:10] }}</td>
+              <td style="font-size: 12px; white-space: nowrap;">
+                <div style="font-weight: 600; color: var(--text-main);">{{ item.created_at | format_date }}</div>
+                <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+                  <i class="far fa-clock"></i> {{ item.created_at | format_time }}
+                </div>
+              </td>
               <td><span class="badge badge-{{ item.status }}">{{ item.status }}</span></td>
               <td style="text-align: right;">
                 <button type="button" class="btn btn-secondary btn-sm btn-view-details" data-inquiry="{{ item | tojson | forceescape }}" onclick="viewInquiry(JSON.parse(this.dataset.inquiry))">
@@ -1075,20 +1094,102 @@
 </div>
 <!-- ── Inquiry Details Modal ── -->
 <div class="modal-overlay" id="inquiryModal">
-  <div class="modal-box">
+  <div class="modal-box" style="max-width: 680px;">
     <div class="modal-header">
-      <div class="modal-title">Inquiry Details</div>
+      <div class="modal-title">Inquiry Details & Timeline</div>
       <button class="modal-close" onclick="closeAllModals()">&times;</button>
     </div>
     <div class="modal-body">
+      <!-- ── Milestone Stepper Track ── -->
+      <div style="background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 11.5px; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-route" style="color: var(--primary);"></i> Inquiry Execution Timeline
+          </span>
+          <span id="modalInquiryTimeline" style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px; border-radius: 12px; background: rgba(200, 117, 58, 0.15); color: var(--primary); font-weight: 600;">
+            <i class="far fa-hourglass"></i> Target: 1 – 2 Months
+          </span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; position: relative;">
+          <div id="adminStep1">
+            <div class="admin-node-icon" style="width: 32px; height: 32px; margin: 0 auto 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; background: #10b981; color: #fff;">
+              <i class="fas fa-check"></i>
+            </div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-main);">1. Brief Logged</div>
+            <div id="adminStep1Time" style="font-size: 10px; color: var(--text-dim); margin-top: 1px;">Received</div>
+          </div>
+          <div id="adminStep2">
+            <div class="admin-node-icon" style="width: 32px; height: 32px; margin: 0 auto 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; background: var(--bg-card); border: 2px solid var(--border-color); color: var(--text-dim);">
+              <i class="fas fa-compass"></i>
+            </div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">2. Review</div>
+            <div id="adminStep2Status" style="font-size: 10px; color: var(--text-dim); margin-top: 1px;">Contacting</div>
+          </div>
+          <div id="adminStep3">
+            <div class="admin-node-icon" style="width: 32px; height: 32px; margin: 0 auto 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; background: var(--bg-card); border: 2px solid var(--border-color); color: var(--text-dim);">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">3. In Flight</div>
+            <div id="adminStep3Status" style="font-size: 10px; color: var(--text-dim); margin-top: 1px;">Production</div>
+          </div>
+          <div id="adminStep4">
+            <div class="admin-node-icon" style="width: 32px; height: 32px; margin: 0 auto 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; background: var(--bg-card); border: 2px solid var(--border-color); color: var(--text-dim);">
+              <i class="fas fa-flag-checkered"></i>
+            </div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">4. Handover</div>
+            <div id="adminStep4Status" style="font-size: 10px; color: var(--text-dim); margin-top: 1px;">Delivery</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Exact Timestamps & Turnaround Grid ── -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px;">
+        <div style="background: var(--bg-input); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <label class="form-label" style="margin-bottom: 2px; font-size: 10.5px; text-transform: uppercase;">Exact Submitted Date & Time</label>
+          <div id="modalInquiryDate" style="font-weight: 600; font-size: 13px; color: var(--text-main);"></div>
+        </div>
+        <div style="background: var(--bg-input); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <label class="form-label" style="margin-bottom: 2px; font-size: 10.5px; text-transform: uppercase;">Last Status Update</label>
+          <div id="modalInquiryUpdated" style="font-weight: 600; font-size: 13px; color: var(--primary);"></div>
+        </div>
+        <div style="background: var(--bg-input); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <label class="form-label" style="margin-bottom: 2px; font-size: 10.5px; text-transform: uppercase;">Target Turnaround</label>
+          <div id="modalInquiryTimelineVal" style="font-weight: 600; font-size: 13px; color: #c084fc;"></div>
+        </div>
+        <div style="background: var(--bg-input); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <label class="form-label" style="margin-bottom: 2px; font-size: 10.5px; text-transform: uppercase;">Approximate Budget</label>
+          <div id="modalInquiryBudget" style="color: #34d399; font-weight: 700; font-size: 13px;"></div>
+        </div>
+      </div>
+
+      <!-- ── Client Account Timeline Box (Visible for Registered Clients) ── -->
+      <div id="modalInquiryClientWrap" style="display: none; background: rgba(200, 117, 58, 0.08); border: 1px solid rgba(200, 117, 58, 0.3); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 11.5px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+            <i class="fas fa-user-shield"></i> Registered Client Account Details
+          </span>
+          <span id="modalInquiryClientUsername" style="font-size: 12px; font-weight: 700; color: var(--text-main);"></span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+          <div>
+            <span style="color: var(--text-dim); display: block;">Account Registered Exact:</span>
+            <strong id="modalInquiryClientCreated" style="color: var(--text-main);"></strong>
+          </div>
+          <div>
+            <span style="color: var(--text-dim); display: block;">Last Active Session Exact:</span>
+            <strong id="modalInquiryClientLastLogin" style="color: #34d399;"></strong>
+          </div>
+        </div>
+      </div>
+
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
         <div>
           <label class="form-label">Client Name</label>
           <div id="modalInquiryName" style="font-weight: 600; font-size: 15px;"></div>
         </div>
         <div>
-          <label class="form-label">Date Submitted</label>
-          <div id="modalInquiryDate" style="font-size: 13px; color: var(--text-muted);"></div>
+          <label class="form-label">Company / Brand</label>
+          <div id="modalInquiryCompany" style="font-weight: 500;"></div>
         </div>
         <div>
           <label class="form-label">Email</label>
@@ -1097,14 +1198,6 @@
         <div>
           <label class="form-label">Phone</label>
           <div><a id="modalInquiryPhone" href="#" style="color: var(--text-main);"></a></div>
-        </div>
-        <div>
-          <label class="form-label">Company / Brand</label>
-          <div id="modalInquiryCompany" style="font-weight: 500;"></div>
-        </div>
-        <div>
-          <label class="form-label">Approximate Budget</label>
-          <div id="modalInquiryBudget" style="color: #34d399; font-weight: 600;"></div>
         </div>
       </div>
       <div style="margin-bottom: 20px;">

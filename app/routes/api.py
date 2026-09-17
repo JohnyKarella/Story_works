@@ -33,6 +33,7 @@ def submit_contact():
     if errors:
         return jsonify({"success": False, "errors": errors}), 400
     ip_address = request.headers.get("X-Forwarded-For", request.remote_addr)
+    timeline = data.get("timeline", "").strip()
     inquiry_data = {
         "first_name": fname,
         "last_name": lname,
@@ -40,6 +41,7 @@ def submit_contact():
         "phone": phone,
         "company": company,
         "budget": budget,
+        "timeline": timeline,
         "services": services_str,
         "message": message,
         "ip_address": ip_address,

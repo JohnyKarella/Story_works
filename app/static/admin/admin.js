@@ -74,22 +74,139 @@ function openModal(modalId) {
   const m = document.getElementById(modalId);
   if (m) m.classList.add("active");
 }
+// Format exact date & time helper for admin
+function formatExactDateTime(isoStr) {
+  if (!isoStr) return "—";
+  try {
+    const d = new Date(isoStr.replace(" ", "T"));
+    if (isNaN(d.getTime())) return isoStr;
+    return d.toLocaleString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+  } catch (e) {
+    return isoStr;
+  }
+}
+
 // Inquiry View Modal
 function viewInquiry(item) {
-  document.getElementById("modalInquiryName").textContent = `${item.first_name} ${item.last_name || ""}`;
-  document.getElementById("modalInquiryEmail").textContent = item.email;
-  document.getElementById("modalInquiryEmail").href = `mailto:${item.email}`;
-  document.getElementById("modalInquiryPhone").textContent = item.phone || "—";
-  if (item.phone) {
-    document.getElementById("modalInquiryPhone").href = `tel:${item.phone}`;
-  } else {
-    document.getElementById("modalInquiryPhone").removeAttribute("href");
+  const nameEl = document.getElementById("modalInquiryName");
+  if (nameEl) nameEl.textContent = `${item.first_name} ${item.last_name || ""}`;
+  
+  const emailEl = document.getElementById("modalInquiryEmail");
+  if (emailEl) {
+    emailEl.textContent = item.email;
+    emailEl.href = `mailto:${item.email}`;
   }
-  document.getElementById("modalInquiryCompany").textContent = item.company || "—";
-  document.getElementById("modalInquiryBudget").textContent = item.budget || "—";
-  document.getElementById("modalInquiryServices").textContent = item.services || "None specified";
-  document.getElementById("modalInquiryDate").textContent = item.created_at;
-  document.getElementById("modalInquiryMessage").textContent = item.message;
+
+  const phoneEl = document.getElementById("modalInquiryPhone");
+  if (phoneEl) {
+    phoneEl.textContent = item.phone || "—";
+    if (item.phone) {
+      phoneEl.href = `tel:${item.phone}`;
+    } else {
+      phoneEl.removeAttribute("href");
+    }
+  }
+
+  const companyEl = document.getElementById("modalInquiryCompany");
+  if (companyEl) companyEl.textContent = item.company || "—";
+
+  const budgetEl = document.getElementById("modalInquiryBudget");
+  if (budgetEl) budgetEl.textContent = item.budget || "—";
+
+  const servicesEl = document.getElementById("modalInquiryServices");
+  if (servicesEl) servicesEl.textContent = item.services || "None specified";
+
+  const formattedCreated = formatExactDateTime(item.created_at);
+  const dateEl = document.getElementById("modalInquiryDate");
+  if (dateEl) dateEl.textContent = formattedCreated;
+
+  const formattedUpdated = formatExactDateTime(item.updated_at || item.created_at);
+  const updatedEl = document.getElementById("modalInquiryUpdated");
+  if (updatedEl) updatedEl.textContent = formattedUpdated;
+
+  const timelineVal = item.timeline || "1 – 2 Months (Standard)";
+  const timelinePill = document.getElementById("modalInquiryTimeline");
+  if (timelinePill) timelinePill.innerHTML = `<i class="far fa-hourglass"></i> Target: ${timelineVal}`;
+  const timelineValEl = document.getElementById("modalInquiryTimelineVal");
+  if (timelineValEl) timelineValEl.textContent = timelineVal;
+
+  const messageEl = document.getElementById("modalInquiryMessage");
+  if (messageEl) messageEl.textContent = item.message;
+
+  // Milestone Stepper Logic for Admin
+  const s1 = document.getElementById("adminStep1");
+  const s2 = document.getElementById("adminStep2");
+  const s3 = document.getElementById("adminStep3");
+  const s4 = document.getElementById("adminStep4");
+
+  if (s1 && s2 && s3 && s4) {
+    const s1Icon = s1.querySelector(".admin-node-icon");
+    const s2Icon = s2.querySelector(".admin-node-icon");
+    const s3Icon = s3.querySelector(".admin-node-icon");
+    const s4Icon = s4.querySelector(".admin-node-icon");
+
+    // Helper to set active/completed/pending
+    const setNode = (node, icon, state) => {
+      if (state === "completed") {
+        icon.style.background = "#10b981";
+        icon.style.borderColor = "#10b981";
+        icon.style.color = "#fff";
+      } else if (state === "active") {
+        icon.style.background = "var(--primary)";
+        icon.style.borderColor = "var(--primary)";
+        icon.style.color = "#fff";
+      } else {
+        icon.style.background = "var(--bg-card)";
+        icon.style.borderColor = "var(--border-color)";
+        icon.style.color = "var(--text-dim)";
+      }
+    };
+
+    setNode(s1, s1Icon, "completed");
+    const st = (item.status || "new").toLowerCase();
+
+    if (st === "new") {
+      setNode(s2, s2Icon, "active");
+      setNode(s3, s3Icon, "pending");
+      setNode(s4, s4Icon, "pending");
+    } else if (st === "contacted") {
+      setNode(s2, s2Icon, "completed");
+      setNode(s3, s3Icon, "active");
+      setNode(s4, s4Icon, "pending");
+    } else if (st === "in_progress") {
+      setNode(s2, s2Icon, "completed");
+      setNode(s3, s3Icon, "completed");
+      setNode(s4, s4Icon, "active");
+    } else {
+      setNode(s2, s2Icon, "completed");
+      setNode(s3, s3Icon, "completed");
+      setNode(s4, s4Icon, "completed");
+    }
+  }
+
+  // Client Account Timeline Info (if registered)
+  const clientWrap = document.getElementById("modalInquiryClientWrap");
+  if (clientWrap) {
+    if (item.user_id || item.client_username) {
+      clientWrap.style.display = "block";
+      const uEl = document.getElementById("modalInquiryClientUsername");
+      if (uEl) uEl.textContent = item.client_username ? `@${item.client_username}` : "Registered Client";
+      const cCreatedEl = document.getElementById("modalInquiryClientCreated");
+      if (cCreatedEl) cCreatedEl.textContent = formatExactDateTime(item.client_created_at);
+      const cLoginEl = document.getElementById("modalInquiryClientLastLogin");
+      if (cLoginEl) cLoginEl.textContent = formatExactDateTime(item.client_last_login);
+    } else {
+      clientWrap.style.display = "none";
+    }
+  }
+
   // Status form action
   const statusForm = document.getElementById("modalStatusForm");
   if (statusForm) {

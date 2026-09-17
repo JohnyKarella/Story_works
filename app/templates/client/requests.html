@@ -213,7 +213,7 @@
 <div class="card">
   <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px;">
     <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 8px;">
-      <i class="fas fa-folder-open" style="color: var(--primary);"></i> Submitted Project Briefs & Studio Status
+      <i class="fas fa-folder-open" style="color: var(--primary);"></i> Project Briefs & Milestones
     </h3>
     <span style="font-size: 13px; color: var(--text-muted); font-weight: 500;" id="briefCountText">
       Showing {{ inquiries|length }} brief{% if inquiries|length != 1 %}s{% endif %}
@@ -226,11 +226,11 @@
         <table class="data-table" id="briefsTable" style="width: 100%;">
           <thead>
             <tr>
-              <th style="width: 150px;">Date & Exact Time</th>
-              <th>Requested Services & Scope</th>
-              <th style="width: 160px;">Investment & Timeline</th>
-              <th style="width: 150px;">Milestone Status</th>
-              <th style="width: 140px; text-align: right;">Action</th>
+              <th style="width: 170px;">Date & Time</th>
+              <th>Service & Scope</th>
+              <th style="width: 175px;">Budget & Timeline</th>
+              <th style="width: 130px;">Status</th>
+              <th style="width: 130px; text-align: right;">Action</th>
             </tr>
           </thead>
           <tbody>

@@ -379,7 +379,7 @@ class BackendTestCase(unittest.TestCase):
 
         res = self.client.get("/client/requests")
         self.assertEqual(res.status_code, 200)
-        self.assertIn(b"Date & Exact Time", res.data)
+        self.assertIn(b"Date & Time", res.data)
         self.assertIn(b"Project Milestone Stepper", res.data)
 
         res = self.client.get("/client/profile")

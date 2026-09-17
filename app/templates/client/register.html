@@ -11,37 +11,33 @@
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='admin/favicon.png') }}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-dark: #08090a;
-      --bg-card: rgba(19, 20, 24, 0.82);
-      --bg-card-hover: rgba(24, 25, 31, 0.92);
-      --bg-input: rgba(13, 14, 17, 0.76);
-      --bg-input-focus: rgba(18, 19, 24, 0.96);
+      --bg-dark: #070809;
+      --bg-card: rgba(18, 19, 23, 0.88);
+      --bg-input: rgba(11, 12, 15, 0.7);
+      --bg-input-focus: rgba(14, 15, 19, 0.98);
       --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(255, 255, 255, 0.18);
-      --border-focus: #c8753a;
+      --border-hover: rgba(255, 255, 255, 0.16);
       --primary: #c8753a;
-      --primary-hover: #e08343;
-      --primary-light: #ff9d5c;
-      --primary-gradient: linear-gradient(135deg, #e58747 0%, #c8753a 50%, #9c4c1a 100%);
-      --primary-glow: rgba(200, 117, 58, 0.32);
-      --primary-glow-strong: rgba(200, 117, 58, 0.58);
-      --accent-amber: #f59e0b;
+      --primary-hover: #db7f3e;
+      --primary-gradient: linear-gradient(135deg, #db7f3e 0%, #c8753a 60%, #a85722 100%);
+      --primary-glow: rgba(200, 117, 58, 0.25);
       --text-main: #f9fafb;
       --text-muted: #9ca3af;
       --text-dim: #6b7280;
-      --radius-card: 24px;
-      --radius-input: 13px;
-      --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
-      --shadow-card: 0 35px 80px -15px rgba(0, 0, 0, 0.85), 0 0 0 1px var(--border-subtle);
+      --radius-card: 22px;
+      --radius-input: 12px;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
     body {
       background-color: var(--bg-dark);
       color: var(--text-main);
@@ -57,66 +53,21 @@
       overflow-y: auto;
     }
 
-    /* ── Ambient Background Canvas ── */
-    .ambient-canvas {
+    /* Ambient Atmosphere */
+    .ambient-bg {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 65% 45% at 50% -5%, rgba(200, 117, 58, 0.16) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 15% 95%, rgba(139, 69, 19, 0.1) 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
-      overflow: hidden;
-    }
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(95px);
-      opacity: 0.55;
-      animation: floatOrb 22s infinite alternate ease-in-out;
-      will-change: transform;
-    }
-    .orb-1 {
-      width: 520px;
-      height: 520px;
-      background: radial-gradient(circle, rgba(200, 117, 58, 0.32) 0%, rgba(200, 117, 58, 0) 70%);
-      top: -120px;
-      left: 50%;
-      transform: translateX(-50%);
-      animation-duration: 18s;
-    }
-    .orb-2 {
-      width: 440px;
-      height: 440px;
-      background: radial-gradient(circle, rgba(139, 69, 19, 0.28) 0%, rgba(139, 69, 19, 0) 70%);
-      bottom: -100px;
-      left: 15%;
-      animation-duration: 24s;
-      animation-delay: -6s;
-    }
-    .orb-3 {
-      width: 380px;
-      height: 380px;
-      background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0) 70%);
-      top: 35%;
-      right: 10%;
-      animation-duration: 20s;
-      animation-delay: -11s;
-    }
-    @keyframes floatOrb {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(30px, -40px) scale(1.08); }
-      100% { transform: translate(-25px, 25px) scale(0.95); }
     }
 
-    /* ── Dot Grid Overlay ── */
     .grid-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
       background-size: 28px 28px;
       pointer-events: none;
       z-index: 1;
@@ -129,117 +80,141 @@
       z-index: 10;
       width: 100%;
       max-width: 540px;
-      animation: fadeInUp 0.75s var(--ease-smooth);
+      animation: cardEntrance 0.5s var(--ease) forwards;
+    }
+
+    @keyframes cardEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .register-card {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
+      border-top: 1px solid rgba(200, 117, 58, 0.45);
       border-radius: var(--radius-card);
-      padding: 40px 38px 34px;
-      box-shadow: var(--shadow-card);
+      padding: 38px 36px 32px;
+      box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.4s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth);
-    }
-    .register-card::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent 0%, rgba(200, 117, 58, 0.8) 50%, transparent 100%);
     }
 
     .brand-header {
       text-align: center;
       margin-bottom: 22px;
     }
-    .logo-badge-wrap {
+
+    .logo-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 54px;
-      height: 54px;
-      border-radius: 17px;
-      background: linear-gradient(135deg, rgba(200, 117, 58, 0.25) 0%, rgba(139, 69, 19, 0.15) 100%);
-      border: 1px solid rgba(200, 117, 58, 0.45);
-      box-shadow: 0 10px 24px var(--primary-glow);
-      margin-bottom: 14px;
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(200, 117, 58, 0.22) 0%, rgba(139, 69, 19, 0.12) 100%);
+      border: 1px solid rgba(200, 117, 58, 0.4);
+      box-shadow: 0 8px 20px rgba(200, 117, 58, 0.2);
+      margin-bottom: 12px;
+      transition: transform 0.3s var(--ease);
     }
-    .logo-icon {
-      font-size: 24px;
+    .logo-badge:hover {
+      transform: translateY(-2px);
+    }
+
+    .logo-text {
+      font-size: 25px;
       font-weight: 800;
-      color: #ffffff;
       background: var(--primary-gradient);
-      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       letter-spacing: -0.5px;
     }
-    .portal-tag {
+
+    .portal-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(200, 117, 58, 0.12);
-      border: 1px solid rgba(200, 117, 58, 0.3);
-      color: var(--primary-light);
+      background: rgba(200, 117, 58, 0.1);
+      border: 1px solid rgba(200, 117, 58, 0.28);
+      color: #ff9d5c;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.8px;
       text-transform: uppercase;
       padding: 4px 12px;
-      border-radius: 30px;
-      margin-bottom: 8px;
+      border-radius: 20px;
+      margin-bottom: 10px;
     }
+
     .brand-header h1 {
       font-size: 24px;
       font-weight: 700;
       color: var(--text-main);
-      letter-spacing: -0.5px;
+      letter-spacing: -0.4px;
       margin-bottom: 6px;
     }
+
     .brand-header p {
-      font-size: 13px;
+      font-size: 13.5px;
       color: var(--text-muted);
       line-height: 1.5;
     }
 
-    .portal-tabs {
+    .tabs-nav {
       display: flex;
-      background: rgba(13, 14, 17, 0.6);
+      background: rgba(10, 11, 14, 0.6);
       border: 1px solid var(--border-subtle);
       border-radius: 12px;
       padding: 4px;
       margin-bottom: 22px;
       gap: 4px;
     }
-    .tab-btn {
+
+    .tab-item {
       flex: 1;
       text-align: center;
-      padding: 9px 14px;
+      padding: 9px 12px;
       font-size: 13px;
       font-weight: 600;
       color: var(--text-muted);
       text-decoration: none;
       border-radius: 9px;
-      transition: all 0.2s ease;
+      transition: all 0.2s var(--ease);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
-    .tab-btn:hover {
+
+    .tab-item:hover {
       color: var(--text-main);
     }
-    .tab-btn.active {
+
+    .tab-item.active {
       background: rgba(200, 117, 58, 0.16);
       color: #ffffff;
       border: 1px solid rgba(200, 117, 58, 0.35);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .flash-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: var(--radius-input);
+      font-size: 13px;
+      line-height: 1.4;
+      margin-bottom: 18px;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
     }
 
     .form-grid-2 {
@@ -255,8 +230,8 @@
 
     .form-group {
       margin-bottom: 16px;
-      position: relative;
     }
+
     .form-label {
       display: block;
       font-size: 12.5px;
@@ -264,6 +239,7 @@
       color: var(--text-main);
       margin-bottom: 6px;
     }
+
     .form-control {
       width: 100%;
       background: var(--bg-input);
@@ -274,30 +250,34 @@
       font-size: 13.5px;
       font-family: inherit;
       outline: none;
-      transition: all 0.25s var(--ease-smooth);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     }
+
     .form-control::placeholder {
       color: rgba(156, 163, 175, 0.45);
     }
+
     .form-control:hover {
       border-color: var(--border-hover);
-      background: rgba(16, 17, 21, 0.85);
+      background: rgba(14, 15, 18, 0.85);
     }
+
     .form-control:focus {
-      border-color: var(--border-focus);
+      border-color: var(--primary);
       background: var(--bg-input-focus);
-      box-shadow: 0 0 0 4px var(--primary-glow);
+      box-shadow: 0 0 0 3px var(--primary-glow);
     }
 
     .password-wrap {
       position: relative;
     }
     .password-wrap .form-control {
-      padding-right: 40px;
+      padding-right: 38px;
     }
-    .password-toggle {
+
+    .eye-btn {
       position: absolute;
-      right: 10px;
+      right: 8px;
       top: 50%;
       transform: translateY(-50%);
       background: none;
@@ -307,19 +287,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 4px;
+      padding: 5px;
+      border-radius: 6px;
       transition: color 0.2s;
     }
-    .password-toggle:hover {
+    .eye-btn:hover {
       color: var(--text-main);
     }
-    .password-toggle svg {
+    .eye-btn svg {
       width: 16px;
       height: 16px;
     }
 
     .btn-submit {
-      position: relative;
       width: 100%;
       background: var(--primary-gradient);
       color: #ffffff;
@@ -327,21 +307,41 @@
       border-radius: var(--radius-input);
       padding: 13px 20px;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 14.5px;
       font-family: inherit;
       cursor: pointer;
-      overflow: hidden;
+      box-shadow: 0 8px 20px var(--primary-glow);
+      transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
       margin-top: 8px;
-      box-shadow: 0 10px 25px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-      transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth), filter 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
     .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 16px 36px var(--primary-glow-strong), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      filter: brightness(1.06);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(200, 117, 58, 0.35);
+      filter: brightness(1.05);
     }
     .btn-submit:active {
-      transform: translateY(1px) scale(0.985);
+      transform: translateY(1px);
+    }
+    .btn-submit:disabled {
+      opacity: 0.75;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     .card-footer {
@@ -352,60 +352,40 @@
       font-size: 13px;
       color: var(--text-muted);
     }
-    .register-link {
-      color: var(--primary-light);
+    .link-primary {
+      color: var(--primary);
       text-decoration: none;
       font-weight: 600;
       transition: color 0.2s;
     }
-    .register-link:hover {
-      color: #ffffff;
+    .link-primary:hover {
+      color: #ff9d5c;
       text-decoration: underline;
     }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(24px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-6px); }
-      40%, 80% { transform: translateX(6px); }
-    }
-    .flash-alert {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 11px 14px;
-      border-radius: var(--radius-input);
-      font-size: 13px;
-      animation: shake 0.5s ease-in-out;
-      margin-bottom: 12px;
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #fca5a5;
+    @media (max-width: 480px) {
+      .register-card {
+        padding: 28px 20px 24px;
+        border-radius: 18px;
+      }
+      .brand-header h1 {
+        font-size: 22px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Ambient glowing aura orbs -->
-  <div class="ambient-canvas" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-  </div>
-
-  <!-- High-end dot grid mask -->
+  <div class="ambient-bg" aria-hidden="true"></div>
   <div class="grid-overlay" aria-hidden="true"></div>
 
   <div class="register-container">
-    <div class="register-card" id="cardContainer">
+    <div class="register-card">
       <div class="brand-header">
-        <div class="logo-badge-wrap">
-          <div class="logo-icon">S</div>
+        <div class="logo-badge">
+          <span class="logo-text">S</span>
         </div>
         <br>
-        <div class="portal-tag">
+        <div class="portal-pill">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
           </svg>
@@ -415,9 +395,9 @@
         <p>Choose your username and custom password to access project tracking and studio briefs.</p>
       </div>
 
-      <!-- Tab Switcher -->
-      <div class="portal-tabs">
-        <a href="{{ url_for('client.login') }}" class="tab-btn">
+      <!-- Segmented Tabs -->
+      <div class="tabs-nav">
+        <a href="{{ url_for('client.login') }}" class="tab-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
             <polyline points="10 17 15 12 10 7"></polyline>
@@ -425,7 +405,7 @@
           </svg>
           Sign In
         </a>
-        <a href="{{ url_for('client.register') }}" class="tab-btn active">
+        <a href="{{ url_for('client.register') }}" class="tab-item active">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="8.5" cy="7" r="4"></circle>
@@ -441,7 +421,12 @@
         {% if messages %}
           <div>
             {% for category, msg in messages %}
-              <div class="flash-alert">
+              <div class="flash-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
                 <span>{{ msg }}</span>
               </div>
             {% endfor %}
@@ -449,7 +434,7 @@
         {% endif %}
       {% endwith %}
 
-      <form method="POST" action="{{ url_for('client.register') }}">
+      <form id="registerForm" method="POST" action="{{ url_for('client.register') }}">
         <div class="form-grid-2">
           <div class="form-group">
             <label class="form-label" for="username">
@@ -543,10 +528,14 @@
                 required
                 minlength="6"
               />
-              <button type="button" class="password-toggle" id="togglePassword1" aria-label="Toggle password">
-                <svg id="eyeIcon1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button type="button" class="eye-btn" id="togglePassword1" aria-label="Toggle password" title="Show / hide password">
+                <svg id="eyeIcon1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
-                  <circle cx="12" cy="3" r="3"></circle>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg id="eyeSlash1" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
                 </svg>
               </button>
             </div>
@@ -566,25 +555,30 @@
                 required
                 minlength="6"
               />
-              <button type="button" class="password-toggle" id="togglePassword2" aria-label="Toggle confirm password">
-                <svg id="eyeIcon2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button type="button" class="eye-btn" id="togglePassword2" aria-label="Toggle confirm password" title="Show / hide password">
+                <svg id="eyeIcon2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
-                  <circle cx="12" cy="3" r="3"></circle>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg id="eyeSlash2" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
                 </svg>
               </button>
             </div>
           </div>
         </div>
 
-        <button type="submit" class="btn-submit">
-          Create Client Account
+        <button type="submit" class="btn-submit" id="regSubmitBtn">
+          <span class="spinner" id="regSpinner"></span>
+          <span id="regBtnText">Create Client Account</span>
         </button>
       </form>
 
       <div class="card-footer">
         <p>
           Already have a client account?
-          <a href="{{ url_for('client.login') }}" class="register-link" style="margin-left: 4px;">
+          <a href="{{ url_for('client.login') }}" class="link-primary" style="margin-left: 4px;">
             Sign In &rarr;
           </a>
         </p>
@@ -596,32 +590,34 @@
   </div>
 
   <script>
-    function setupToggle(btnId, inputId) {
+    function setupToggle(btnId, inputId, eyeId, slashId) {
       const btn = document.getElementById(btnId);
       const input = document.getElementById(inputId);
+      const eye = document.getElementById(eyeId);
+      const slash = document.getElementById(slashId);
       if (btn && input) {
         btn.addEventListener("click", function () {
-          const type = input.getAttribute("type") === "password" ? "text" : "password";
-          input.setAttribute("type", type);
+          const isPwd = input.getAttribute("type") === "password";
+          input.setAttribute("type", isPwd ? "text" : "password");
+          if (eye && slash) {
+            eye.style.display = isPwd ? "none" : "block";
+            slash.style.display = isPwd ? "block" : "none";
+          }
         });
       }
     }
-    setupToggle("togglePassword1", "password");
-    setupToggle("togglePassword2", "confirm_password");
+    setupToggle("togglePassword1", "password", "eyeIcon1", "eyeSlash1");
+    setupToggle("togglePassword2", "confirm_password", "eyeIcon2", "eyeSlash2");
 
-    const card = document.getElementById('cardContainer');
-    if (card) {
-      document.addEventListener('mousemove', (e) => {
-        if (window.innerWidth < 768) return;
-        const rect = card.getBoundingClientRect();
-        const cardCenterX = rect.left + rect.width / 2;
-        const cardCenterY = rect.top + rect.height / 2;
-        const deltaX = (e.clientX - cardCenterX) / 45;
-        const deltaY = (e.clientY - cardCenterY) / 45;
-        card.style.transform = `perspective(1000px) rotateY(${deltaX}deg) rotateX(${-deltaY}deg) translateY(-2px)`;
-      });
-      document.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(0px)';
+    const regForm = document.getElementById("registerForm");
+    const regSubmitBtn = document.getElementById("regSubmitBtn");
+    const regSpinner = document.getElementById("regSpinner");
+    const regBtnText = document.getElementById("regBtnText");
+    if (regForm && regSubmitBtn) {
+      regForm.addEventListener("submit", () => {
+        regSubmitBtn.disabled = true;
+        if (regSpinner) regSpinner.style.display = "inline-block";
+        if (regBtnText) regBtnText.textContent = "Creating Account...";
       });
     }
   </script>

@@ -131,7 +131,7 @@
                 </form>
               </td>
               <td style="text-align: right; white-space: nowrap;">
-                <button type="button" class="btn btn-secondary btn-sm" onclick='viewInquiry({{ item | tojson }})'>
+                <button type="button" class="btn btn-secondary btn-sm" data-inquiry="{{ item | tojson | forceescape }}" onclick="viewInquiry(JSON.parse(this.dataset.inquiry))">
                   View Details
                 </button>
                 <form method="POST" action="{{ url_for('admin.delete_inquiry', inquiry_id=item.id) }}" style="display: inline;" onsubmit="return confirm('Permanently delete this inquiry?');">

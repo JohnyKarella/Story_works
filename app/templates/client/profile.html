@@ -718,7 +718,11 @@
 
           <!-- Milestone 3: Project Briefs -->
           <div style="display: flex; gap: 14px; align-items: flex-start;">
-            <div style="width: 34px; height: 34px; border-radius: 50%; background: {% if stats and stats.total > 0 %}#3b82f6{% else %}var(--bg-input){% endif %}; color: {% if stats and stats.total > 0 %}#fff{% else %}var(--text-dim){% endif %}; border: 2px solid {% if stats and stats.total > 0 %}#3b82f6{% else %}var(--border-color){% endif %}; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">
+            {% if stats and stats.total > 0 %}
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: #3b82f6; color: #fff; border: 2px solid #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">
+            {% else %}
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: var(--bg-input); color: var(--text-dim); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">
+            {% endif %}
               <i class="fas fa-folder-open"></i>
             </div>
             <div style="flex: 1;">

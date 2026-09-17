@@ -13,20 +13,20 @@
 <style>
   /* ── Dashboard Specific User Attractions ── */
   .dash-hero {
-    background: linear-gradient(135deg, rgba(200, 117, 58, 0.18) 0%, rgba(18, 19, 23, 0.88) 55%, rgba(10, 11, 14, 0.98) 100%);
-    border: 1px solid rgba(200, 117, 58, 0.35);
+    background: linear-gradient(135deg, rgba(200, 117, 58, 0.16) 0%, rgba(18, 19, 23, 0.9) 55%, rgba(10, 11, 14, 0.98) 100%);
+    border: 1px solid rgba(200, 117, 58, 0.3);
     border-top: 2px solid var(--primary);
     border-radius: var(--radius-lg);
-    padding: 30px 34px;
-    margin-bottom: 28px;
+    padding: 20px 28px;
+    margin-bottom: 22px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 22px;
+    gap: 18px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.55);
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
   }
 
   .dash-hero::before {
@@ -34,9 +34,9 @@
     position: absolute;
     top: -40%;
     right: -10%;
-    width: 320px;
-    height: 320px;
-    background: radial-gradient(circle, rgba(200, 117, 58, 0.18) 0%, transparent 70%);
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(200, 117, 58, 0.16) 0%, transparent 70%);
     pointer-events: none;
   }
 
@@ -78,7 +78,7 @@
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    padding: 20px;
+    padding: 16px 18px;
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s, box-shadow 0.2s;
     position: relative;
     overflow: hidden;
@@ -93,17 +93,17 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
 
   .kpi-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
     transition: transform 0.25s ease;
   }
   .kpi-stat-card:hover .kpi-icon {
@@ -115,7 +115,7 @@
     height: 4px;
     background: rgba(255, 255, 255, 0.08);
     border-radius: 4px;
-    margin-top: 14px;
+    margin-top: 12px;
     overflow: hidden;
   }
   .kpi-bar-fill {
@@ -146,16 +146,33 @@
     box-shadow: 0 6px 18px rgba(37, 211, 102, 0.4);
   }
 
-  .milestone-pill {
+  .milestone-track {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .milestone-step {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-dim);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text-muted);
+    gap: 3px;
+    white-space: nowrap;
+  }
+  .milestone-step.active-step {
+    background: rgba(200, 117, 58, 0.16);
+    color: var(--primary);
+    border-color: rgba(200, 117, 58, 0.35);
+  }
+  .milestone-step.completed-step {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.3);
   }
 
   .timeline-pill {
@@ -252,7 +269,7 @@
 <!-- ── 1. Welcome Hero Banner with Attractions ── -->
 <div class="dash-hero">
   <div style="position: relative; z-index: 2;">
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
       <span class="client-badge">
         <i class="fas fa-gem" style="margin-right: 4px;"></i> Client Partner
       </span>
@@ -265,26 +282,26 @@
         <span class="pulse-indicator"></span> Creative Studio Online
       </span>
     </div>
-    <h2 style="font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 6px; letter-spacing: -0.4px;">
+    <h2 style="font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 4px; letter-spacing: -0.3px;">
       Welcome back, {{ (client.full_name or client.username) if client else 'Client' }}!
     </h2>
-    <p style="font-size: 14px; color: var(--text-muted); max-width: 620px; line-height: 1.55;">
-      Manage your creative campaigns, track studio progress, or brief us on a new project. Our strategy and design team is at your disposal.
+    <p style="font-size: 13.5px; color: var(--text-muted); max-width: 650px; line-height: 1.5; margin: 0;">
+      Track active campaigns, review milestones in real-time, or brief our strategy and production team.
     </p>
   </div>
 
-  <div style="display: flex; gap: 12px; flex-wrap: wrap; position: relative; z-index: 2;">
-    <a href="{{ url_for('client.request_service') }}" class="btn btn-primary" style="padding: 11px 20px; font-weight: 600;">
+  <div style="display: flex; gap: 10px; flex-wrap: wrap; position: relative; z-index: 2;">
+    <a href="{{ url_for('client.request_service') }}" class="btn btn-primary btn-sm" style="padding: 9px 18px; font-weight: 600;">
       <i class="fas fa-plus-circle" style="margin-right: 6px;"></i> Submit New Brief
     </a>
-    <a href="{{ url_for('client.services') }}" class="btn btn-secondary" style="padding: 11px 20px;">
+    <a href="{{ url_for('client.services') }}" class="btn btn-secondary btn-sm" style="padding: 9px 16px;">
       <i class="fas fa-cubes" style="margin-right: 6px;"></i> Browse Services
     </a>
   </div>
 </div>
 
 <!-- ── 2. Interactive KPI Stats Grid with Progress Indicators ── -->
-<div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 28px;">
+<div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-bottom: 24px;">
   <!-- Card 1: Total Briefs -->
   <a href="{{ url_for('client.requests') }}" class="kpi-link-card" title="View all submitted briefs">
     <div class="kpi-stat-card">
@@ -294,10 +311,10 @@
         </div>
         <span style="font-size: 11.5px; color: var(--text-dim); font-weight: 600;">All Submissions &rarr;</span>
       </div>
-      <div style="font-size: 28px; font-weight: 800; color: #ffffff; line-height: 1.1; margin-bottom: 4px;">
+      <div style="font-size: 24px; font-weight: 800; color: #ffffff; line-height: 1.1; margin-bottom: 4px;">
         {{ (stats.total or 0) if stats else 0 }}
       </div>
-      <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
+      <div style="font-size: 12.5px; color: var(--text-muted); font-weight: 500;">
         Total Project Briefs
       </div>
       <div class="kpi-bar">
@@ -315,10 +332,10 @@
         </div>
         <span style="font-size: 11.5px; color: #60a5fa; font-weight: 600;">Awaiting Review &rarr;</span>
       </div>
-      <div style="font-size: 28px; font-weight: 800; color: #60a5fa; line-height: 1.1; margin-bottom: 4px;">
+      <div style="font-size: 24px; font-weight: 800; color: #60a5fa; line-height: 1.1; margin-bottom: 4px;">
         {{ (stats.new or 0) if stats else 0 }}
       </div>
-      <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
+      <div style="font-size: 12.5px; color: var(--text-muted); font-weight: 500;">
         In Studio Review
       </div>
       <div class="kpi-bar">
@@ -336,10 +353,10 @@
         </div>
         <span style="font-size: 11.5px; color: #c084fc; font-weight: 600;">Active Flight &rarr;</span>
       </div>
-      <div style="font-size: 28px; font-weight: 800; color: #c084fc; line-height: 1.1; margin-bottom: 4px;">
+      <div style="font-size: 24px; font-weight: 800; color: #c084fc; line-height: 1.1; margin-bottom: 4px;">
         {{ (stats.in_progress or 0) if stats else 0 }}
       </div>
-      <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
+      <div style="font-size: 12.5px; color: var(--text-muted); font-weight: 500;">
         In Active Production
       </div>
       <div class="kpi-bar">
@@ -357,10 +374,10 @@
         </div>
         <span style="font-size: 11.5px; color: #34d399; font-weight: 600;">Delivered &rarr;</span>
       </div>
-      <div style="font-size: 28px; font-weight: 800; color: #34d399; line-height: 1.1; margin-bottom: 4px;">
+      <div style="font-size: 24px; font-weight: 800; color: #34d399; line-height: 1.1; margin-bottom: 4px;">
         {{ (stats.completed or 0) if stats else 0 }}
       </div>
-      <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
+      <div style="font-size: 12.5px; color: var(--text-muted); font-weight: 500;">
         Completed Deliveries
       </div>
       <div class="kpi-bar">
@@ -370,174 +387,244 @@
   </a>
 </div>
 
-<!-- ── 3. Main Grid: Recent Briefs & Studio Support ── -->
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start;">
-  <!-- Recent Briefs Section -->
-  <div class="card" style="margin-bottom: 0;">
-    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px;">
+<!-- ── 3. Recent Project Briefs (Full Width Expansive Table) ── -->
+<div class="card" style="width: 100%; margin-bottom: 24px;">
+  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
       <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin: 0;">
         <i class="fas fa-clock" style="color: var(--primary);"></i> Recent Project Briefs
       </h3>
-      <a href="{{ url_for('client.requests') }}" style="font-size: 13px; color: var(--primary); font-weight: 600; text-decoration: none;">
-        View All ({{ (stats.total or 0) if stats else 0 }}) &rarr;
-      </a>
+      <span style="font-size: 11px; color: var(--text-dim); background: var(--bg-input); padding: 2px 8px; border-radius: 12px; border: 1px solid var(--border-color); font-weight: 600;">
+        Latest Submissions
+      </span>
     </div>
-
-    <div class="card-body" style="padding: 0;">
-      {% if recent_inquiries %}
-        <div class="table-responsive">
-          <table class="data-table" style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="width: 150px;">Date & Exact Time</th>
-                <th>Requested Services & Scope</th>
-                <th style="width: 160px;">Investment & Timeline</th>
-                <th style="width: 140px;">Milestone Status</th>
-                <th style="width: 130px; text-align: right;">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for item in recent_inquiries %}
-                <tr>
-                  <td style="font-size: 13px; color: var(--text-muted); white-space: nowrap;">
-                    <div style="font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 5px;">
-                      <i class="far fa-calendar-alt" style="color: var(--primary); font-size: 12px;"></i>
-                      {{ item.created_at | format_date }}
-                    </div>
-                    <div style="font-size: 12px; color: var(--text-dim); margin-top: 3px; display: flex; align-items: center; gap: 5px;">
-                      <i class="far fa-clock" style="font-size: 11px;"></i>
-                      <span>{{ item.created_at | format_time }}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div style="font-weight: 600; color: var(--text-main); font-size: 14px; margin-bottom: 3px; display: flex; align-items: center; gap: 6px;">
-                      {% if 'Brand' in (item.services or '') %}
-                        <i class="fas fa-paint-brush" style="color: var(--primary); font-size: 12px;"></i>
-                      {% elif 'Web' in (item.services or '') %}
-                        <i class="fas fa-laptop-code" style="color: #60a5fa; font-size: 12px;"></i>
-                      {% elif 'Content' in (item.services or '') %}
-                        <i class="fas fa-pen-nib" style="color: #f59e0b; font-size: 12px;"></i>
-                      {% else %}
-                        <i class="fas fa-gem" style="color: var(--primary); font-size: 12px;"></i>
-                      {% endif %}
-                      <span>{{ item.services or 'Creative Services' }}</span>
-                    </div>
-                    <div style="font-size: 12.5px; color: var(--text-muted); max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                      {{ item.message }}
-                    </div>
-                  </td>
-                  <td style="font-size: 13px; color: var(--text-muted);">
-                    <div style="font-weight: 600; color: var(--text-main); margin-bottom: 4px;">{{ item.budget or 'Custom Scope' }}</div>
-                    <span class="timeline-pill" title="Target turnaround timeline">
-                      <i class="far fa-hourglass"></i> {{ item.timeline or '1 – 2 Months' }}
-                    </span>
-                  </td>
-                  <td>
-                    {% if item.status == 'new' %}
-                      <span class="status-badge status-new">
-                        <i class="fas fa-sparkles" style="margin-right: 4px;"></i> New
-                      </span>
-                    {% elif item.status == 'contacted' %}
-                      <span class="status-badge status-contacted">
-                        <i class="fas fa-phone-alt" style="margin-right: 4px;"></i> In Review
-                      </span>
-                    {% elif item.status == 'in_progress' %}
-                      <span class="status-badge status-in_progress">
-                        <i class="fas fa-circle-notch fa-spin" style="margin-right: 4px;"></i> In Progress
-                      </span>
-                    {% else %}
-                      <span class="status-badge status-completed">
-                        <i class="fas fa-check" style="margin-right: 4px;"></i> Completed
-                      </span>
-                    {% endif %}
-                  </td>
-                  <td style="text-align: right;">
-                    <button
-                      type="button"
-                      class="btn btn-secondary btn-sm"
-                      data-brief="{{ item | tojson | forceescape }}"
-                      onclick="openBriefModal(this.dataset.brief)"
-                    >
-                      <i class="fas fa-eye" style="margin-right: 4px;"></i> Full Timeline
-                    </button>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <div style="text-align: center; padding: 48px 24px;">
-          <div style="font-size: 40px; color: var(--text-dim); margin-bottom: 12px;">
-            <i class="fas fa-folder-plus"></i>
-          </div>
-          <h4 style="font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 6px;">
-            No Project Briefs Submitted Yet
-          </h4>
-          <p style="font-size: 13px; color: var(--text-muted); max-width: 400px; margin: 0 auto 18px;">
-            Ready to kick off a new branding, digital marketing, or web design project? Submit your requirements directly to our creative team.
-          </p>
-          <a href="{{ url_for('client.request_service') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Submit Your First Brief
-          </a>
-        </div>
-      {% endif %}
-    </div>
+    <a href="{{ url_for('client.requests') }}" style="font-size: 13px; color: var(--primary); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+      View All Briefs ({{ (stats.total or 0) if stats else 0 }}) <i class="fas fa-arrow-right" style="font-size: 11px;"></i>
+    </a>
   </div>
 
-  <!-- Studio Direct Support Card & Attractions -->
-  <div style="display: flex; flex-direction: column; gap: 20px;">
-    <!-- Studio Contact Card -->
-    <div class="card" style="margin-bottom: 0;">
-      <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding: 18px 20px;">
-        <h3 style="font-size: 15px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin: 0;">
-          <i class="fas fa-headset" style="color: var(--primary);"></i> Studio Support & WhatsApp
-        </h3>
+  <div class="card-body" style="padding: 0;">
+    {% if recent_inquiries %}
+      <div class="table-responsive">
+        <table class="data-table" style="width: 100%;">
+          <thead>
+            <tr>
+              <th style="width: 160px;">Date & Exact Time</th>
+              <th>Requested Services & Scope</th>
+              <th style="width: 175px;">Investment & Timeline</th>
+              <th style="width: 140px;">Milestone Status</th>
+              <th style="width: 130px; text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in recent_inquiries %}
+              <tr>
+                <td style="font-size: 13px; color: var(--text-muted); white-space: nowrap;">
+                  <div style="font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                    <i class="far fa-calendar-alt" style="color: var(--primary); font-size: 12px;"></i>
+                    {{ item.created_at | format_date }}
+                  </div>
+                  <div style="font-size: 12px; color: var(--text-dim); margin-top: 3px; display: flex; align-items: center; gap: 6px;">
+                    <i class="far fa-clock" style="font-size: 11px;"></i>
+                    <span>{{ item.created_at | format_time }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div style="font-weight: 700; color: var(--text-main); font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                    {% if 'Brand' in (item.services or '') %}
+                      <i class="fas fa-paint-brush" style="color: var(--primary); font-size: 12px;"></i>
+                    {% elif 'Web' in (item.services or '') %}
+                      <i class="fas fa-laptop-code" style="color: #60a5fa; font-size: 12px;"></i>
+                    {% elif 'Content' in (item.services or '') %}
+                      <i class="fas fa-pen-nib" style="color: #f59e0b; font-size: 12px;"></i>
+                    {% else %}
+                      <i class="fas fa-gem" style="color: var(--primary); font-size: 12px;"></i>
+                    {% endif %}
+                    <span>{{ item.services or 'Creative Services & Design' }}</span>
+                  </div>
+                  {% set clean_msg = item.message %}
+                  {% if '[Target Timeline:' in clean_msg and ']' in clean_msg %}
+                    {% set clean_msg = clean_msg.split(']')[-1] | trim %}
+                  {% endif %}
+                  <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; max-width: 520px;">
+                    {{ clean_msg[:130] }}{% if clean_msg|length > 130 %}...{% endif %}
+                  </div>
+
+                  <!-- Mini Milestone Stepper -->
+                  <div class="milestone-track" style="margin-top: 6px;">
+                    <span class="milestone-step active-step">
+                      <i class="fas fa-check" style="font-size: 8px;"></i> 1. Scoping
+                    </span>
+                    <span class="milestone-step {% if item.status in ('contacted', 'in_progress', 'completed') %}active-step{% endif %}">
+                      {% if item.status in ('contacted', 'in_progress', 'completed') %}<i class="fas fa-check" style="font-size: 8px;"></i> {% endif %}2. Strategy
+                    </span>
+                    <span class="milestone-step {% if item.status in ('in_progress', 'completed') %}active-step{% endif %}">
+                      {% if item.status in ('in_progress', 'completed') %}<i class="fas fa-check" style="font-size: 8px;"></i> {% endif %}3. Production
+                    </span>
+                    <span class="milestone-step {% if item.status == 'completed' %}completed-step{% endif %}">
+                      {% if item.status == 'completed' %}<i class="fas fa-check" style="font-size: 8px;"></i> {% endif %}4. Delivery
+                    </span>
+                  </div>
+                </td>
+                <td style="font-size: 13px; color: var(--text-muted);">
+                  <div style="font-weight: 600; color: var(--text-main); margin-bottom: 5px;">{{ item.budget or 'Custom Scope' }}</div>
+                  <span class="timeline-pill" title="Target turnaround timeline">
+                    <i class="far fa-hourglass"></i> {{ item.timeline or '1 – 2 Months' }}
+                  </span>
+                </td>
+                <td>
+                  {% if item.status == 'new' %}
+                    <span class="status-badge status-new">
+                      <i class="fas fa-sparkles"></i> New
+                    </span>
+                  {% elif item.status == 'contacted' %}
+                    <span class="status-badge status-contacted">
+                      <i class="fas fa-phone-alt"></i> In Review
+                    </span>
+                  {% elif item.status == 'in_progress' %}
+                    <span class="status-badge status-in_progress">
+                      <i class="fas fa-circle-notch fa-spin"></i> In Production
+                    </span>
+                  {% else %}
+                    <span class="status-badge status-completed">
+                      <i class="fas fa-check"></i> Completed
+                    </span>
+                  {% endif %}
+                </td>
+                <td style="text-align: right;">
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-sm"
+                    data-brief="{{ item | tojson | forceescape }}"
+                    onclick="openBriefModal(this.dataset.brief)"
+                  >
+                    <i class="fas fa-eye" style="margin-right: 4px;"></i> Full Timeline
+                  </button>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-      <div class="card-body" style="padding: 20px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
-        <p style="margin-bottom: 14px;">
-          Our creative directors and lead designers are available Monday through Saturday.
+    {% else %}
+      <div style="text-align: center; padding: 48px 24px;">
+        <div style="font-size: 40px; color: var(--text-dim); margin-bottom: 12px;">
+          <i class="fas fa-folder-plus"></i>
+        </div>
+        <h4 style="font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 6px;">
+          No Project Briefs Submitted Yet
+        </h4>
+        <p style="font-size: 13px; color: var(--text-muted); max-width: 400px; margin: 0 auto 18px;">
+          Ready to kick off a new branding, digital marketing, or web design project? Submit your requirements directly to our creative team.
         </p>
-
-        <!-- WhatsApp Quick Chat Button -->
-        <a href="https://wa.me/917601085696?text=Hi%20Storyworks%20Team%2C%20I%20am%20a%20registered%20client%20and%20need%20assistance." target="_blank" class="btn-whatsapp" style="margin-bottom: 16px;">
-          <i class="fab fa-whatsapp" style="font-size: 17px;"></i> Chat on WhatsApp
+        <a href="{{ url_for('client.request_service') }}" class="btn btn-primary btn-sm">
+          <i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Submit Your First Brief
         </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
 
-        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-envelope" style="color: var(--primary); width: 16px;"></i>
-          <a href="mailto:{{ site_settings.contact_email or 'hello@storyworks.studio' }}" style="color: var(--text-main); text-decoration: none;">
+<!-- ── 4. Bottom Grid: Studio Concierge & Client Account Timeline ── -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; align-items: start;">
+  <!-- Left Column: Studio Direct Support & WhatsApp Concierge -->
+  <div class="card" style="margin-bottom: 0;">
+    <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding: 18px 22px; display: flex; align-items: center; justify-content: space-between;">
+      <h3 style="font-size: 15px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin: 0;">
+        <i class="fab fa-whatsapp" style="color: #25d366; font-size: 17px;"></i> Studio Direct WhatsApp & Support
+      </h3>
+      <span style="font-size: 11px; font-weight: 600; color: #34d399; background: rgba(16, 185, 129, 0.12); padding: 2px 8px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.3);">
+        Active Today
+      </span>
+    </div>
+    <div class="card-body" style="padding: 22px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+      <p style="margin-bottom: 16px;">
+        Direct creative access for priority briefs, creative direction, and campaign status updates. Available Monday through Saturday.
+      </p>
+
+      <!-- WhatsApp Quick Chat Button -->
+      <a href="https://wa.me/917601085696?text=Hi%20Storyworks%20Team%2C%20I%20am%20a%20registered%20client%20and%20need%20assistance." target="_blank" class="btn-whatsapp" style="margin-bottom: 18px;">
+        <i class="fab fa-whatsapp" style="font-size: 18px;"></i> Chat with Studio Director on WhatsApp
+      </a>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="color: var(--text-dim); display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-envelope" style="color: var(--primary); width: 14px;"></i> Studio Email:
+          </span>
+          <a href="mailto:{{ site_settings.contact_email or 'hello@storyworks.studio' }}" style="color: var(--text-main); text-decoration: none; font-weight: 500;">
             {{ site_settings.contact_email or 'hello@storyworks.studio' }}
           </a>
         </div>
-        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-phone" style="color: var(--primary); width: 16px;"></i>
-          <span style="color: var(--text-main);">{{ site_settings.contact_phone or '+91 98765 43210' }}</span>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="color: var(--text-dim); display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-phone" style="color: var(--primary); width: 14px;"></i> Studio Hotline:
+          </span>
+          <span style="color: var(--text-main); font-weight: 500;">
+            {{ site_settings.contact_phone or '+91 98765 43210' }}
+          </span>
         </div>
-        <div style="margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
-          <i class="fas fa-map-marker-alt" style="color: var(--primary); width: 16px;"></i>
-          <span style="color: var(--text-main);">{{ site_settings.contact_address or 'Bengaluru, India' }}</span>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="color: var(--text-dim); display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-map-marker-alt" style="color: var(--primary); width: 14px;"></i> Studio Hub:
+          </span>
+          <span style="color: var(--text-main); font-weight: 500;">
+            {{ site_settings.contact_address or 'Bengaluru, India' }}
+          </span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="color: var(--text-dim); display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-business-time" style="color: var(--primary); width: 14px;"></i> Studio Hours:
+          </span>
+          <span style="color: var(--text-main); font-weight: 500;">
+            Mon – Sat: 09:30 AM – 07:00 PM IST
+          </span>
+        </div>
+      </div>
+
+      <a href="mailto:{{ site_settings.contact_email or 'hello@storyworks.studio' }}" class="btn btn-secondary" style="width: 100%; text-align: center; display: block; padding: 10px;">
+        <i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Email Studio Team
+      </a>
+    </div>
+  </div>
+
+  <!-- Right Column: Client Account Timeline & Studio Capabilities -->
+  <div style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Client Account Lifecycle Timeline Card -->
+    <div class="card" style="margin-bottom: 0;">
+      <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;">
+        <h3 style="font-size: 15px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin: 0;">
+          <i class="fas fa-user-shield" style="color: var(--primary);"></i> Client Account Timeline
+        </h3>
+        <span class="client-badge">
+          <i class="fas fa-shield-alt" style="margin-right: 3px;"></i> Verified
+        </span>
+      </div>
+      <div class="card-body" style="padding: 18px 20px; font-size: 13px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+          <div style="background: var(--bg-input); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <div style="font-size: 11px; color: var(--text-dim); font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">
+              <i class="far fa-calendar-check" style="color: var(--primary); margin-right: 4px;"></i> Member Since
+            </div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-main);">
+              {{ client.created_at | format_dt if client and client.created_at else 'Active Partner' }}
+            </div>
+          </div>
+          <div style="background: var(--bg-input); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <div style="font-size: 11px; color: var(--text-dim); font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">
+              <i class="fas fa-history" style="color: #10b981; margin-right: 4px;"></i> Last Active
+            </div>
+            <div style="font-size: 13px; font-weight: 700; color: #34d399;">
+              {{ client.last_login | format_dt if client and client.last_login else 'Active Now' }}
+            </div>
+          </div>
         </div>
 
-        <a href="mailto:{{ site_settings.contact_email or 'hello@storyworks.studio' }}" class="btn btn-secondary" style="width: 100%; text-align: center; display: block; padding: 10px; margin-bottom: 16px;">
-          <i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Email Studio Team
-        </a>
-
-        <!-- ── Client Account Timeline Box ── -->
-        <div style="padding-top: 14px; border-top: 1px solid var(--border-color); font-size: 12px; color: var(--text-dim);">
-          <div style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px; display: flex; align-items: center; gap: 6px;">
-            <i class="fas fa-user-shield" style="color: var(--primary);"></i> Client Account Timeline
-          </div>
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
-            <span><i class="far fa-calendar-check" style="color: var(--primary); margin-right: 5px;"></i> Member Since:</span>
-            <strong style="color: var(--text-main);">{{ client.created_at | format_dt if client and client.created_at else 'Active Partner' }}</strong>
-          </div>
-          {% if client and client.last_login %}
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <span><i class="fas fa-history" style="color: #10b981; margin-right: 5px;"></i> Last Active:</span>
-            <strong style="color: #34d399;">{{ client.last_login | format_dt }}</strong>
-          </div>
-          {% endif %}
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(200, 117, 58, 0.08); border-radius: var(--radius-sm); border: 1px solid rgba(200, 117, 58, 0.25);">
+          <span style="font-size: 12.5px; color: var(--text-main); font-weight: 500;">
+            <i class="fas fa-layer-group" style="color: var(--primary); margin-right: 6px;"></i> Total Briefs Managed:
+          </span>
+          <strong style="color: var(--primary); font-size: 14px;">{{ stats.total or 0 }} Briefs</strong>
         </div>
       </div>
     </div>
@@ -548,12 +635,14 @@
         <h3 style="font-size: 14.5px; font-weight: 700; color: var(--text-main); margin: 0;">
           Core Capabilities
         </h3>
-        <a href="{{ url_for('client.services') }}" style="font-size: 12px; color: var(--primary); font-weight: 600;">View All (6)</a>
+        <a href="{{ url_for('client.services') }}" style="font-size: 12px; color: var(--primary); font-weight: 600; text-decoration: none;">
+          View All (6) &rarr;
+        </a>
       </div>
       <div class="card-body" style="padding: 12px 16px;">
         <div style="display: flex; flex-direction: column; gap: 8px;">
           {% for s in services[:4] %}
-            <a href="{{ url_for('client.request_service', service=s.title) }}" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: var(--radius-sm); background: var(--bg-input); transition: var(--transition); text-decoration: none;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='var(--bg-input)'">
+            <a href="{{ url_for('client.request_service', service=s.title) }}" style="display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: var(--radius-sm); background: var(--bg-input); transition: var(--transition); text-decoration: none;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='var(--bg-input)'">
               <span style="font-size: 13px; font-weight: 500; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
                 <i class="{{ s.icon or 'fas fa-check' }}" style="color: var(--primary); font-size: 12px; width: 14px;"></i>
                 {{ s.title }}

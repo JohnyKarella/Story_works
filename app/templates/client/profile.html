@@ -1,77 +1,460 @@
 {% extends "client/base.html" %}
 
-{% block title %}Profile & Security{% endblock %}
+{% block title %}Profile & Security — Storyworks Studio{% endblock %}
 {% block page_title %}Profile & Account Security{% endblock %}
 
+{% block topbar_actions %}
+<a href="{{ url_for('client.request_service') }}" class="btn btn-primary btn-sm">
+  <i class="fas fa-plus" style="margin-right: 6px;"></i> Submit New Brief
+</a>
+{% endblock %}
+
+{% block head %}
+<style>
+  /* ── Profile Specific Luxury Styling ── */
+  .profile-hero {
+    background: linear-gradient(135deg, rgba(200, 117, 58, 0.16) 0%, rgba(18, 19, 23, 0.9) 60%, rgba(10, 11, 14, 0.98) 100%);
+    border: 1px solid rgba(200, 117, 58, 0.35);
+    border-top: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-bottom: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 22px;
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.5);
+  }
+
+  .profile-hero-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .profile-avatar-wrap {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+  }
+
+  .profile-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--primary) 0%, #7c3308 100%);
+    border: 2px solid rgba(200, 117, 58, 0.6);
+    box-shadow: 0 8px 22px rgba(200, 117, 58, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+  }
+
+  .profile-status-dot {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #10b981;
+    border: 2.5px solid var(--bg-card);
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  }
+
+  .profile-hero-meta h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 5px;
+    letter-spacing: -0.3px;
+  }
+
+  .profile-hero-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+
+  .verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: rgba(16, 185, 129, 0.14);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .profile-subtext {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* ── 4 KPI Stats Grid ── */
+  .profile-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 26px;
+  }
+
+  .profile-stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: var(--transition);
+  }
+  .profile-stat-card:hover {
+    border-color: rgba(200, 117, 58, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .profile-stat-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .profile-stat-info .stat-label {
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .profile-stat-info .stat-value {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.2;
+  }
+
+  /* ── 2-Column Main Layout ── */
+  .profile-main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── Form Controls & Input Wrappers ── */
+  .input-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-icon-wrap .input-left-icon {
+    position: absolute;
+    left: 13px;
+    color: var(--text-dim);
+    font-size: 14px;
+    pointer-events: none;
+    transition: color 0.2s;
+  }
+
+  .input-icon-wrap .form-control {
+    width: 100%;
+    padding: 11px 14px 11px 40px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-main);
+    font-size: 13.5px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+
+  .input-icon-wrap .form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(200, 117, 58, 0.2);
+    background: rgba(14, 15, 19, 0.95);
+  }
+  .input-icon-wrap:focus-within .input-left-icon {
+    color: var(--primary);
+  }
+
+  .input-icon-wrap.disabled-wrap .form-control {
+    background: rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.06);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+
+  .eye-toggle-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, background 0.2s;
+  }
+  .eye-toggle-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .eye-toggle-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .btn-spinner {
+    display: none;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 6px;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 980px) {
+    .profile-main-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 680px) {
+    .profile-hero {
+      padding: 22px 20px;
+    }
+    .profile-hero-left {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="display: grid; grid-template-columns: 3fr 2fr; gap: 24px; align-items: start;">
-  <!-- Left Column: Profile Info & Stats -->
-  <div style="display: flex; flex-direction: column; gap: 24px;">
-    <!-- Profile Edit Card -->
-    <div class="card" style="margin-bottom: 0;">
-      <div class="card-header">
-        <h3 style="font-size: 16px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-          <i class="fas fa-id-card" style="color: var(--primary);"></i> Client Partner Information
-        </h3>
+<!-- ── 1. Top Hero Profile Banner (Matches Dashboard & Services Aesthetic) ── -->
+<div class="profile-hero">
+  <div class="profile-hero-left">
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar">
+        {{ (client.full_name or client.username or 'C')[:1].upper() }}
       </div>
-      <div class="card-body">
-        <form method="POST" action="{{ url_for('client.profile') }}">
-          <input type="hidden" name="action" value="update_profile" />
+      <div class="profile-status-dot" title="Account Active"></div>
+    </div>
+    <div class="profile-hero-meta">
+      <div class="profile-hero-badges">
+        <span class="client-badge">
+          <i class="fas fa-gem" style="margin-right: 4px;"></i> Client Partner
+        </span>
+        {% if client.company %}
+          <span style="font-size: 12.5px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px;">
+            <i class="fas fa-building" style="color: var(--primary); font-size: 11px;"></i> {{ client.company }}
+          </span>
+        {% endif %}
+        <span class="verified-badge">
+          <i class="fas fa-shield-check"></i> Verified Account
+        </span>
+      </div>
+      <h2>{{ client.full_name or client.username }}</h2>
+      <div class="profile-subtext">
+        <span style="color: var(--primary); font-weight: 600;">@{{ client.username }}</span>
+        <span style="color: rgba(255, 255, 255, 0.15);">&bull;</span>
+        <span><i class="fas fa-envelope" style="margin-right: 4px; font-size: 11px; color: var(--text-dim);"></i>{{ client.email }}</span>
+        {% if client.phone %}
+          <span style="color: rgba(255, 255, 255, 0.15);">&bull;</span>
+          <span><i class="fas fa-phone-alt" style="margin-right: 4px; font-size: 11px; color: var(--text-dim);"></i>{{ client.phone }}</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
-            <div class="form-group">
-              <label class="form-label" style="font-size: 13px; font-weight: 500; color: var(--text-dim); display: block; margin-bottom: 6px;">
-                Username (Account Identifier)
-              </label>
-              <input
-                type="text"
-                class="form-control"
-                value="{{ client.username }}"
-                disabled
-                style="width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-muted); cursor: not-allowed;"
-              />
-              <span style="font-size: 11px; color: var(--text-dim); margin-top: 4px; display: block;">
-                Fixed unique identifier
-              </span>
-            </div>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+    <a href="{{ url_for('client.requests') }}" class="btn btn-secondary" style="padding: 10px 18px; font-size: 13.5px;">
+      <i class="fas fa-folder-open" style="margin-right: 6px;"></i> My Briefs ({{ stats.total }})
+    </a>
+    <a href="{{ url_for('client.request_service') }}" class="btn btn-primary" style="padding: 10px 18px; font-weight: 600; font-size: 13.5px;">
+      <i class="fas fa-plus-circle" style="margin-right: 6px;"></i> Submit New Brief
+    </a>
+  </div>
+</div>
 
-            <div class="form-group">
-              <label class="form-label" style="font-size: 13px; font-weight: 500; color: var(--text-dim); display: block; margin-bottom: 6px;">
-                Email Address
-              </label>
-              <input
-                type="email"
-                class="form-control"
-                value="{{ client.email }}"
-                disabled
-                style="width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-muted); cursor: not-allowed;"
-              />
-              <span style="font-size: 11px; color: var(--text-dim); margin-top: 4px; display: block;">
-                Primary communication channel
+<!-- ── 2. Top Account KPI Metric Cards (Cleanly Elevated, Never Cut Off) ── -->
+<div class="profile-stats-grid">
+  <!-- Card 1: Standing -->
+  <div class="profile-stat-card">
+    <div class="profile-stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+      <i class="fas fa-shield-halved"></i>
+    </div>
+    <div class="profile-stat-info">
+      <div class="stat-label">Account Standing</div>
+      <div class="stat-value" style="color: #34d399; font-size: 15.5px; display: flex; align-items: center; gap: 5px;">
+        <i class="fas fa-check-circle" style="font-size: 13px;"></i> Verified Partner
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2: Partner Since -->
+  <div class="profile-stat-card">
+    <div class="profile-stat-icon" style="background: rgba(200, 117, 58, 0.15); color: var(--primary);">
+      <i class="fas fa-calendar-check"></i>
+    </div>
+    <div class="profile-stat-info">
+      <div class="stat-label">Partner Since</div>
+      <div class="stat-value">
+        {{ client.created_at[:10] if client.created_at else 'Recent Partner' }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3: Total Briefs -->
+  <div class="profile-stat-card">
+    <div class="profile-stat-icon" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa;">
+      <i class="fas fa-folder-open"></i>
+    </div>
+    <div class="profile-stat-info">
+      <div class="stat-label">Total Briefs</div>
+      <div class="stat-value" style="color: #60a5fa;">
+        {{ stats.total }} Submitted Brief{% if stats.total != 1 %}s{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 4: Studio Dispatches -->
+  <div class="profile-stat-card">
+    <div class="profile-stat-icon" style="background: rgba(168, 85, 247, 0.15); color: #c084fc;">
+      <i class="fas fa-layer-group"></i>
+    </div>
+    <div class="profile-stat-info">
+      <div class="stat-label">Studio Production</div>
+      <div class="stat-value" style="color: #c084fc;">
+        {{ (stats.new or 0) + (stats.in_progress or 0) }} In Active Flight
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 3. Main 2-Column Balanced Grid ── -->
+<div class="profile-main-grid">
+  <!-- Left Column: Partner Information -->
+  <div class="card" style="margin-bottom: 0;">
+    <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding: 20px 24px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(200, 117, 58, 0.14); border: 1px solid rgba(200, 117, 58, 0.3); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+          <i class="fas fa-id-card"></i>
+        </div>
+        <div>
+          <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 2px;">
+            Client Partner Information
+          </h3>
+          <p style="font-size: 12.5px; color: var(--text-muted); margin: 0;">
+            Manage contact credentials and company profile used for brief communications.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body" style="padding: 24px;">
+      <form method="POST" action="{{ url_for('client.profile') }}" id="profileForm">
+        <input type="hidden" name="action" value="update_profile" />
+
+        <!-- Read-only Identifiers -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+          <div>
+            <label style="display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: var(--text-dim); margin-bottom: 7px;">
+              <span>Username</span>
+              <span style="font-size: 10px; color: var(--text-dim); background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.08);">
+                <i class="fas fa-lock" style="font-size: 9px; margin-right: 3px;"></i> Immutable
               </span>
+            </label>
+            <div class="input-icon-wrap disabled-wrap">
+              <span class="input-left-icon"><i class="fas fa-at"></i></span>
+              <input type="text" class="form-control" value="{{ client.username }}" disabled />
             </div>
+            <span style="font-size: 11px; color: var(--text-dim); margin-top: 5px; display: block;">
+              Unique account identifier
+            </span>
           </div>
 
-          <div class="form-group" style="margin-bottom: 18px;">
-            <label class="form-label" for="full_name" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
-              Full Name <span style="color: var(--primary);">*</span>
+          <div>
+            <label style="display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 600; color: var(--text-dim); margin-bottom: 7px;">
+              <span>Email Address</span>
+              <span style="font-size: 10px; color: #34d399; background: rgba(16,185,129,0.12); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16,185,129,0.25);">
+                <i class="fas fa-check-circle" style="font-size: 9px; margin-right: 3px;"></i> Verified
+              </span>
             </label>
+            <div class="input-icon-wrap disabled-wrap">
+              <span class="input-left-icon"><i class="fas fa-envelope"></i></span>
+              <input type="email" class="form-control" value="{{ client.email }}" disabled />
+            </div>
+            <span style="font-size: 11px; color: var(--text-dim); margin-top: 5px; display: block;">
+              Primary studio dispatches
+            </span>
+          </div>
+        </div>
+
+        <!-- Full Name -->
+        <div style="margin-bottom: 20px;">
+          <label for="full_name" style="display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 7px;">
+            Full Name <span style="color: var(--primary);">*</span>
+          </label>
+          <div class="input-icon-wrap">
+            <span class="input-left-icon"><i class="fas fa-user"></i></span>
             <input
               type="text"
               id="full_name"
               name="full_name"
               class="form-control"
               value="{{ client.full_name or '' }}"
+              placeholder="e.g. Alex Smith"
               required
-              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
             />
           </div>
+        </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-            <div class="form-group">
-              <label class="form-label" for="company" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
-                Company / Organization
-              </label>
+        <!-- Company & Phone Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 26px;">
+          <div>
+            <label for="company" style="display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 7px;">
+              Company / Organization
+            </label>
+            <div class="input-icon-wrap">
+              <span class="input-left-icon"><i class="fas fa-building"></i></span>
               <input
                 type="text"
                 id="company"
@@ -79,14 +462,16 @@
                 class="form-control"
                 value="{{ client.company or '' }}"
                 placeholder="e.g. Acme Corp"
-                style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
               />
             </div>
+          </div>
 
-            <div class="form-group">
-              <label class="form-label" for="phone" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
-                Phone / WhatsApp Number
-              </label>
+          <div>
+            <label for="phone" style="display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 7px;">
+              Phone / WhatsApp
+            </label>
+            <div class="input-icon-wrap">
+              <span class="input-left-icon"><i class="fas fa-phone-alt"></i></span>
               <input
                 type="tel"
                 id="phone"
@@ -94,142 +479,229 @@
                 class="form-control"
                 value="{{ client.phone or '' }}"
                 placeholder="e.g. +91 98765 43210"
-                style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
               />
             </div>
           </div>
+        </div>
 
-          <button
-            type="submit"
-            class="btn btn-primary"
-            style="padding: 10px 22px; font-weight: 600;"
-          >
-            <i class="fas fa-save" style="margin-right: 6px;"></i> Save Profile Changes
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-top: 10px; border-top: 1px solid var(--border-color);">
+          <button type="submit" class="btn btn-primary" id="saveProfileBtn" style="padding: 11px 22px; font-weight: 600;">
+            <span class="btn-spinner" id="profileSpinner"></span>
+            <span id="profileBtnText"><i class="fas fa-save" style="margin-right: 6px;"></i> Save Profile Changes</span>
           </button>
-        </form>
-      </div>
-    </div>
-
-    <!-- Account Overview Card -->
-    <div class="card" style="margin-bottom: 0;">
-      <div class="card-header">
-        <h3 style="font-size: 15px; font-weight: 600; color: var(--text-main);">
-          Account Status & Membership
-        </h3>
-      </div>
-      <div class="card-body" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
-        <div style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-          <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Partner Since</div>
-          <div style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-top: 4px;">
-            {{ client.created_at[:10] if client.created_at else 'Recent' }}
-          </div>
+          <span style="font-size: 12px; color: var(--text-dim);">
+            <i class="fas fa-clock" style="margin-right: 4px;"></i> Updates sync instantly
+          </span>
         </div>
-
-        <div style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-          <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Total Project Briefs</div>
-          <div style="font-size: 14px; font-weight: 600; color: var(--primary); margin-top: 4px;">
-            {{ stats.total }} Brief{% if stats.total != 1 %}s{% endif %}
-          </div>
-        </div>
-
-        <div style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-          <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Account Role</div>
-          <div style="font-size: 14px; font-weight: 600; color: var(--success); margin-top: 4px;">
-            <i class="fas fa-check-circle" style="margin-right: 4px;"></i> Verified Client
-          </div>
-        </div>
-      </div>
+      </form>
     </div>
   </div>
 
-  <!-- Right Column: Security & Password Update -->
+  <!-- Right Column: Password & Security Assurance -->
   <div style="display: flex; flex-direction: column; gap: 24px;">
     <!-- Change Password Card -->
     <div class="card" style="margin-bottom: 0;">
-      <div class="card-header">
-        <h3 style="font-size: 16px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-          <i class="fas fa-key" style="color: var(--primary);"></i> Change Password
-        </h3>
+      <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding: 20px 24px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(200, 117, 58, 0.14); border: 1px solid rgba(200, 117, 58, 0.3); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+            <i class="fas fa-lock"></i>
+          </div>
+          <div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 2px;">
+              Change Password
+            </h3>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0;">
+              Update your secret credentials for secure studio portal sign-in.
+            </p>
+          </div>
+        </div>
       </div>
-      <div class="card-body">
-        <form method="POST" action="{{ url_for('client.profile') }}">
+
+      <div class="card-body" style="padding: 24px;">
+        <form method="POST" action="{{ url_for('client.profile') }}" id="passwordForm">
           <input type="hidden" name="action" value="change_password" />
 
-          <div class="form-group" style="margin-bottom: 16px;">
-            <label class="form-label" for="current_password" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+          <!-- Current Password -->
+          <div style="margin-bottom: 18px;">
+            <label for="current_password" style="display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 7px;">
               Current Password <span style="color: var(--primary);">*</span>
             </label>
-            <input
-              type="password"
-              id="current_password"
-              name="current_password"
-              class="form-control"
-              required
-              placeholder="Enter current password"
-              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
-            />
+            <div class="input-icon-wrap" style="padding-right: 0;">
+              <span class="input-left-icon"><i class="fas fa-key"></i></span>
+              <input
+                type="password"
+                id="current_password"
+                name="current_password"
+                class="form-control"
+                style="padding-right: 42px;"
+                placeholder="Enter current password"
+                required
+                autocomplete="current-password"
+              />
+              <button type="button" class="eye-toggle-btn" id="toggleCurrentBtn" aria-label="Toggle password visibility">
+                <svg id="eyeIconCurrent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg id="eyeSlashCurrent" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
           </div>
 
-          <div class="form-group" style="margin-bottom: 16px;">
-            <label class="form-label" for="new_password" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
-              New Password <span style="color: var(--primary);">*</span>
+          <!-- New Password -->
+          <div style="margin-bottom: 18px;">
+            <label for="new_password" style="display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 7px;">
+              New Custom Password <span style="color: var(--primary);">*</span>
             </label>
-            <input
-              type="password"
-              id="new_password"
-              name="new_password"
-              class="form-control"
-              required
-              minlength="6"
-              placeholder="Min 6 characters"
-              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
-            />
+            <div class="input-icon-wrap">
+              <span class="input-left-icon"><i class="fas fa-lock"></i></span>
+              <input
+                type="password"
+                id="new_password"
+                name="new_password"
+                class="form-control"
+                style="padding-right: 42px;"
+                placeholder="Choose new password (min 6 chars)"
+                required
+                minlength="6"
+                autocomplete="new-password"
+              />
+              <button type="button" class="eye-toggle-btn" id="toggleNewBtn" aria-label="Toggle password visibility">
+                <svg id="eyeIconNew" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg id="eyeSlashNew" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+            <span style="font-size: 11px; color: var(--text-dim); margin-top: 5px; display: block;">
+              Minimum 6 characters recommended with alphanumeric blend
+            </span>
           </div>
 
-          <div class="form-group" style="margin-bottom: 22px;">
-            <label class="form-label" for="confirm_new_password" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+          <!-- Confirm New Password -->
+          <div style="margin-bottom: 24px;">
+            <label for="confirm_new_password" style="display: block; font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 7px;">
               Confirm New Password <span style="color: var(--primary);">*</span>
             </label>
-            <input
-              type="password"
-              id="confirm_new_password"
-              name="confirm_new_password"
-              class="form-control"
-              required
-              minlength="6"
-              placeholder="Re-enter new password"
-              style="width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main);"
-            />
+            <div class="input-icon-wrap">
+              <span class="input-left-icon"><i class="fas fa-shield-check"></i></span>
+              <input
+                type="password"
+                id="confirm_new_password"
+                name="confirm_new_password"
+                class="form-control"
+                style="padding-right: 42px;"
+                placeholder="Re-enter new password"
+                required
+                minlength="6"
+                autocomplete="new-password"
+              />
+              <button type="button" class="eye-toggle-btn" id="toggleConfirmBtn" aria-label="Toggle password visibility">
+                <svg id="eyeIconConfirm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg id="eyeSlashConfirm" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
           </div>
 
-          <button
-            type="submit"
-            class="btn btn-primary"
-            style="width: 100%; padding: 11px; font-weight: 600;"
-          >
-            <i class="fas fa-lock" style="margin-right: 6px;"></i> Update Password
+          <button type="submit" class="btn btn-primary" id="updatePwdBtn" style="width: 100%; padding: 12px; font-weight: 600;">
+            <span class="btn-spinner" id="pwdSpinner"></span>
+            <span id="pwdBtnText"><i class="fas fa-lock" style="margin-right: 6px;"></i> Update Account Password</span>
           </button>
         </form>
       </div>
     </div>
 
-    <!-- Security Information Notice -->
+    <!-- Security & Privacy Assurance Card -->
     <div class="card" style="margin-bottom: 0;">
-      <div class="card-header">
-        <h4 style="font-size: 14px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-          <i class="fas fa-shield-alt" style="color: var(--success);"></i> Security & Privacy
+      <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding: 16px 20px;">
+        <h4 style="font-size: 14px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin: 0;">
+          <i class="fas fa-shield-alt" style="color: #34d399;"></i> Security & Privacy Assurance
         </h4>
       </div>
-      <div class="card-body" style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
-        <p style="margin-bottom: 10px;">
-          Your credentials and submitted project briefs are encrypted and accessible exclusively by authorized Storyworks Studio directors.
-        </p>
-        <p>
-          To update your registered email address or transfer account ownership, please contact our studio administrator directly.
-        </p>
+      <div class="card-body" style="padding: 20px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+        <div style="display: flex; gap: 12px; margin-bottom: 14px;">
+          <i class="fas fa-user-shield" style="color: var(--primary); margin-top: 3px; font-size: 14px;"></i>
+          <div>
+            <strong style="color: var(--text-main); display: block; margin-bottom: 2px;">Private Brief Vault</strong>
+            Your creative briefs, budgets, and files are protected and accessible only by verified Storyworks directors.
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <i class="fas fa-headset" style="color: #60a5fa; margin-top: 3px; font-size: 14px;"></i>
+          <div>
+            <strong style="color: var(--text-main); display: block; margin-bottom: 2px;">Account Support</strong>
+            To modify your primary registered email address or transfer ownership, please contact our team at
+            <a href="mailto:hello@storyworks.studio" style="color: var(--primary); font-weight: 600; text-decoration: none;">hello@storyworks.studio</a>.
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 {% endblock %}
 
+{% block scripts %}
+<script>
+  // ── Password Visibility Toggles ──
+  function setupEyeToggle(btnId, inputId, eyeId, slashId) {
+    const btn = document.getElementById(btnId);
+    const input = document.getElementById(inputId);
+    const eye = document.getElementById(eyeId);
+    const slash = document.getElementById(slashId);
+    if (btn && input) {
+      btn.addEventListener("click", function () {
+        const isPwd = input.getAttribute("type") === "password";
+        input.setAttribute("type", isPwd ? "text" : "password");
+        if (eye && slash) {
+          eye.style.display = isPwd ? "none" : "block";
+          slash.style.display = isPwd ? "block" : "none";
+        }
+      });
+    }
+  }
+
+  setupEyeToggle("toggleCurrentBtn", "current_password", "eyeIconCurrent", "eyeSlashCurrent");
+  setupEyeToggle("toggleNewBtn", "new_password", "eyeIconNew", "eyeSlashNew");
+  setupEyeToggle("toggleConfirmBtn", "confirm_new_password", "eyeIconConfirm", "eyeSlashConfirm");
+
+  // ── Submit Loading States ──
+  const profileForm = document.getElementById("profileForm");
+  const saveProfileBtn = document.getElementById("saveProfileBtn");
+  const profileSpinner = document.getElementById("profileSpinner");
+  const profileBtnText = document.getElementById("profileBtnText");
+
+  if (profileForm && saveProfileBtn) {
+    profileForm.addEventListener("submit", function () {
+      saveProfileBtn.disabled = true;
+      if (profileSpinner) profileSpinner.style.display = "inline-block";
+      if (profileBtnText) profileBtnText.textContent = "Saving...";
+    });
+  }
+
+  const passwordForm = document.getElementById("passwordForm");
+  const updatePwdBtn = document.getElementById("updatePwdBtn");
+  const pwdSpinner = document.getElementById("pwdSpinner");
+  const pwdBtnText = document.getElementById("pwdBtnText");
+
+  if (passwordForm && updatePwdBtn) {
+    passwordForm.addEventListener("submit", function () {
+      updatePwdBtn.disabled = true;
+      if (pwdSpinner) pwdSpinner.style.display = "inline-block";
+      if (pwdBtnText) pwdBtnText.textContent = "Updating Password...";
+    });
+  }
+</script>
+{% endblock %}

@@ -118,6 +118,49 @@
       border-color: var(--primary);
       color: #fff;
     }
+    /* Sticky Layout & Footer Polish */
+    .admin-layout {
+      min-height: 100vh;
+      display: flex;
+    }
+    .main-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+    .page-content {
+      padding: 32px;
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .admin-footer {
+      margin-top: auto;
+      flex-shrink: 0;
+      padding: 20px 32px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-dim);
+      background: var(--bg-card);
+    }
+    @media (max-width: 768px) {
+      .page-content {
+        padding: 20px 16px;
+      }
+      .admin-footer {
+        padding: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
   </style>
   {% block head %}{% endblock %}
 </head>
@@ -212,7 +255,7 @@
         <div class="topbar-actions">
           {% block topbar_actions %}
           <a href="{{ url_for('client.request_service') }}" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus" style="margin-right: 6px;"></i> Submit Brief
+            <i class="fas fa-plus" style="margin-right: 6px;"></i> Submit New Brief
           </a>
           {% endblock %}
         </div>

@@ -81,6 +81,18 @@ def _resolve_file_case_insensitive(base_dir, rel_path):
             return None
         curr = matched
     return str(curr) if curr.is_file() else None
+@web_bp.route("/client.html")
+def client_html_redirect():
+    return redirect("/client")
+
+@web_bp.route("/client/login.html")
+def client_login_html_redirect():
+    return redirect("/client/login")
+
+@web_bp.route("/client/register.html")
+def client_register_html_redirect():
+    return redirect("/client/register")
+
 @web_bp.route("/<path:path>")
 def static_pages_and_files(path):
     """Serve any other static HTML or root asset file."""
@@ -88,6 +100,38 @@ def static_pages_and_files(path):
     safe_path = os.path.normpath(path).lstrip("/\\")
     if ".." in safe_path:
         abort(403)
+    
+    lower_path = safe_path.lower().replace("\\", "/")
+    # Smart redirects if a user navigates to client or admin template paths directly in URL
+    if "client/register" in lower_path:
+        return redirect("/client/register")
+    if "client/login" in lower_path:
+        return redirect("/client/login")
+    if "client/dashboard" in lower_path:
+        return redirect("/client/dashboard")
+    if "client/requests" in lower_path:
+        return redirect("/client/requests")
+    if "client/request_form" in lower_path or "client/request-service" in lower_path:
+        return redirect("/client/request-service")
+    if "client/services" in lower_path:
+        return redirect("/client/services")
+    if "client/profile" in lower_path:
+        return redirect("/client/profile")
+    if lower_path in ("client", "client.html", "client/index.html"):
+        return redirect("/client")
+    if lower_path in ("admin", "admin.html", "admin/dashboard", "admin/index.html") or "templates/admin" in lower_path:
+        return redirect("/admin")
+
+    # Never serve internal templates, databases, or python source files directly
+    if (
+        "templates" in lower_path
+        or lower_path.endswith(".py")
+        or lower_path.endswith(".db")
+        or lower_path.endswith(".env")
+        or ".git" in lower_path
+    ):
+        abort(404)
+
     full_path = os.path.join(Config.BASE_DIR, safe_path)
     if os.path.isfile(full_path):
         directory = os.path.dirname(full_path)

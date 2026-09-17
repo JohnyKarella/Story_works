@@ -166,6 +166,28 @@ def init_db(app=None, run_seed=True):
                 (title, slug, sdesc, fdesc, icon, order, active),
             )
         conn.commit()
+    # Ensure all cover_image paths in blogs and portfolio start with '/'
+    cursor.execute("UPDATE blogs SET cover_image = '/' || cover_image WHERE cover_image IS NOT NULL AND cover_image != '' AND cover_image NOT LIKE '/%' AND cover_image NOT LIKE 'http%'")
+    cursor.execute("UPDATE portfolio SET cover_image = '/' || cover_image WHERE cover_image IS NOT NULL AND cover_image != '' AND cover_image NOT LIKE '/%' AND cover_image NOT LIKE 'http%'")
+    # Check if legacy blog seeds exist (e.g. power-of-visual-storytelling)
+    cursor.execute("SELECT slug FROM blogs")
+    blog_slugs = {row[0] for row in cursor.fetchall()}
+    if "power-of-visual-storytelling" in blog_slugs:
+        cursor.execute("DELETE FROM blogs WHERE slug IN ('power-of-visual-storytelling', 'building-a-distinct-brand-voice', 'data-driven-creative-growth')")
+        new_blogs = [
+            ("In-House Marketing vs Hiring a Bangalore Agency: What’s the Real Cost?", "in-house-marketing-vs-hiring-agency-cost", "Strategy & Scaling", "Storyworks Studio", "MAR 16, 2026", "/assets/blogs/d1.jpg", "The choice between creating an internal marketing team and outsourcing to an external agency is frequently presented as a matter of comparing costs. For a founder, though the true issue isn't how much you spend, it's the return you receive for it.", "The choice between creating an internal marketing team and outsourcing to an external agency is frequently presented as a matter of comparing costs. For a founder, though the true issue isn't how much you spend, it's the return you receive for it. Revenue, speed and reliability are far more important than mere superficial savings.\nMarketing today is not a single role, it demands strategy, content, design, performance marketing, analytics and ongoing optimization. Assembling an in-house team that performs effectively in all these functions is costly and time-consuming.", "published"),
+            ("The 2026 Digital Marketing Playbook for Bangalore SMEs: What Actually Works", "digital-marketing-playbook-bangalore-smes", "Digital Growth", "Storyworks Studio", "MAR 20, 2026", "/assets/blogs/e1.jpg", "Digital marketing has advanced to the stage where fragmented initiatives no longer yield significant outcomes. For small and medium-sized enterprises in Bengaluru, the issue is not an absence of avenues but rather clarity on what truly fuels expansion.", "Digital marketing has advanced to the stage where fragmented initiatives no longer yield significant outcomes. For small and medium-sized enterprises in Bengaluru, the issue is not an absence of avenue but rather uncertainty about what truly fuels expansion.\nThe approach for 2026 emphasizes building a targeted system aligned with customer behavior and business goals, rather than experimenting across every platform.", "published"),
+            ("Why Most Businesses Struggle With Marketing Even After Spending on It", "why-businesses-struggle-with-marketing", "Marketing Strategy", "Storyworks Studio", "MAR 26, 2026", "/assets/blogs/f1.jpg", "Building a brand today comes with far more challenges than just creating a product and putting it online. The absence of a suitable marketing framework is one of the most serious difficulties companies confront.", "Building a brand today comes with far more challenges than just creating a product and putting it online. The absence of a suitable marketing framework is one of the most serious difficulties companies confront, not the absence of marketing activity.\nHow effectively several departments cooperate concurrently determines the modern success of brand expansion. Performance marketing, customer psychology, SEO, analytics, design, storytelling, and conversion optimization all have to work in perfect harmony.", "published")
+        ]
+        for title, slug, cat, author, pdate, cimg, excerpt, content, status in new_blogs:
+            cursor.execute(
+                """
+                INSERT OR IGNORE INTO blogs (title, slug, category, author, published_date, cover_image, excerpt, content, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (title, slug, cat, author, pdate, cimg, excerpt, content, status)
+            )
+    conn.commit()
     # Auto-seed initial content if database was freshly created
     if run_seed:
         cursor.execute("SELECT COUNT(*) FROM blogs")

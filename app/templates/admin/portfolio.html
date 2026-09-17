@@ -29,7 +29,7 @@
             <tr>
               <td>
                 {% if p.cover_image %}
-                  <img src="{{ p.cover_image }}" alt="Cover" style="width: 60px; height: 42px; border-radius: 4px; object-fit: cover; background: var(--bg-input);" onerror="this.src='/assets/images/portfolio/hp/4.jpg'" />
+                  <img src="{{ p.cover_image if (p.cover_image.startswith('/') or p.cover_image.startswith('http')) else ('/' ~ p.cover_image) }}" alt="Cover" style="width: 60px; height: 42px; border-radius: 4px; object-fit: cover; background: var(--bg-input);" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'width:60px;height:42px;border-radius:4px;background:var(--bg-input);display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:10px;\'>No Cover</div>';" />
                 {% else %}
                   <div style="width: 60px; height: 42px; border-radius: 4px; background: var(--bg-input); display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 10px;">No Cover</div>
                 {% endif %}

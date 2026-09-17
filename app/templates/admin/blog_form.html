@@ -55,7 +55,7 @@
             <input type="text" name="cover_image" class="form-control" value="{{ blog.cover_image if blog else '' }}" placeholder="assets/blogs/a1.jpg or /uploads/..." />
           </div>
         </div>
-        <img id="blogCoverPreview" class="img-preview" src="{{ blog.cover_image if blog and blog.cover_image else '' }}" style="display: {{ 'block' if blog and blog.cover_image else 'none' }}; margin-top: 12px;" />
+        <img id="blogCoverPreview" class="img-preview" src="{{ (blog.cover_image if (blog.cover_image.startswith('/') or blog.cover_image.startswith('http')) else ('/' ~ blog.cover_image)) if blog and blog.cover_image else '' }}" style="display: {{ 'block' if blog and blog.cover_image else 'none' }}; margin-top: 12px;" />
       </div>
       <div class="form-group">
         <label class="form-label" for="excerpt">Short Summary / Excerpt</label>

@@ -1,6 +1,6 @@
 {% extends "client/base.html" %}
 
-{% block title %}Agency Services{% endblock %}
+{% block title %}Agency Services — Storyworks Studio{% endblock %}
 {% block page_title %}Agency Capabilities & Services{% endblock %}
 
 {% block topbar_actions %}
@@ -9,52 +9,228 @@
 </a>
 {% endblock %}
 
+{% block head %}
+<style>
+  /* ── Agency Capabilities User Attractions ── */
+  .services-hero-banner {
+    background: linear-gradient(135deg, rgba(200, 117, 58, 0.16) 0%, rgba(18, 19, 23, 0.88) 60%, rgba(10, 11, 14, 0.98) 100%);
+    border: 1px solid rgba(200, 117, 58, 0.35);
+    border-top: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-bottom: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.55);
+  }
+
+  .category-nav-wrap {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+  .cat-filter-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .cat-filter-btn:hover {
+    color: var(--text-main);
+    border-color: var(--primary);
+  }
+  .cat-filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(200, 117, 58, 0.35);
+  }
+
+  .service-card-luxe {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 26px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, box-shadow 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card-luxe:hover {
+    border-color: rgba(200, 117, 58, 0.55);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6), 0 0 18px rgba(200, 117, 58, 0.16);
+  }
+
+  .flagship-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: linear-gradient(135deg, rgba(200, 117, 58, 0.22) 0%, rgba(245, 158, 11, 0.16) 100%);
+    border: 1px solid rgba(200, 117, 58, 0.4);
+    color: #ff9d5c;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .deliverables-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 16px 0 20px;
+  }
+  .deliverable-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-dim);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .turnaround-pill {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="margin-bottom: 28px;">
-  <span class="client-badge" style="margin-bottom: 8px; display: inline-block;">
-    <i class="fas fa-sparkles" style="margin-right: 4px;"></i> Studio Offerings
-  </span>
-  <h2 style="font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">
-    Storyworks Studio Capabilities
-  </h2>
-  <p style="font-size: 14px; color: var(--text-muted); max-width: 680px; line-height: 1.5;">
-    Our multidisciplinary studio integrates strategic brand thinking with craft-led visual execution and high-performance digital systems.
-  </p>
+<!-- ── Top Capabilities Hero ── -->
+<div class="services-hero-banner">
+  <div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+      <span class="client-badge">
+        <i class="fas fa-sparkles" style="margin-right: 4px;"></i> Studio Offerings
+      </span>
+      <span style="font-size: 12.5px; color: var(--text-muted);">
+        &bull; 6 Core Disciplines
+      </span>
+    </div>
+    <h2 style="font-size: 24px; font-weight: 800; color: #ffffff; margin-bottom: 6px; letter-spacing: -0.3px;">
+      Storyworks Studio Capabilities
+    </h2>
+    <p style="font-size: 14px; color: var(--text-muted); max-width: 680px; line-height: 1.55;">
+      Our multidisciplinary studio integrates strategic brand thinking with craft-led visual execution and high-performance digital systems.
+    </p>
+  </div>
+
+  <a href="{{ url_for('client.request_service') }}" class="btn btn-primary" style="padding: 11px 22px; font-weight: 600;">
+    <i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Brief Us on a Project
+  </a>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+<!-- ── Category Filter Tabs ── -->
+<div class="category-nav-wrap">
+  <button type="button" class="cat-filter-btn active" onclick="filterServices('all', this)">
+    All Capabilities (6)
+  </button>
+  <button type="button" class="cat-filter-btn" onclick="filterServices('strategy', this)">
+    Branding & Strategy (2)
+  </button>
+  <button type="button" class="cat-filter-btn" onclick="filterServices('digital', this)">
+    Web & Digital (2)
+  </button>
+  <button type="button" class="cat-filter-btn" onclick="filterServices('content', this)">
+    Content & Campaigns (2)
+  </button>
+</div>
+
+<!-- ── Capabilities Cards Grid with User Attractions ── -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;" id="servicesGrid">
   {% for s in services %}
-    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0; transition: var(--transition); border: 1px solid var(--border-color);" onmouseover="this.style.borderColor='var(--primary)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-color)'; this.style.transform='translateY(0)';">
+    {% set cat = 'strategy' if ('Strategy' in s.title or 'Identity' in s.title or 'Brand' in s.title) else ('digital' if ('Web' in s.title or 'Digital' in s.title) else 'content') %}
+    <div class="service-card-luxe" data-category="{{ cat }}">
       <div>
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-          <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: rgba(200, 117, 58, 0.15); border: 1px solid rgba(200, 117, 58, 0.3); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 18px;">
+          <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(200, 117, 58, 0.16); border: 1px solid rgba(200, 117, 58, 0.35); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 20px;">
             <i class="{{ s.icon or 'fas fa-gem' }}"></i>
           </div>
-          <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.5px;">
+          <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-dim); letter-spacing: 0.8px;">
             Capability 0{{ loop.index }}
           </span>
         </div>
 
-        <h3 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 10px;">
+        {% if loop.index in [1, 5] %}
+          <div class="flagship-badge">
+            <i class="fas fa-crown" style="font-size: 9px; margin-right: 3px;"></i> Flagship
+          </div>
+        {% endif %}
+
+        <h3 style="font-size: 19px; font-weight: 700; color: var(--text-main); margin-bottom: 10px;">
           {{ s.title }}
         </h3>
 
-        <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+        <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px;">
           {{ s.short_desc }}
         </p>
 
+        <!-- Deliverable Tag Pills -->
+        <div class="deliverables-wrap">
+          {% if 'Strategy' in s.title %}
+            <span class="deliverable-tag">Brand Positioning</span>
+            <span class="deliverable-tag">Persona Mapping</span>
+            <span class="deliverable-tag">Architecture</span>
+            <span class="deliverable-tag">Manifesto</span>
+          {% elif 'Identity' in s.title or 'Design' in s.title and 'Web' not in s.title %}
+            <span class="deliverable-tag">Logo Suite</span>
+            <span class="deliverable-tag">Typography</span>
+            <span class="deliverable-tag">Color Systems</span>
+            <span class="deliverable-tag">Brand Guidelines</span>
+          {% elif 'Content' in s.title or 'Copy' in s.title %}
+            <span class="deliverable-tag">Voice & Tone</span>
+            <span class="deliverable-tag">Website Copy</span>
+            <span class="deliverable-tag">Storytelling</span>
+            <span class="deliverable-tag">Scripts</span>
+          {% elif 'Digital' in s.title or 'Marketing' in s.title %}
+            <span class="deliverable-tag">Performance Media</span>
+            <span class="deliverable-tag">SEO Framework</span>
+            <span class="deliverable-tag">Analytics</span>
+            <span class="deliverable-tag">Growth</span>
+          {% elif 'Web' in s.title %}
+            <span class="deliverable-tag">UI/UX Design</span>
+            <span class="deliverable-tag">Responsive Build</span>
+            <span class="deliverable-tag">Figma Prototype</span>
+            <span class="deliverable-tag">CMS Setup</span>
+          {% else %}
+            <span class="deliverable-tag">Go-to-Market</span>
+            <span class="deliverable-tag">PR Stunts</span>
+            <span class="deliverable-tag">Campaign Rollout</span>
+            <span class="deliverable-tag">Asset Kit</span>
+          {% endif %}
+        </div>
+
         {% if s.full_desc and s.full_desc != s.short_desc %}
           <div style="font-size: 12.5px; color: var(--text-dim); line-height: 1.5; margin-bottom: 20px; padding-top: 12px; border-top: 1px dashed var(--border-color);">
-            {{ s.full_desc[:140] }}...
+            {{ s.full_desc[:130] }}...
           </div>
         {% endif %}
       </div>
 
-      <div style="padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
-        <span style="font-size: 12px; color: var(--text-dim);">
-          <i class="fas fa-check-circle" style="color: var(--success); margin-right: 4px;"></i> Active Studio Offering
+      <div style="padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <span class="turnaround-pill">
+          <i class="far fa-clock" style="color: var(--primary);"></i> 2-4 Wks Cycle
         </span>
-        <a href="{{ url_for('client.request_service', service=s.title) }}" class="btn btn-primary btn-sm" style="font-weight: 500;">
+        <a href="{{ url_for('client.request_service', service=s.title) }}" class="btn btn-primary btn-sm" style="font-weight: 600;">
           Request This Service &rarr;
         </a>
       </div>
@@ -63,3 +239,21 @@
 </div>
 {% endblock %}
 
+{% block scripts %}
+<script>
+  function filterServices(category, btn) {
+    document.querySelectorAll(".cat-filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const cards = document.querySelectorAll(".service-card-luxe");
+    cards.forEach(card => {
+      const cardCat = card.dataset.category;
+      if (category === 'all' || cardCat === category) {
+        card.style.display = "flex";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  }
+</script>
+{% endblock %}

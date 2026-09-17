@@ -1,6 +1,6 @@
 {% extends "client/base.html" %}
 
-{% block title %}My Project Briefs{% endblock %}
+{% block title %}My Project Briefs — Storyworks Studio{% endblock %}
 {% block page_title %}My Project Briefs{% endblock %}
 
 {% block topbar_actions %}
@@ -9,31 +9,134 @@
 </a>
 {% endblock %}
 
+{% block head %}
+<style>
+  /* ── Project Briefs User Attractions ── */
+  .requests-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .filter-chips-wrap {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .pulse-dot-small {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #60a5fa;
+    box-shadow: 0 0 6px #60a5fa;
+    display: inline-block;
+    margin-right: 5px;
+    animation: pulseRing 2s infinite;
+  }
+
+  .brief-search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 260px;
+  }
+
+  .brief-search-wrap input {
+    width: 100%;
+    padding: 8px 14px 8px 34px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    color: var(--text-main);
+    font-size: 13px;
+    outline: none;
+    transition: var(--transition);
+  }
+  .brief-search-wrap input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(200, 117, 58, 0.2);
+  }
+  .brief-search-wrap i {
+    position: absolute;
+    left: 12px;
+    color: var(--text-dim);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  /* Milestone Mini Trackers */
+  .milestone-track {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .milestone-step {
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-dim);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .milestone-step.active-step {
+    background: rgba(200, 117, 58, 0.16);
+    color: var(--primary);
+    border-color: rgba(200, 117, 58, 0.35);
+  }
+  .milestone-step.completed-step {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+
+  .data-table tbody tr {
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .data-table tbody tr:hover {
+    background: rgba(200, 117, 58, 0.04);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Filter Chips -->
-<div style="display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; align-items: center;">
-  <span style="font-size: 13px; color: var(--text-dim); margin-right: 4px;">Filter by status:</span>
-  <a href="{{ url_for('client.requests') }}" class="filter-chip {% if active_status == 'all' or not active_status %}active{% endif %}">
-    All Briefs ({{ stats.total }})
-  </a>
-  <a href="{{ url_for('client.requests', status='new') }}" class="filter-chip {% if active_status == 'new' %}active{% endif %}">
-    <i class="fas fa-sparkles" style="margin-right: 6px; font-size: 11px;"></i> New ({{ stats.new }})
-  </a>
-  <a href="{{ url_for('client.requests', status='in_progress') }}" class="filter-chip {% if active_status == 'in_progress' %}active{% endif %}">
-    <i class="fas fa-spinner fa-spin" style="margin-right: 6px; font-size: 11px;"></i> In Progress ({{ stats.in_progress }})
-  </a>
-  <a href="{{ url_for('client.requests', status='completed') }}" class="filter-chip {% if active_status in ('completed', 'closed') %}active{% endif %}">
-    <i class="fas fa-check" style="margin-right: 6px; font-size: 11px;"></i> Completed ({{ stats.completed }})
-  </a>
+<!-- ── Top Filter & Search Bar ── -->
+<div class="requests-header-bar">
+  <div class="filter-chips-wrap">
+    <span style="font-size: 13px; color: var(--text-dim); margin-right: 4px; font-weight: 500;">Filter:</span>
+    <a href="{{ url_for('client.requests') }}" class="filter-chip {% if active_status == 'all' or not active_status %}active{% endif %}">
+      All Briefs ({{ stats.total }})
+    </a>
+    <a href="{{ url_for('client.requests', status='new') }}" class="filter-chip {% if active_status == 'new' %}active{% endif %}">
+      <span class="pulse-dot-small"></span> New ({{ stats.new }})
+    </a>
+    <a href="{{ url_for('client.requests', status='in_progress') }}" class="filter-chip {% if active_status == 'in_progress' %}active{% endif %}">
+      <i class="fas fa-spinner fa-spin" style="margin-right: 5px; font-size: 11px;"></i> In Production ({{ stats.in_progress }})
+    </a>
+    <a href="{{ url_for('client.requests', status='completed') }}" class="filter-chip {% if active_status in ('completed', 'closed') %}active{% endif %}">
+      <i class="fas fa-check" style="margin-right: 5px; font-size: 11px;"></i> Completed ({{ stats.completed }})
+    </a>
+  </div>
+
+  <div class="brief-search-wrap">
+    <i class="fas fa-search"></i>
+    <input type="text" id="briefSearchInput" placeholder="Search briefs by service or scope..." onkeyup="filterBriefsTable()" />
+  </div>
 </div>
 
-<!-- Project Briefs Card -->
+<!-- ── Project Briefs Card ── -->
 <div class="card">
-  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-    <h3 style="font-size: 16px; font-weight: 600; color: var(--text-main);">
-      Submitted Project Briefs & Studio Status
+  <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px;">
+    <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 8px;">
+      <i class="fas fa-folder-open" style="color: var(--primary);"></i> Submitted Project Briefs & Studio Status
     </h3>
-    <span style="font-size: 13px; color: var(--text-muted);">
+    <span style="font-size: 13px; color: var(--text-muted); font-weight: 500;" id="briefCountText">
       Showing {{ inquiries|length }} brief{% if inquiries|length != 1 %}s{% endif %}
     </span>
   </div>
@@ -41,19 +144,19 @@
   <div class="card-body" style="padding: 0;">
     {% if inquiries %}
       <div class="table-responsive">
-        <table class="data-table" style="width: 100%;">
+        <table class="data-table" id="briefsTable" style="width: 100%;">
           <thead>
             <tr>
               <th style="width: 130px;">Date</th>
               <th>Requested Services & Scope</th>
               <th style="width: 140px;">Budget</th>
               <th style="width: 150px;">Studio Status</th>
-              <th style="width: 160px; text-align: right;">Action</th>
+              <th style="width: 150px; text-align: right;">Action</th>
             </tr>
           </thead>
           <tbody>
             {% for item in inquiries %}
-              <tr>
+              <tr class="brief-row">
                 <td style="font-size: 13px; color: var(--text-muted); white-space: nowrap;">
                   <div style="font-weight: 600; color: var(--text-main);">{{ item.created_at[:10] if item.created_at else 'Recent' }}</div>
                   <div style="font-size: 11.5px; color: var(--text-dim); margin-top: 2px;">
@@ -61,20 +164,48 @@
                   </div>
                 </td>
                 <td>
-                  <div style="font-weight: 600; color: var(--text-main); font-size: 14px; margin-bottom: 4px;">
-                    {{ item.services or 'Creative Strategy & Design' }}
+                  <div style="font-weight: 700; color: var(--text-main); font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                    {% if 'Brand' in (item.services or '') %}
+                      <i class="fas fa-paint-brush" style="color: var(--primary); font-size: 12px;"></i>
+                    {% elif 'Web' in (item.services or '') %}
+                      <i class="fas fa-laptop-code" style="color: #60a5fa; font-size: 12px;"></i>
+                    {% elif 'Content' in (item.services or '') %}
+                      <i class="fas fa-pen-nib" style="color: #f59e0b; font-size: 12px;"></i>
+                    {% else %}
+                      <i class="fas fa-gem" style="color: var(--primary); font-size: 12px;"></i>
+                    {% endif %}
+                    <span>{{ item.services or 'Creative Strategy & Design' }}</span>
                   </div>
-                  <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; max-width: 450px;">
+                  <div style="font-size: 13px; color: var(--text-muted); line-height: 1.5; max-width: 480px;" class="brief-scope-text">
                     {{ item.message[:160] }}{% if item.message|length > 160 %}...{% endif %}
                   </div>
+
+                  <!-- Milestone Mini Stepper -->
+                  <div class="milestone-track">
+                    <span class="milestone-step {% if item.status in ('new', 'contacted', 'in_progress', 'completed') %}active-step{% endif %}">
+                      1. Scoping
+                    </span>
+                    <span class="milestone-step {% if item.status in ('contacted', 'in_progress', 'completed') %}active-step{% endif %}">
+                      2. Strategy
+                    </span>
+                    <span class="milestone-step {% if item.status in ('in_progress', 'completed') %}active-step{% endif %}">
+                      3. Production
+                    </span>
+                    <span class="milestone-step {% if item.status == 'completed' %}completed-step{% endif %}">
+                      4. Delivery
+                    </span>
+                  </div>
+
                   {% if item.notes %}
-                    <div style="margin-top: 6px; font-size: 12px; color: var(--primary); display: flex; align-items: center; gap: 5px;">
+                    <div style="margin-top: 6px; font-size: 12px; color: var(--primary); display: flex; align-items: center; gap: 5px; font-weight: 500;">
                       <i class="fas fa-comment-dots"></i> Studio reply received
                     </div>
                   {% endif %}
                 </td>
                 <td style="font-size: 13px; color: var(--text-muted);">
-                  {{ item.budget or 'Custom Scope' }}
+                  <span style="font-weight: 600; color: var(--text-main); background: rgba(255,255,255,0.04); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                    {{ item.budget or 'Custom Scope' }}
+                  </span>
                 </td>
                 <td>
                   {% if item.status == 'new' %}
@@ -99,7 +230,8 @@
                   <button
                     type="button"
                     class="btn btn-secondary btn-sm"
-                    onclick="openBriefModal({{ item | tojson | forceescape }})"
+                    data-brief="{{ item | tojson | forceescape }}"
+                    onclick="openBriefModal(this.dataset.brief)"
                   >
                     <i class="fas fa-eye" style="margin-right: 4px;"></i> View Full Brief
                   </button>
@@ -119,14 +251,21 @@
         </h4>
         <p style="font-size: 13px; color: var(--text-muted); max-width: 440px; margin: 0 auto 20px;">
           {% if active_status and active_status != 'all' %}
-            There are currently no briefs matching the "{{ active_status }}" filter. Try selecting "All Briefs".
+            No project briefs match the filter "<strong>{{ active_status }}</strong>". View all submissions or submit a new project.
           {% else %}
-            You haven't submitted any creative briefs yet. Let's start building your next brand campaign!
+            You haven't submitted any briefs yet. Ready to start your next branding or digital marketing project?
           {% endif %}
         </p>
-        <a href="{{ url_for('client.request_service') }}" class="btn btn-primary btn-sm">
-          <i class="fas fa-plus" style="margin-right: 6px;"></i> Submit New Brief
-        </a>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+          {% if active_status and active_status != 'all' %}
+            <a href="{{ url_for('client.requests') }}" class="btn btn-secondary btn-sm">
+              Show All Briefs
+            </a>
+          {% endif %}
+          <a href="{{ url_for('client.request_service') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-paper-plane" style="margin-right: 6px;"></i> Submit New Brief
+          </a>
+        </div>
       </div>
     {% endif %}
   </div>
@@ -136,7 +275,7 @@
 <div class="modal-overlay" id="briefModal">
   <div class="modal-card">
     <div class="modal-card-header">
-      <h3 style="font-size: 17px; font-weight: 600; color: var(--text-main);" id="modalTitle">
+      <h3 style="font-size: 17px; font-weight: 700; color: var(--text-main);" id="modalTitle">
         Project Brief Details
       </h3>
       <button type="button" class="flash-close" onclick="closeBriefModal()">&times;</button>
@@ -144,33 +283,33 @@
     <div class="modal-card-body">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
         <div>
-          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Submission Date</label>
-          <div id="modalDate" style="font-size: 14px; font-weight: 500; color: var(--text-main); margin-top: 2px;"></div>
+          <label style="font-size: 11.5px; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Submitted On</label>
+          <div id="modalDate" style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-top: 2px;"></div>
         </div>
         <div>
-          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Studio Review Status</label>
+          <label style="font-size: 11.5px; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Studio Status</label>
           <div id="modalStatus" style="margin-top: 2px;"></div>
         </div>
         <div>
-          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Services Requested</label>
-          <div id="modalServices" style="font-size: 14px; font-weight: 500; color: var(--text-main); margin-top: 2px;"></div>
+          <label style="font-size: 11.5px; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Requested Services</label>
+          <div id="modalServices" style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-top: 2px;"></div>
         </div>
         <div>
-          <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase;">Budget Estimate</label>
-          <div id="modalBudget" style="font-size: 14px; font-weight: 500; color: var(--text-main); margin-top: 2px;"></div>
+          <label style="font-size: 11.5px; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Budget Estimate</label>
+          <div id="modalBudget" style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-top: 2px;"></div>
         </div>
       </div>
 
       <div style="margin-bottom: 20px;">
-        <label style="font-size: 12px; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 6px;">
+        <label style="font-size: 11.5px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 6px;">
           Project Scope / Brief Requirements
         </label>
         <div id="modalMessage" style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); font-size: 14px; color: var(--text-main); white-space: pre-wrap; line-height: 1.6; border: 1px solid var(--border-color);"></div>
       </div>
 
       <div id="modalNotesWrap" style="display: none; margin-bottom: 16px;">
-        <label style="font-size: 12px; color: var(--primary); text-transform: uppercase; display: block; margin-bottom: 6px;">
-          <i class="fas fa-comment-dots" style="margin-right: 4px;"></i> Studio Direct Response & Progress Notes
+        <label style="font-size: 11.5px; color: var(--primary); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 6px;">
+          <i class="fas fa-comment-dots" style="margin-right: 4px;"></i> Studio Response / Notes
         </label>
         <div id="modalNotes" style="background: rgba(200, 117, 58, 0.08); border: 1px solid rgba(200, 117, 58, 0.25); padding: 14px; border-radius: var(--radius-md); font-size: 14px; color: var(--text-main); white-space: pre-wrap; line-height: 1.6;"></div>
       </div>
@@ -185,10 +324,34 @@
 
 {% block scripts %}
 <script>
+  function filterBriefsTable() {
+    const input = document.getElementById("briefSearchInput").value.toLowerCase();
+    const rows = document.querySelectorAll(".brief-row");
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      if (text.includes(input)) {
+        row.style.display = "";
+        visibleCount++;
+      } else {
+        row.style.display = "none";
+      }
+    });
+
+    const countText = document.getElementById("briefCountText");
+    if (countText) {
+      countText.textContent = "Showing " + visibleCount + " brief" + (visibleCount === 1 ? "" : "s");
+    }
+  }
+
   function openBriefModal(data) {
+    if (typeof data === "string") {
+      data = JSON.parse(data);
+    }
     document.getElementById("modalDate").textContent = data.created_at || "Recent";
     document.getElementById("modalServices").textContent = data.services || "General Creative Strategy";
-    document.getElementById("modalBudget").textContent = data.budget || "Custom";
+    document.getElementById("modalBudget").textContent = data.budget || "Custom Scope";
     document.getElementById("modalMessage").textContent = data.message || "";
 
     const statusEl = document.getElementById("modalStatus");
@@ -227,4 +390,3 @@
   });
 </script>
 {% endblock %}
-

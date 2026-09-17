@@ -8,104 +8,440 @@
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='admin/favicon.svg') }}" />
   <link rel="alternate icon" type="image/png" href="{{ url_for('static', filename='admin/favicon.png') }}" />
   <link rel="shortcut icon" href="{{ url_for('static', filename='admin/favicon.ico') }}" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='admin/admin.css') }}" />
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='admin/favicon.png') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
+    :root {
+      --bg-dark: #08090a;
+      --bg-card: rgba(19, 20, 24, 0.82);
+      --bg-card-hover: rgba(24, 25, 31, 0.92);
+      --bg-input: rgba(13, 14, 17, 0.76);
+      --bg-input-focus: rgba(18, 19, 24, 0.96);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.18);
+      --border-focus: #c8753a;
+      --primary: #c8753a;
+      --primary-hover: #e08343;
+      --primary-light: #ff9d5c;
+      --primary-gradient: linear-gradient(135deg, #e58747 0%, #c8753a 50%, #9c4c1a 100%);
+      --primary-glow: rgba(200, 117, 58, 0.32);
+      --primary-glow-strong: rgba(200, 117, 58, 0.58);
+      --accent-amber: #f59e0b;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --radius-card: 24px;
+      --radius-input: 13px;
+      --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+      --shadow-card: 0 35px 80px -15px rgba(0, 0, 0, 0.85), 0 0 0 1px var(--border-subtle);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      background: radial-gradient(circle at top center, #1b1712 0%, #0c0d0e 70%);
       padding: 32px 20px;
+      line-height: 1.5;
+      position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
-    .register-container {
+
+    /* ── Ambient Background Canvas ── */
+    .ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100%;
-      max-width: 520px;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
     }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(95px);
+      opacity: 0.55;
+      animation: floatOrb 22s infinite alternate ease-in-out;
+      will-change: transform;
+    }
+    .orb-1 {
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, rgba(200, 117, 58, 0.32) 0%, rgba(200, 117, 58, 0) 70%);
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation-duration: 18s;
+    }
+    .orb-2 {
+      width: 440px;
+      height: 440px;
+      background: radial-gradient(circle, rgba(139, 69, 19, 0.28) 0%, rgba(139, 69, 19, 0) 70%);
+      bottom: -100px;
+      left: 15%;
+      animation-duration: 24s;
+      animation-delay: -6s;
+    }
+    .orb-3 {
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0) 70%);
+      top: 35%;
+      right: 10%;
+      animation-duration: 20s;
+      animation-delay: -11s;
+    }
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -40px) scale(1.08); }
+      100% { transform: translate(-25px, 25px) scale(0.95); }
+    }
+
+    /* ── Dot Grid Overlay ── */
+    .grid-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      z-index: 1;
+      mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+      -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 85%);
+    }
+
+    .register-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 540px;
+      animation: fadeInUp 0.75s var(--ease-smooth);
+    }
+
     .register-card {
-      background: rgba(21, 22, 25, 0.95);
-      border: 1px solid rgba(200, 117, 58, 0.25);
-      border-radius: var(--radius-lg);
-      padding: 36px 32px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(12px);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-card);
+      padding: 40px 38px 34px;
+      box-shadow: var(--shadow-card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth);
     }
-    .brand-badge {
+    .register-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(200, 117, 58, 0.8) 50%, transparent 100%);
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+    .logo-badge-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 17px;
+      background: linear-gradient(135deg, rgba(200, 117, 58, 0.25) 0%, rgba(139, 69, 19, 0.15) 100%);
+      border: 1px solid rgba(200, 117, 58, 0.45);
+      box-shadow: 0 10px 24px var(--primary-glow);
+      margin-bottom: 14px;
+    }
+    .logo-icon {
+      font-size: 24px;
+      font-weight: 800;
+      color: #ffffff;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .portal-tag {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       background: rgba(200, 117, 58, 0.12);
-      color: var(--primary);
+      border: 1px solid rgba(200, 117, 58, 0.3);
+      color: var(--primary-light);
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      margin-bottom: 14px;
-      border: 1px solid rgba(200, 117, 58, 0.25);
+      padding: 4px 12px;
+      border-radius: 30px;
+      margin-bottom: 8px;
     }
+    .brand-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .brand-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .portal-tabs {
+      display: flex;
+      background: rgba(13, 14, 17, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 22px;
+      gap: 4px;
+    }
+    .tab-btn {
+      flex: 1;
+      text-align: center;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 9px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .tab-btn:hover {
+      color: var(--text-main);
+    }
+    .tab-btn.active {
+      background: rgba(200, 117, 58, 0.16);
+      color: #ffffff;
+      border: 1px solid rgba(200, 117, 58, 0.35);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
     .form-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 14px;
     }
-    @media (max-width: 540px) {
+    @media (max-width: 520px) {
       .form-grid-2 {
         grid-template-columns: 1fr;
       }
     }
+
+    .form-group {
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .form-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-input);
+      padding: 11px 13px;
+      color: var(--text-main);
+      font-size: 13.5px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.25s var(--ease-smooth);
+    }
+    .form-control::placeholder {
+      color: rgba(156, 163, 175, 0.45);
+    }
+    .form-control:hover {
+      border-color: var(--border-hover);
+      background: rgba(16, 17, 21, 0.85);
+    }
+    .form-control:focus {
+      border-color: var(--border-focus);
+      background: var(--bg-input-focus);
+      box-shadow: 0 0 0 4px var(--primary-glow);
+    }
+
     .password-wrap {
       position: relative;
     }
+    .password-wrap .form-control {
+      padding-right: 40px;
+    }
     .password-toggle {
       position: absolute;
-      right: 12px;
+      right: 10px;
       top: 50%;
       transform: translateY(-50%);
       background: none;
       border: none;
       color: var(--text-dim);
       cursor: pointer;
-      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      transition: color 0.2s;
     }
     .password-toggle:hover {
       color: var(--text-main);
     }
+    .password-toggle svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-submit {
+      position: relative;
+      width: 100%;
+      background: var(--primary-gradient);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-input);
+      padding: 13px 20px;
+      font-weight: 700;
+      font-size: 15px;
+      font-family: inherit;
+      cursor: pointer;
+      overflow: hidden;
+      margin-top: 8px;
+      box-shadow: 0 10px 25px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-smooth), filter 0.2s;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 36px var(--primary-glow-strong), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      filter: brightness(1.06);
+    }
+    .btn-submit:active {
+      transform: translateY(1px) scale(0.985);
+    }
+
+    .card-footer {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-subtle);
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .register-link {
+      color: var(--primary-light);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .register-link:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .flash-alert {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: var(--radius-input);
+      font-size: 13px;
+      animation: shake 0.5s ease-in-out;
+      margin-bottom: 12px;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
   </style>
 </head>
 <body>
+  <!-- Ambient glowing aura orbs -->
+  <div class="ambient-canvas" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- High-end dot grid mask -->
+  <div class="grid-overlay" aria-hidden="true"></div>
+
   <div class="register-container">
-    <div class="register-card">
-      <div style="text-align: center; margin-bottom: 26px;">
-        <div class="brand-badge">
-          <i class="fas fa-sparkles"></i> New Client Partnership
+    <div class="register-card" id="cardContainer">
+      <div class="brand-header">
+        <div class="logo-badge-wrap">
+          <div class="logo-icon">S</div>
         </div>
-        <h1 style="font-size: 26px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; letter-spacing: -0.5px;">
-          Create Client Account
-        </h1>
-        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">
-          Choose your own credentials to register and immediately submit and track project briefs with our studio team.
-        </p>
+        <br>
+        <div class="portal-tag">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+          </svg>
+          Storyworks Client Portal
+        </div>
+        <h1>Create Client Account</h1>
+        <p>Choose your username and custom password to access project tracking and studio briefs.</p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="portal-tabs">
+        <a href="{{ url_for('client.login') }}" class="tab-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          Sign In
+        </a>
+        <a href="{{ url_for('client.register') }}" class="tab-btn active">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
+          </svg>
+          Create Account
+        </a>
       </div>
 
       <!-- Flash Messages -->
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-          <div style="margin-bottom: 20px;">
-            {% for category, message in messages %}
-              <div class="flash-alert flash-{{ category }}" style="margin-bottom: 8px;">
-                <div class="flash-icon">
-                  {% if category == 'success' %}
-                    <i class="fas fa-check-circle"></i>
-                  {% elif category == 'error' or category == 'danger' %}
-                    <i class="fas fa-exclamation-circle"></i>
-                  {% else %}
-                    <i class="fas fa-info-circle"></i>
-                  {% endif %}
-                </div>
-                <span class="flash-text">{{ message }}</span>
+          <div>
+            {% for category, msg in messages %}
+              <div class="flash-alert">
+                <span>{{ msg }}</span>
               </div>
             {% endfor %}
           </div>
@@ -113,9 +449,9 @@
       {% endwith %}
 
       <form method="POST" action="{{ url_for('client.register') }}">
-        <div class="form-grid-2" style="margin-bottom: 16px;">
+        <div class="form-grid-2">
           <div class="form-group">
-            <label class="form-label" for="username" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+            <label class="form-label" for="username">
               Username <span style="color: var(--primary);">*</span>
             </label>
             <input
@@ -123,16 +459,15 @@
               id="username"
               name="username"
               class="form-control"
-              placeholder="e.g. johndoe"
+              placeholder="e.g. alexsmith"
               value="{{ form_data.username or '' }}"
               required
               autofocus
-              style="width: 100%; padding: 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
             />
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="email" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+            <label class="form-label" for="email">
               Email Address <span style="color: var(--primary);">*</span>
             </label>
             <input
@@ -140,16 +475,15 @@
               id="email"
               name="email"
               class="form-control"
-              placeholder="e.g. john@brand.com"
+              placeholder="e.g. alex@brand.com"
               value="{{ form_data.email or '' }}"
               required
-              style="width: 100%; padding: 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
             />
           </div>
         </div>
 
-        <div class="form-group" style="margin-bottom: 16px;">
-          <label class="form-label" for="full_name" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+        <div class="form-group">
+          <label class="form-label" for="full_name">
             Full Name <span style="color: var(--primary);">*</span>
           </label>
           <input
@@ -157,17 +491,16 @@
             id="full_name"
             name="full_name"
             class="form-control"
-            placeholder="e.g. John Doe"
+            placeholder="e.g. Alex Smith"
             value="{{ form_data.full_name or '' }}"
             required
-            style="width: 100%; padding: 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
           />
         </div>
 
-        <div class="form-grid-2" style="margin-bottom: 16px;">
+        <div class="form-grid-2">
           <div class="form-group">
-            <label class="form-label" for="company" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
-              Company / Organization
+            <label class="form-label" for="company">
+              Company / Brand
             </label>
             <input
               type="text"
@@ -176,13 +509,12 @@
               class="form-control"
               placeholder="e.g. Acme Corp"
               value="{{ form_data.company or '' }}"
-              style="width: 100%; padding: 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
             />
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="phone" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
-              Phone Number
+            <label class="form-label" for="phone">
+              Phone / WhatsApp
             </label>
             <input
               type="tel"
@@ -191,14 +523,13 @@
               class="form-control"
               placeholder="e.g. +91 98765 43210"
               value="{{ form_data.phone or '' }}"
-              style="width: 100%; padding: 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
             />
           </div>
         </div>
 
-        <div class="form-grid-2" style="margin-bottom: 24px;">
+        <div class="form-grid-2">
           <div class="form-group">
-            <label class="form-label" for="password" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+            <label class="form-label" for="password">
               Choose Password <span style="color: var(--primary);">*</span>
             </label>
             <div class="password-wrap">
@@ -210,16 +541,18 @@
                 placeholder="Min 6 characters"
                 required
                 minlength="6"
-                style="width: 100%; padding: 11px 36px 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
               />
-              <button type="button" class="password-toggle" id="togglePassword1" aria-label="Toggle password visibility">
-                <i class="fas fa-eye" id="toggleIcon1"></i>
+              <button type="button" class="password-toggle" id="togglePassword1" aria-label="Toggle password">
+                <svg id="eyeIcon1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+                  <circle cx="12" cy="3" r="3"></circle>
+                </svg>
               </button>
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="confirm_password" style="font-size: 13px; font-weight: 500; color: var(--text-main); display: block; margin-bottom: 6px;">
+            <label class="form-label" for="confirm_password">
               Confirm Password <span style="color: var(--primary);">*</span>
             </label>
             <div class="password-wrap">
@@ -231,56 +564,65 @@
                 placeholder="Repeat password"
                 required
                 minlength="6"
-                style="width: 100%; padding: 11px 36px 11px 13px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-main); font-size: 14px;"
               />
-              <button type="button" class="password-toggle" id="togglePassword2" aria-label="Toggle password visibility">
-                <i class="fas fa-eye" id="toggleIcon2"></i>
+              <button type="button" class="password-toggle" id="togglePassword2" aria-label="Toggle confirm password">
+                <svg id="eyeIcon2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
+                  <circle cx="12" cy="3" r="3"></circle>
+                </svg>
               </button>
             </div>
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="btn btn-primary"
-          style="width: 100%; padding: 13px; font-size: 15px; font-weight: 600; border-radius: var(--radius-md); letter-spacing: 0.3px;"
-        >
-          <i class="fas fa-user-plus" style="margin-right: 8px;"></i> Create My Client Account
+        <button type="submit" class="btn-submit">
+          Create Client Account
         </button>
       </form>
 
-      <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-color); text-align: center; font-size: 13px; color: var(--text-muted);">
+      <div class="card-footer">
         <p>
           Already have a client account?
-          <a href="{{ url_for('client.login') }}" style="color: var(--primary); font-weight: 600;">
+          <a href="{{ url_for('client.login') }}" class="register-link" style="margin-left: 4px;">
             Sign In &rarr;
           </a>
         </p>
-        <div style="margin-top: 10px; font-size: 12px;">
-          <a href="/" style="color: var(--text-dim); text-decoration: underline;">
-            &larr; Return to Website
-          </a>
+        <div style="margin-top: 12px; font-size: 12px;">
+          <a href="/" style="color: var(--text-dim); text-decoration: none;">&larr; Return to Website</a>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    function setupToggle(btnId, inputId, iconId) {
+    function setupToggle(btnId, inputId) {
       const btn = document.getElementById(btnId);
       const input = document.getElementById(inputId);
-      const icon = document.getElementById(iconId);
-      if (btn && input && icon) {
+      if (btn && input) {
         btn.addEventListener("click", function () {
           const type = input.getAttribute("type") === "password" ? "text" : "password";
           input.setAttribute("type", type);
-          icon.classList.toggle("fa-eye");
-          icon.classList.toggle("fa-eye-slash");
         });
       }
     }
-    setupToggle("togglePassword1", "password", "toggleIcon1");
-    setupToggle("togglePassword2", "confirm_password", "toggleIcon2");
+    setupToggle("togglePassword1", "password");
+    setupToggle("togglePassword2", "confirm_password");
+
+    const card = document.getElementById('cardContainer');
+    if (card) {
+      document.addEventListener('mousemove', (e) => {
+        if (window.innerWidth < 768) return;
+        const rect = card.getBoundingClientRect();
+        const cardCenterX = rect.left + rect.width / 2;
+        const cardCenterY = rect.top + rect.height / 2;
+        const deltaX = (e.clientX - cardCenterX) / 45;
+        const deltaY = (e.clientY - cardCenterY) / 45;
+        card.style.transform = `perspective(1000px) rotateY(${deltaX}deg) rotateX(${-deltaY}deg) translateY(-2px)`;
+      });
+      document.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(0px)';
+      });
+    }
   </script>
 </body>
 </html>

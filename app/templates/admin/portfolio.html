@@ -13,10 +13,12 @@
     <table class="admin-table">
       <thead>
         <tr>
-          <th style="width: 80px;">Cover</th>
+          <th style="width: 60px;">Thumbnail</th>
+          <th style="width: 75px;">Hero Banner</th>
+          <th style="width: 60px;">Approach</th>
+          <th style="width: 75px;">Mid Banner</th>
           <th>Project & Client</th>
           <th>Category</th>
-          <th>Badge</th>
           <th>Year</th>
           <th>Featured</th>
           <th>Status</th>
@@ -28,10 +30,32 @@
           {% for p in items %}
             <tr>
               <td>
-                {% if p.cover_image %}
-                  <img src="{{ p.cover_image if (p.cover_image.startswith('/') or p.cover_image.startswith('http')) else ('/' ~ p.cover_image) }}" alt="Cover" style="width: 60px; height: 42px; border-radius: 4px; object-fit: cover; background: var(--bg-input);" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'width:60px;height:42px;border-radius:4px;background:var(--bg-input);display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:10px;\'>No Cover</div>';" />
+                {% set thumb_src = p.thumbnail_image or p.cover_image %}
+                {% if thumb_src %}
+                  <img src="{{ thumb_src if (thumb_src.startswith('/') or thumb_src.startswith('http')) else ('/' ~ thumb_src) }}" alt="Thumb" style="width: 50px; height: 36px; border-radius: 4px; object-fit: cover; background: var(--bg-input); border: 1px solid var(--border-color);" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'width:50px;height:36px;border-radius:4px;background:var(--bg-input);display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:8px;\'>No Thumb</div>';" />
                 {% else %}
-                  <div style="width: 60px; height: 42px; border-radius: 4px; background: var(--bg-input); display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 10px;">No Cover</div>
+                  <div style="width: 50px; height: 36px; border-radius: 4px; background: var(--bg-input); display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 8px;">No Thumb</div>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.banner_image %}
+                  <img src="{{ p.banner_image if (p.banner_image.startswith('/') or p.banner_image.startswith('http')) else ('/' ~ p.banner_image) }}" alt="Banner" style="width: 68px; height: 36px; border-radius: 4px; object-fit: cover; background: var(--bg-input); border: 1px solid var(--border-color);" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'width:68px;height:36px;border-radius:4px;background:var(--bg-input);display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:8px;\'>No Banner</div>';" />
+                {% else %}
+                  <div style="width: 68px; height: 36px; border-radius: 4px; background: var(--bg-input); display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 8px;">No Banner</div>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.approach_image %}
+                  <img src="{{ p.approach_image if (p.approach_image.startswith('/') or p.approach_image.startswith('http')) else ('/' ~ p.approach_image) }}" alt="Approach" style="width: 50px; height: 36px; border-radius: 4px; object-fit: cover; background: var(--bg-input); border: 1px solid var(--border-color);" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'width:50px;height:36px;border-radius:4px;background:var(--bg-input);display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:8px;\'>No Photo</div>';" />
+                {% else %}
+                  <div style="width: 50px; height: 36px; border-radius: 4px; background: var(--bg-input); display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 8px;">No Photo</div>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.middle_banner_image %}
+                  <img src="{{ p.middle_banner_image if (p.middle_banner_image.startswith('/') or p.middle_banner_image.startswith('http')) else ('/' ~ p.middle_banner_image) }}" alt="Mid Banner" style="width: 68px; height: 36px; border-radius: 4px; object-fit: cover; background: var(--bg-input); border: 1px solid var(--border-color);" onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'width:68px;height:36px;border-radius:4px;background:var(--bg-input);display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:8px;\'>No Mid</div>';" />
+                {% else %}
+                  <div style="width: 68px; height: 36px; border-radius: 4px; background: var(--bg-input); display: flex; align-items: center; justify-content: center; color: var(--text-dim); font-size: 8px;">No Mid</div>
                 {% endif %}
               </td>
               <td>
@@ -63,7 +87,7 @@
           {% endfor %}
         {% else %}
           <tr>
-            <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 48px;">
+            <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 48px;">
               No portfolio projects recorded yet. Click "New Project" to add your first case study.
             </td>
           </tr>

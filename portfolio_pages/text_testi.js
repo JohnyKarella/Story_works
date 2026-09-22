@@ -75,8 +75,10 @@
     }
     resetAuto();
     /* pause on hover */
-    stage.addEventListener('mouseenter', function () { clearInterval(autoTimer); });
-    stage.addEventListener('mouseleave', resetAuto);
+    if (stage) {
+        stage.addEventListener('mouseenter', function () { clearInterval(autoTimer); });
+        stage.addEventListener('mouseleave', resetAuto);
+    }
     /* keyboard */
     document.addEventListener('keydown', function (e) {
         if (e.key === 'ArrowLeft') goTo(current - 1);
@@ -84,12 +86,71 @@
     });
     /* scroll reveal header */
     var head = document.getElementById('testiHead');
-    new IntersectionObserver(function (entries, obs) {
-        if (entries[0].isIntersecting) {
-            head.classList.add('on');
-            obs.disconnect();
-        }
-    }, { threshold: 0.2 }).observe(head);
+    if (head && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries, obs) {
+            if (entries[0].isIntersecting) {
+                head.classList.add('on');
+                obs.disconnect();
+            }
+        }, { threshold: 0.2 }).observe(head);
+    }
     /* initial render */
     render();
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// HOMEPAGE DYNAMIC PORTFOLIO GRID SYNCHRONIZATION
+// Syncs index.html .portfolio-grid cards with live Admin modifications
+// ═══════════════════════════════════════════════════════════════
+(function initHomeDynamicPortfolio() {
+    function formatImgUrl(url) {
+        if (!url) return '';
+        if (url.startsWith('/') || url.startsWith('http')) return url;
+        return '/' + url;
+    }
+
+    function syncPortfolioGrid() {
+        var grid = document.querySelector('.portfolio-section .portfolio-grid');
+        if (!grid) return;
+        fetch('/api/portfolio?_=' + Date.now())
+            .then(function (res) { return res.json(); })
+            .then(function (json) {
+                if (!json || !json.success || !Array.isArray(json.data) || json.data.length === 0) return;
+                var items = json.data;
+                grid.innerHTML = items.map(function (p) {
+                    var thumb = p.thumbnail_image || p.cover_image || 'assets/images/portfolio/hp/4.jpg';
+                    var thumbSrc = formatImgUrl(thumb);
+                    var targetUrl = p.project_url || ('/portfolio/' + (p.slug || p.id));
+                    var badgeText = p.badge || p.client || p.title;
+                    var descText = p.quote || p.short_desc || '';
+                    var cat = (p.category || 'all').toLowerCase().replace(/[^a-z0-9]/g, '');
+                    return (
+                        '<article class="portfolio-card" data-category="' + cat + '">' +
+                            '<a href="' + targetUrl + '">' +
+                                '<div class="card-image-wrapper">' +
+                                    '<div class="card-image">' +
+                                        '<img src="' + thumbSrc + '" alt="' + (p.title || '') + '" onerror="this.onerror=null; this.src=\'assets/images/portfolio/hp/4.jpg\';">' +
+                                    '</div>' +
+                                    '<div class="card-overlay"></div>' +
+                                    '<div class="card-badge">' + badgeText + '</div>' +
+                                '</div>' +
+                                '<div class="card-content">' +
+                                    '<h3 class="card-title">' + (p.title || '') + '</h3>' +
+                                    (descText ? '<p class="portfolio-description"><i>"' + descText.replace(/^"|"$/g, '') + '"</i></p>' : '') +
+                                '</div>' +
+                            '</a>' +
+                        '</article>'
+                    );
+                }).join('');
+            })
+            .catch(function (err) {
+                console.warn('Home portfolio sync notice:', err);
+            });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncPortfolioGrid);
+    } else {
+        syncPortfolioGrid();
+    }
 })();

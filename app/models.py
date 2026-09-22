@@ -364,6 +364,17 @@ class Portfolio:
         conn.close()
         return dict(row) if row else None
     @staticmethod
+    def get_by_project_url(url):
+        conn = get_db()
+        clean_url = url.split("?")[0].lstrip("/")
+        row = conn.execute(
+            "SELECT * FROM portfolio WHERE project_url = ? OR project_url = ? OR slug = ?",
+            (clean_url, "/" + clean_url, clean_url)
+        ).fetchone()
+        conn.close()
+        return dict(row) if row else None
+
+    @staticmethod
     def create(data):
         conn = get_db()
         cursor = conn.cursor()
@@ -373,10 +384,18 @@ class Portfolio:
         while cursor.execute("SELECT id FROM portfolio WHERE slug = ?", (slug,)).fetchone():
             slug = f"{base_slug}-{counter}"
             counter += 1
+
+        thumbnail_image = (data.get("thumbnail_image") or data.get("cover_image") or "").strip()
+        cover_image = (data.get("cover_image") or thumbnail_image).strip()
+        banner_image = (data.get("banner_image") or "").strip()
+        approach_image = (data.get("approach_image") or "").strip()
+        approach = (data.get("approach") or "").strip()
+        middle_banner_image = (data.get("middle_banner_image") or "").strip()
+
         cursor.execute(
             """
-            INSERT INTO portfolio (title, slug, client, category, badge, cover_image, gallery_images, short_desc, full_desc, quote, year, project_url, is_featured, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO portfolio (title, slug, client, category, badge, cover_image, thumbnail_image, banner_image, approach_image, approach, middle_banner_image, gallery_images, short_desc, full_desc, quote, year, project_url, is_featured, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 data.get("title"),
@@ -384,7 +403,12 @@ class Portfolio:
                 data.get("client", ""),
                 data.get("category", ""),
                 data.get("badge", ""),
-                data.get("cover_image", ""),
+                cover_image,
+                thumbnail_image,
+                banner_image,
+                approach_image,
+                approach,
+                middle_banner_image,
                 data.get("gallery_images", "[]"),
                 data.get("short_desc", ""),
                 data.get("full_desc", ""),
@@ -399,14 +423,23 @@ class Portfolio:
         conn.commit()
         conn.close()
         return new_id
+
     @staticmethod
     def update(item_id, data):
         conn = get_db()
         slug = data.get("slug") or slugify(data.get("title", ""))
+
+        thumbnail_image = (data.get("thumbnail_image") or data.get("cover_image") or "").strip()
+        cover_image = (data.get("cover_image") or thumbnail_image).strip()
+        banner_image = (data.get("banner_image") or "").strip()
+        approach_image = (data.get("approach_image") or "").strip()
+        approach = (data.get("approach") or "").strip()
+        middle_banner_image = (data.get("middle_banner_image") or "").strip()
+
         conn.execute(
             """
             UPDATE portfolio
-            SET title = ?, slug = ?, client = ?, category = ?, badge = ?, cover_image = ?, gallery_images = ?, short_desc = ?, full_desc = ?, quote = ?, year = ?, project_url = ?, is_featured = ?, status = ?
+            SET title = ?, slug = ?, client = ?, category = ?, badge = ?, cover_image = ?, thumbnail_image = ?, banner_image = ?, approach_image = ?, approach = ?, middle_banner_image = ?, gallery_images = ?, short_desc = ?, full_desc = ?, quote = ?, year = ?, project_url = ?, is_featured = ?, status = ?
             WHERE id = ?
             """,
             (
@@ -415,7 +448,12 @@ class Portfolio:
                 data.get("client"),
                 data.get("category"),
                 data.get("badge"),
-                data.get("cover_image"),
+                cover_image,
+                thumbnail_image,
+                banner_image,
+                approach_image,
+                approach,
+                middle_banner_image,
                 data.get("gallery_images", "[]"),
                 data.get("short_desc"),
                 data.get("full_desc"),

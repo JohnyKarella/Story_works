@@ -70,17 +70,26 @@ def get_single_blog(slug_or_id):
     return jsonify({"success": True, "data": blog})
 @api_bp.route("/portfolio", methods=["GET"])
 def get_portfolio():
-    """Return published portfolio case studies."""
+    """Return published portfolio case studies, or look up by url param."""
+    page_url = request.args.get("url") or request.args.get("page")
+    if page_url:
+        item = Portfolio.get_by_project_url(page_url)
+        if item and item.get("status") == "published":
+            return jsonify({"success": True, "data": item})
+        return jsonify({"success": False, "error": "Portfolio item not found"}), 404
+
     category = request.args.get("category")
     items = Portfolio.get_all(category=category, status="published")
     return jsonify({"success": True, "count": len(items), "data": items})
-@api_bp.route("/portfolio/<slug_or_id>", methods=["GET"])
+@api_bp.route("/portfolio/<path:slug_or_id>", methods=["GET"])
 def get_single_portfolio(slug_or_id):
-    """Return single portfolio case study by slug or numeric ID."""
+    """Return single portfolio case study by slug, numeric ID, or project URL."""
     if slug_or_id.isdigit():
         item = Portfolio.get_by_id(int(slug_or_id))
     else:
         item = Portfolio.get_by_slug(slug_or_id)
+        if not item:
+            item = Portfolio.get_by_project_url(slug_or_id)
     if not item or item["status"] != "published":
         return jsonify({"success": False, "error": "Portfolio item not found"}), 404
     return jsonify({"success": True, "data": item})

@@ -387,6 +387,73 @@ class BackendTestCase(unittest.TestCase):
         self.assertIn(b"Partner Since", res.data)
         self.assertIn(b"Client Account Timeline", res.data)
 
+    def test_portfolio_banners_and_approach_options(self):
+        """Verify Hero Banner, Thumbnail, Approach Photo, Approach narrative, and Middle Banner options."""
+        # 1. Verify project 1 seeded data has all new fields
+        p1 = Portfolio.get_by_id(1)
+        self.assertIsNotNone(p1)
+        self.assertIn("banner_image", p1)
+        self.assertIn("thumbnail_image", p1)
+        self.assertIn("approach_image", p1)
+        self.assertIn("approach", p1)
+        self.assertIn("middle_banner_image", p1)
+
+        # 2. Test Admin Edit Portfolio GET renders all 4 banner/photo input options
+        with self.client.session_transaction() as sess:
+            sess["user_id"] = 1
+            sess["username"] = "admin"
+            sess["role"] = "admin"
+
+        res = self.client.get("/admin/portfolio/1/edit")
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b"Hero Banner Photo", res.data)
+        self.assertIn(b"Cover or Thumbnail Photo", res.data)
+        self.assertIn(b"Approach Photo & Creative Strategy", res.data)
+        self.assertIn(b"Middle Banner Photo", res.data)
+        self.assertIn(b"portHeroBannerPreview", res.data)
+        self.assertIn(b"portApproachPhotoPreview", res.data)
+        self.assertIn(b"portMiddleBannerPreview", res.data)
+
+        # 3. Test Admin Portfolio Update POST saves all banners and approach fields
+        res = self.client.post(
+            "/admin/portfolio/1/edit",
+            data={
+                "title": "Shaanvi Luxury Living",
+                "client": "Shaanvi Group",
+                "category": "Branding",
+                "short_desc": "Redefining premium residential living in Hyderabad.",
+                "full_desc": "Shaanvi approached Story Works Studio to create a timeless visual identity.",
+                "approach": "We adopted an architectural minimalism philosophy focusing on light, form, and texture.",
+                "banner_image": "assets/images/portfolio/hp/1_shaanvi.png",
+                "thumbnail_image": "assets/images/portfolio/hp/4.jpg",
+                "approach_image": "assets/images/portfolio/hp/shaanvi-works.png",
+                "middle_banner_image": "assets/images/portfolio/hp/portfolio-works.png",
+                "project_url": "1_shaanvi.html",
+                "featured": "1",
+                "order_num": "1",
+            },
+            follow_redirects=True,
+        )
+        self.assertEqual(res.status_code, 200)
+
+        # Verify DB updated
+        p1_updated = Portfolio.get_by_id(1)
+        self.assertEqual(p1_updated["title"], "Shaanvi Luxury Living")
+        self.assertEqual(p1_updated["approach"], "We adopted an architectural minimalism philosophy focusing on light, form, and texture.")
+        self.assertEqual(p1_updated["approach_image"], "assets/images/portfolio/hp/shaanvi-works.png")
+        self.assertEqual(p1_updated["middle_banner_image"], "assets/images/portfolio/hp/portfolio-works.png")
+        self.assertEqual(p1_updated["banner_image"], "assets/images/portfolio/hp/1_shaanvi.png")
+
+        # 4. Verify API returns updated banners and approach
+        api_res = self.client.get("/api/portfolio?url=1_shaanvi.html")
+        self.assertEqual(api_res.status_code, 200)
+        api_data = api_res.get_json()
+        self.assertTrue(api_data["success"])
+        self.assertEqual(api_data["data"]["title"], "Shaanvi Luxury Living")
+        self.assertEqual(api_data["data"]["approach_image"], "assets/images/portfolio/hp/shaanvi-works.png")
+        self.assertEqual(api_data["data"]["middle_banner_image"], "assets/images/portfolio/hp/portfolio-works.png")
+
 
 if __name__ == "__main__":
     unittest.main()
+

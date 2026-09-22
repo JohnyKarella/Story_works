@@ -106,17 +106,72 @@ lbBox.addEventListener('touchend', e => {
     if (Math.abs(dx) > 45) goLB(dx < 0 ? 1 : -1);
 }, { passive: true });
 /* card click → lightbox — reads from live HTML */
-document.querySelector('.img-panel').addEventListener('click', e => {
-    const card = e.target.closest('.pc');
-    if (!card) return;
-    const grid = card.closest('.grid-set');
-    const cards = Array.from(grid.querySelectorAll('.pc'));
-    const i = cards.indexOf(card);
-    const l = cards.map(c => ({
-        img: c.querySelector('img').src,
-        title: c.querySelector('.pc-title')?.textContent || c.querySelector('.pc-lbl')?.textContent || '',
-        badge: c.querySelector('.pc-badge')?.textContent || '',
-        quote: (c.querySelector('.pc-quote')?.textContent || '').replace(/^"|"$/g, ''),
-    }));
-    openLB(l, i);
-});
+const imgPanel = document.querySelector('.img-panel');
+if (imgPanel) {
+    imgPanel.addEventListener('click', e => {
+        const card = e.target.closest('.pc');
+        if (!card) return;
+        const grid = card.closest('.grid-set');
+        if (!grid) return;
+        const cards = Array.from(grid.querySelectorAll('.pc'));
+        const i = cards.indexOf(card);
+        const l = cards.map(c => ({
+            img: c.querySelector('img')?.src || '',
+            title: c.querySelector('.pc-title')?.textContent || c.querySelector('.pc-lbl')?.textContent || '',
+            badge: c.querySelector('.pc-badge')?.textContent || '',
+            quote: (c.querySelector('.pc-quote')?.textContent || '').replace(/^"|"$/g, ''),
+        }));
+        openLB(l, i);
+    });
+}
+
+// ═══════════════════════════════════════
+// DYNAMIC PORTFOLIO GRID SYNCHRONIZATION
+// Hydrates portfolio.html with live backend data
+// ═══════════════════════════════════════
+(function initDynamicPortfolio() {
+    function syncPortfolioGrid() {
+        const grid = document.querySelector('.portfolio-grid');
+        if (!grid) return;
+        fetch('/api/portfolio?_=' + Date.now())
+            .then(res => res.json())
+            .then(json => {
+                if (!json || !json.success || !Array.isArray(json.data) || json.data.length === 0) return;
+                const items = json.data;
+                grid.innerHTML = items.map(p => {
+                    const thumb = p.thumbnail_image || p.cover_image || 'assets/images/portfolio/hp/4.jpg';
+                    const thumbSrc = (thumb.startsWith('/') || thumb.startsWith('http')) ? thumb : ('/' + thumb);
+                    const targetUrl = p.project_url || ('/portfolio/' + p.slug);
+                    const badgeText = p.badge || p.client || p.title;
+                    const descText = p.quote || p.short_desc || '';
+                    const cat = (p.category || 'all').toLowerCase().replace(/[^a-z0-9]/g, '');
+                    return `
+                        <article class="portfolio-card" data-category="${cat}">
+                            <a href="${targetUrl}">
+                                <div class="card-image-wrapper">
+                                    <div class="card-image">
+                                        <img src="${thumbSrc}" alt="${p.title}" onerror="this.onerror=null; this.src='assets/images/portfolio/hp/4.jpg';">
+                                    </div>
+                                    <div class="card-overlay"></div>
+                                    <div class="card-badge">${badgeText}</div>
+                                </div>
+                                <div class="card-content">
+                                    <h3 class="card-title">${p.title}</h3>
+                                    ${descText ? `<p class="portfolio-description"><i>"${descText.replace(/^"|"$/g, '')}"</i></p>` : ''}
+                                </div>
+                            </a>
+                        </article>
+                    `;
+                }).join('');
+            })
+            .catch(err => {
+                console.warn('Portfolio sync notice:', err);
+            });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncPortfolioGrid);
+    } else {
+        syncPortfolioGrid();
+    }
+})();

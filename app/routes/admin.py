@@ -311,7 +311,14 @@ def new_portfolio():
         client = request.form.get("client", "").strip()
         category = request.form.get("category", "").strip()
         badge = request.form.get("badge", client).strip()
-        cover_image = request.form.get("cover_image", "").strip()
+        banner_image = request.form.get("banner_image", "").strip()
+        thumbnail_image = request.form.get("thumbnail_image", "").strip()
+        cover_image = request.form.get("cover_image", "").strip() or thumbnail_image
+        if not thumbnail_image and cover_image:
+            thumbnail_image = cover_image
+        approach_image = request.form.get("approach_image", "").strip()
+        approach = request.form.get("approach", "").strip()
+        middle_banner_image = request.form.get("middle_banner_image", "").strip()
         short_desc = request.form.get("short_desc", "").strip()
         full_desc = request.form.get("full_desc", "").strip()
         quote = request.form.get("quote", "").strip()
@@ -319,12 +326,47 @@ def new_portfolio():
         project_url = request.form.get("project_url", "").strip()
         is_featured = bool(request.form.get("is_featured"))
         status = request.form.get("status", "published")
-        if "cover_file" in request.files:
+
+        # 1. Hero Banner Photo Upload
+        if "banner_file" in request.files and request.files["banner_file"].filename:
+            file = request.files["banner_file"]
+            if allowed_file(file.filename):
+                fname = f"banner_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+                file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
+                banner_image = f"/uploads/{fname}"
+
+        # 2. Cover / Thumbnail Photo Upload
+        if "thumbnail_file" in request.files and request.files["thumbnail_file"].filename:
+            file = request.files["thumbnail_file"]
+            if allowed_file(file.filename):
+                fname = f"thumb_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+                file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
+                thumbnail_image = f"/uploads/{fname}"
+                cover_image = thumbnail_image
+        elif "cover_file" in request.files and request.files["cover_file"].filename:
             file = request.files["cover_file"]
-            if file and file.filename and allowed_file(file.filename):
+            if allowed_file(file.filename):
                 fname = f"port_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
                 file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
                 cover_image = f"/uploads/{fname}"
+                thumbnail_image = cover_image
+
+        # 3. Approach Photo Upload
+        if "approach_file" in request.files and request.files["approach_file"].filename:
+            file = request.files["approach_file"]
+            if allowed_file(file.filename):
+                fname = f"approach_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+                file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
+                approach_image = f"/uploads/{fname}"
+
+        # 4. Middle Banner Photo Upload
+        if "middle_banner_file" in request.files and request.files["middle_banner_file"].filename:
+            file = request.files["middle_banner_file"]
+            if allowed_file(file.filename):
+                fname = f"midbnr_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+                file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
+                middle_banner_image = f"/uploads/{fname}"
+
         if not title:
             flash("Project title is required.", "error")
             return render_template("admin/portfolio_form.html", item=None)
@@ -333,7 +375,12 @@ def new_portfolio():
             "client": client,
             "category": category,
             "badge": badge,
+            "banner_image": banner_image,
+            "thumbnail_image": thumbnail_image,
             "cover_image": cover_image,
+            "approach_image": approach_image,
+            "approach": approach,
+            "middle_banner_image": middle_banner_image,
             "short_desc": short_desc,
             "full_desc": full_desc,
             "quote": quote,
@@ -358,7 +405,14 @@ def edit_portfolio(item_id):
         client = request.form.get("client", "").strip()
         category = request.form.get("category", "").strip()
         badge = request.form.get("badge", client).strip()
-        cover_image = request.form.get("cover_image", item["cover_image"]).strip()
+        banner_image = request.form.get("banner_image", item.get("banner_image") or "").strip()
+        thumbnail_image = request.form.get("thumbnail_image", item.get("thumbnail_image") or item.get("cover_image") or "").strip()
+        cover_image = request.form.get("cover_image", item.get("cover_image") or thumbnail_image).strip() or thumbnail_image
+        if not thumbnail_image and cover_image:
+            thumbnail_image = cover_image
+        approach_image = request.form.get("approach_image", item.get("approach_image") or "").strip()
+        approach = request.form.get("approach", item.get("approach") or "").strip()
+        middle_banner_image = request.form.get("middle_banner_image", item.get("middle_banner_image") or "").strip()
         short_desc = request.form.get("short_desc", "").strip()
         full_desc = request.form.get("full_desc", "").strip()
         quote = request.form.get("quote", "").strip()
@@ -366,19 +420,59 @@ def edit_portfolio(item_id):
         project_url = request.form.get("project_url", "").strip()
         is_featured = bool(request.form.get("is_featured"))
         status = request.form.get("status", "published")
-        if "cover_file" in request.files:
+
+        # 1. Hero Banner Photo Upload
+        if "banner_file" in request.files and request.files["banner_file"].filename:
+            file = request.files["banner_file"]
+            if allowed_file(file.filename):
+                fname = f"banner_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+                file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
+                banner_image = f"/uploads/{fname}"
+
+        # 2. Cover / Thumbnail Photo Upload
+        if "thumbnail_file" in request.files and request.files["thumbnail_file"].filename:
+            file = request.files["thumbnail_file"]
+            if allowed_file(file.filename):
+                fname = f"thumb_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+                file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
+                thumbnail_image = f"/uploads/{fname}"
+                cover_image = thumbnail_image
+        elif "cover_file" in request.files and request.files["cover_file"].filename:
             file = request.files["cover_file"]
-            if file and file.filename and allowed_file(file.filename):
+            if allowed_file(file.filename):
                 fname = f"port_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
                 file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
                 cover_image = f"/uploads/{fname}"
+                thumbnail_image = cover_image
+
+        # 3. Approach Photo Upload
+        if "approach_file" in request.files and request.files["approach_file"].filename:
+            file = request.files["approach_file"]
+            if allowed_file(file.filename):
+                fname = f"approach_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+                file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
+                approach_image = f"/uploads/{fname}"
+
+        # 4. Middle Banner Photo Upload
+        if "middle_banner_file" in request.files and request.files["middle_banner_file"].filename:
+            file = request.files["middle_banner_file"]
+            if allowed_file(file.filename):
+                fname = f"midbnr_{int(datetime.now().timestamp())}_{secure_filename(file.filename)}"
+                file.save(os.path.join(Config.UPLOAD_FOLDER, fname))
+                middle_banner_image = f"/uploads/{fname}"
+
         Portfolio.update(item_id, {
             "title": title,
             "slug": slug,
             "client": client,
             "category": category,
             "badge": badge,
+            "banner_image": banner_image,
+            "thumbnail_image": thumbnail_image,
             "cover_image": cover_image,
+            "approach_image": approach_image,
+            "approach": approach,
+            "middle_banner_image": middle_banner_image,
             "short_desc": short_desc,
             "full_desc": full_desc,
             "quote": quote,

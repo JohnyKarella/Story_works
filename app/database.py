@@ -81,6 +81,11 @@ def init_db(app=None, run_seed=True):
         category TEXT,
         badge TEXT,
         cover_image TEXT,
+        thumbnail_image TEXT,
+        banner_image TEXT,
+        approach_image TEXT,
+        approach TEXT,
+        middle_banner_image TEXT,
         gallery_images TEXT,
         short_desc TEXT,
         full_desc TEXT,
@@ -153,6 +158,101 @@ def init_db(app=None, run_seed=True):
         """)
     except Exception:
         pass
+    # Migration: Ensure portfolio-related columns exist
+    cursor.execute("PRAGMA table_info(portfolio)")
+    port_cols = {row["name"] for row in cursor.fetchall()}
+    if "banner_image" not in port_cols:
+        cursor.execute("ALTER TABLE portfolio ADD COLUMN banner_image TEXT")
+    if "thumbnail_image" not in port_cols:
+        cursor.execute("ALTER TABLE portfolio ADD COLUMN thumbnail_image TEXT")
+    if "approach_image" not in port_cols:
+        cursor.execute("ALTER TABLE portfolio ADD COLUMN approach_image TEXT")
+    if "approach" not in port_cols:
+        cursor.execute("ALTER TABLE portfolio ADD COLUMN approach TEXT")
+    if "middle_banner_image" not in port_cols:
+        cursor.execute("ALTER TABLE portfolio ADD COLUMN middle_banner_image TEXT")
+
+    # Sync thumbnail_image and cover_image
+    cursor.execute("UPDATE portfolio SET thumbnail_image = cover_image WHERE (thumbnail_image IS NULL OR thumbnail_image = '') AND cover_image IS NOT NULL AND cover_image != ''")
+    cursor.execute("UPDATE portfolio SET cover_image = thumbnail_image WHERE (cover_image IS NULL OR cover_image = '') AND thumbnail_image IS NOT NULL AND thumbnail_image != ''")
+
+    # Initial data backfill for standard case studies
+    initial_portfolio_data = {
+        1: {
+            "banner_image": "/assets/portfolio_page/shaanvi posts/1_shaanvi.png",
+            "thumbnail_image": "/assets/images/portfolio/hp/4.jpg",
+            "approach_image": "/assets/portfolio_page/shaanvi posts/shaanvi-works.png",
+            "approach": "We created a cohesive visual direction that places the fabric at the centre, using minimal design and balanced compositions to highlight texture, colour and detail. The focus was on building a clean, consistent and premium aesthetic that enhances the brand’s identity, resulting in a more refined presence and stronger visual recall.",
+            "middle_banner_image": "/assets/portfolio_page/shaanvi posts/portfolio-works.png",
+        },
+        2: {
+            "banner_image": "/assets/portfolio_page/mantras/matras-banner.png",
+            "thumbnail_image": "/assets/images/portfolio/hp/2.jpg",
+            "approach_image": "/assets/portfolio_page/mantras/matra-works.png",
+            "approach": "We built a clean and informative digital presence that balances clinical expertise with approachability. Through minimal, structured design and educational-led content, we simplified complex treatments while maintaining a refined, premium aesthetic. The focus was on creating clarity, building trust and positioning Mantras as a credible and reliable clinic thus resulting in stronger engagement and a more consistent brand presence.",
+            "middle_banner_image": "/assets/portfolio_page/mantras/phnbnr.png",
+        },
+        3: {
+            "banner_image": "/assets/portfolio_page/picklejar/portfolio-banners.png",
+            "thumbnail_image": "/assets/images/portfolio/hp/3.jpg",
+            "approach_image": "/assets/portfolio_page/picklejar/postfolio-about.png",
+            "approach": "We built a warm and engaging visual identity that brings out the richness and nostalgia of homemade flavours. Through vibrant, appetising visuals and relatable storytelling the focus was on making the product feel both authentic and desirable. The result is a distinctive and inviting brand presence that enhances recall and connects with audiences through taste, tradition and emotion.",
+            "middle_banner_image": "/assets/portfolio_page/picklejar/portfolio_bnr.png",
+        },
+        4: {
+            "banner_image": "/assets/portfolio_page/bship/bshipbnr.png",
+            "thumbnail_image": "/assets/images/portfolio/hp/1.jpg",
+            "approach_image": "/assets/portfolio_page/bship/postfolio-about.png",
+            "approach": "We positioned BShip with a clear and structured communication style that reflects reliability, efficiency, and end-to-end logistics support. By organising core services into distinct, easily digestible segments, we streamlined complex supply-chain capabilities into an intuitive digital experience.",
+            "middle_banner_image": "/assets/portfolio_page/bship/portfolio-works.png",
+        },
+        5: {
+            "banner_image": "/assets/portfolio_page/fishland/portfolio-banners.png",
+            "thumbnail_image": "/assets/images/portfolio/hp/5.jpg",
+            "approach_image": "/assets/portfolio_page/fishland/postfolio-about.png",
+            "approach": "We built a visually rich and appetite-led content direction that highlights freshness, quality and maritime authenticity. Through bold, clean compositions and vibrant storytelling, the focus was on positioning Fishland as a trusted destination for premium seafood.",
+            "middle_banner_image": "/assets/portfolio_page/fishland/portfolio-works.png",
+        },
+        6: {
+            "banner_image": "/assets/portfolio_page/temple/portfolio-banners.png",
+            "thumbnail_image": "/assets/images/portfolio/hp/6.jpg",
+            "approach_image": "/assets/portfolio_page/temple/postfolio-about.png",
+            "approach": "We crafted a spiritual and cultural preservation narrative that documents sacred temple architecture, intricate sculptures, and timeless ritual traditions with profound dignity and visual grandeur.",
+            "middle_banner_image": "/assets/portfolio_page/temple/portfolio-works.png",
+        },
+        7: {
+            "banner_image": "/assets/portfolio_page/sbl_food/portfolio-banners.png",
+            "thumbnail_image": "/assets/images/portfolio/hp/7.jpg",
+            "approach_image": "/assets/portfolio_page/sbl_food/postfolio-about.png",
+            "approach": "We helped position SBL Food as a brand with a simplified and emotion-led communication style. By highlighting purity, tradition and everyday nourishment, we crafted an identity that connects deeply with modern households while celebrating culinary heritage.",
+            "middle_banner_image": "/assets/portfolio_page/sbl_food/portfolio-works.png",
+        },
+        8: {
+            "banner_image": "/assets/portfolio_page/sbl_farm/portfolio-banners.png",
+            "thumbnail_image": "/assets/images/portfolio/hp/8.jpg",
+            "approach_image": "/assets/portfolio_page/sbl_farm/postfolio-about.png",
+            "approach": "We positioned SBL Farms with a storytelling-led communication style that captures the authenticity of the land, fresh produce, and regenerative farming. Through natural visuals and grounded narratives, we connected the farm-to-table ethos with modern consumers.",
+            "middle_banner_image": "/assets/portfolio_page/sbl_farm/portfolio-works.png",
+        },
+        9: {
+            "banner_image": "/assets/portfolio_page/books/portfolio-banners.png",
+            "thumbnail_image": "/assets/images/portfolio/hp/9.jpg",
+            "approach_image": "/assets/portfolio_page/books/postfolio-about.png",
+            "approach": "We positioned Achuthan Publications with a clear and academically grounded communication style. By balancing timeless editorial elegance with structured layouts, we crafted an authoritative presence celebrating literature and scholarship.",
+            "middle_banner_image": "/assets/portfolio_page/books/portfolio-works.png",
+        },
+    }
+    for pid, vals in initial_portfolio_data.items():
+        cursor.execute("""
+            UPDATE portfolio
+            SET banner_image = COALESCE(NULLIF(banner_image, ''), ?),
+                thumbnail_image = COALESCE(NULLIF(thumbnail_image, ''), ?),
+                approach_image = COALESCE(NULLIF(approach_image, ''), ?),
+                approach = COALESCE(NULLIF(approach, ''), ?),
+                middle_banner_image = COALESCE(NULLIF(middle_banner_image, ''), ?)
+            WHERE id = ?
+        """, (vals["banner_image"], vals["thumbnail_image"], vals["approach_image"], vals["approach"], vals["middle_banner_image"], pid))
+
     conn.commit()
     # Seed default admin if no user exists
     cursor.execute("SELECT COUNT(*) FROM users")

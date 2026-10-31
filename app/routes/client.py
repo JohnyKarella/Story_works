@@ -1,3 +1,4 @@
+import secrets
 from functools import wraps
 from flask import (
     Blueprint,
@@ -10,9 +11,21 @@ from flask import (
     jsonify,
     current_app,
 )
-from app.models import User, Inquiry, Service, Setting
+from app.config import Config
+from app.models import User, Inquiry, Service, Setting, LoginHistory, PasswordReset
+from app.notifications import send_password_reset_otp
 
 client_bp = Blueprint("client", __name__, url_prefix="/client")
+
+
+def record_client_login(user):
+    """Save a client_login_history entry and remember its id for logout."""
+    session["client_login_history_id"] = LoginHistory.record_login(
+        user,
+        "client",
+        ip_address=request.headers.get("X-Forwarded-For", request.remote_addr),
+        user_agent=request.headers.get("User-Agent", ""),
+    )
 
 
 def client_login_required(f):
@@ -109,6 +122,7 @@ def register():
             session["client_name"] = full_name
             session["client_role"] = "client"
             User.record_login(new_id)
+            record_client_login({"id": new_id, "username": username, "role": "client"})
 
             flash(f"Welcome to Storyworks, {full_name}! Your client portal is ready.", "success")
             return redirect(url_for("client.dashboard"))
@@ -150,6 +164,7 @@ def login():
             session["client_name"] = user.get("full_name") or user["username"]
             session["client_role"] = user.get("role", "client")
             User.record_login(user["id"])
+            record_client_login(user)
 
             flash(f"Welcome back, {session['client_name']}!", "success")
             next_page = request.args.get("next")
@@ -162,6 +177,9 @@ def login():
 
 @client_bp.route("/logout")
 def logout():
+    login_history_id = session.pop("client_login_history_id", None)
+    if login_history_id:
+        LoginHistory.record_logout(login_history_id, "client")
     session.pop("client_id", None)
     session.pop("client_username", None)
     session.pop("client_email", None)
@@ -169,6 +187,87 @@ def logout():
     session.pop("client_role", None)
     flash("You have been signed out of the Client Portal.", "info")
     return redirect(url_for("client.login"))
+
+
+# ─────────────────────────────────────────────────────────────
+# FORGOT PASSWORD (OTP via email + SMS)
+# ─────────────────────────────────────────────────────────────
+
+@client_bp.route("/forgot-password", methods=["GET", "POST"], strict_slashes=False)
+def forgot_password():
+    if request.method == "POST":
+        identifier = request.form.get("identifier", "").strip()
+        if not identifier:
+            flash("Please enter your username or email address.", "error")
+            return render_template("client/forgot_password.html", step="request")
+
+        user = User.get_by_username(identifier) or User.get_by_email(identifier)
+        if not user or user.get("role") != "client":
+            flash("No client account found with that username or email.", "error")
+            return render_template("client/forgot_password.html", step="request", identifier=identifier)
+
+        waited = PasswordReset.seconds_since_sent(user["id"])
+        if waited is not None and waited < Config.OTP_RESEND_SECONDS:
+            flash(f"Please wait {int(Config.OTP_RESEND_SECONDS - waited)} seconds before requesting a new code.", "error")
+            return redirect(url_for("client.reset_password"))
+
+        otp = f"{secrets.randbelow(1000000):06d}"
+        PasswordReset.create(user["id"], otp, Config.OTP_EXPIRY_MINUTES)
+        sent_to = send_password_reset_otp(user, otp)
+
+        if not sent_to:
+            PasswordReset.clear(user["id"])
+            flash("We couldn't send a reset code right now. Please contact the studio for help.", "error")
+            return render_template("client/forgot_password.html", step="request", identifier=identifier)
+
+        session["reset_user_id"] = user["id"]
+        session["reset_identifier"] = identifier
+        flash(f"We sent a 6-digit code to {' and '.join(sent_to)}.", "success")
+        return redirect(url_for("client.reset_password"))
+
+    return render_template("client/forgot_password.html", step="request")
+
+
+@client_bp.route("/reset-password", methods=["GET", "POST"], strict_slashes=False)
+def reset_password():
+    user_id = session.get("reset_user_id")
+    if not user_id:
+        flash("Please request a password reset code first.", "info")
+        return redirect(url_for("client.forgot_password"))
+
+    if request.method == "POST":
+        otp = request.form.get("otp", "").strip()
+        new_password = request.form.get("new_password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if not (otp.isdigit() and len(otp) == 6):
+            flash("Please enter the 6-digit code we sent you.", "error")
+        elif len(new_password) < 6:
+            flash("New password must be at least 6 characters long.", "error")
+        elif new_password != confirm_password:
+            flash("Passwords do not match. Please try again.", "error")
+        else:
+            result = PasswordReset.verify(user_id, otp, Config.OTP_MAX_ATTEMPTS)
+            if result == "ok":
+                User.update_password(user_id, new_password)
+                PasswordReset.clear(user_id)
+                session.pop("reset_user_id", None)
+                session.pop("reset_identifier", None)
+                flash("Your password has been reset. Please sign in with your new password.", "success")
+                return redirect(url_for("client.login"))
+            if result == "invalid":
+                flash("That code is incorrect. Please check and try again.", "error")
+            elif result == "locked":
+                PasswordReset.clear(user_id)
+                flash("Too many incorrect attempts. Please request a new code.", "error")
+            else:
+                flash("This code has expired. Please request a new one.", "error")
+
+    return render_template(
+        "client/forgot_password.html",
+        step="reset",
+        identifier=session.get("reset_identifier", ""),
+    )
 
 
 # ─────────────────────────────────────────────────────────────

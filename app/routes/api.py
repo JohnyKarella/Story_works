@@ -125,9 +125,9 @@ def get_public_settings():
     })
 @api_bp.route("/health", methods=["GET"])
 def health_check():
-    """System and database health check for Railway."""
+    """System and database health check."""
     return jsonify({
         "status": "healthy",
         "service": "storyworks-studio",
-        "database": "sqlite",
+        "database": "mongodb",
     }), 200

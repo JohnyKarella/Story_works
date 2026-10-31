@@ -16,7 +16,7 @@ from flask import (
     current_app,
 )
 from werkzeug.utils import secure_filename
-from app.models import User, Inquiry, Blog, Portfolio, Service, Subscriber, Setting
+from app.models import User, Inquiry, Blog, Portfolio, Service, Subscriber, Setting, LoginHistory
 from app.config import Config
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 def login_required(f):
@@ -51,6 +51,12 @@ def login():
             session["email"] = user["email"]
             session["role"] = user["role"]
             User.record_login(user["id"])
+            session["login_history_id"] = LoginHistory.record_login(
+                user,
+                "admin",
+                ip_address=request.headers.get("X-Forwarded-For", request.remote_addr),
+                user_agent=request.headers.get("User-Agent", ""),
+            )
             flash(f"Welcome back, {user['username']}!", "success")
             next_page = request.args.get("next")
             return redirect(next_page or url_for("admin.dashboard"))
@@ -59,6 +65,9 @@ def login():
     return render_template("admin/login.html")
 @admin_bp.route("/logout")
 def logout():
+    login_history_id = session.pop("login_history_id", None)
+    if login_history_id:
+        LoginHistory.record_logout(login_history_id, "admin")
     session.pop("user_id", None)
     session.pop("username", None)
     session.pop("email", None)
@@ -566,6 +575,15 @@ def delete_subscriber(sub_id):
     Subscriber.delete(sub_id)
     flash("Subscriber removed.", "info")
     return redirect(url_for("admin.subscribers"))
+# ─────────────────────────────────────────────────────────────
+# LOGIN HISTORY
+# ─────────────────────────────────────────────────────────────
+@admin_bp.route("/login-history")
+@login_required
+def login_history():
+    role = request.args.get("role", "all")
+    entries = LoginHistory.get_all(portal=None if role == "all" else role)
+    return render_template("admin/login_history.html", entries=entries, current_role=role)
 # ─────────────────────────────────────────────────────────────
 # SETTINGS & PROFILE
 # ─────────────────────────────────────────────────────────────

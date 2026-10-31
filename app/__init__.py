@@ -10,8 +10,8 @@ def create_app(config_class=Config):
         static_url_path="/admin-static",
     )
     app.config.from_object(config_class)
-    # Enable CORS for API routes
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    # Enable CORS for API routes (set CORS_ORIGINS to your domain in production)
+    CORS(app, resources={r"/api/*": {"origins": config_class.CORS_ORIGINS}})
     # Initialize Database
     with app.app_context():
         init_db(app)

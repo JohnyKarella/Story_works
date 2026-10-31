@@ -1,338 +1,433 @@
-import sqlite3
 import os
-from pathlib import Path
+import re
+from datetime import datetime
+from bson import ObjectId
+import pymongo
+from pymongo import MongoClient
 from werkzeug.security import generate_password_hash
 from app.config import Config
-def get_db():
-    """Create and return a database connection with dict-like Row factory."""
-    db_path = Config.DATABASE_PATH
-    os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON;")
-    return conn
-def init_db(app=None, run_seed=True):
-    """Initialize database tables and create default admin user if not exists."""
-    # Ensure uploads folder exists
-    os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
-    conn = get_db()
-    cursor = conn.cursor()
-    # 1. Users table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        role TEXT DEFAULT 'client',
-        full_name TEXT,
-        company TEXT,
-        phone TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        last_login TIMESTAMP
-    );
-    """)
-    # 2. Contact Inquiries table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS inquiries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        first_name TEXT NOT NULL,
-        last_name TEXT,
-        email TEXT NOT NULL,
-        phone TEXT,
-        company TEXT,
-        budget TEXT,
-        timeline TEXT,
-        services TEXT,
-        message TEXT NOT NULL,
-        status TEXT DEFAULT 'new',
-        notes TEXT,
-        ip_address TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """)
-    # 3. Blogs table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS blogs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        slug TEXT UNIQUE NOT NULL,
-        category TEXT DEFAULT 'Blog',
-        author TEXT DEFAULT 'Storyworks Studio',
-        published_date TEXT,
-        cover_image TEXT,
-        excerpt TEXT,
-        content TEXT,
-        status TEXT DEFAULT 'published',
-        views INTEGER DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """)
-    # 4. Portfolio Projects table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS portfolio (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        slug TEXT UNIQUE NOT NULL,
-        client TEXT,
-        category TEXT,
-        badge TEXT,
-        cover_image TEXT,
-        thumbnail_image TEXT,
-        banner_image TEXT,
-        approach_image TEXT,
-        approach TEXT,
-        middle_banner_image TEXT,
-        gallery_images TEXT,
-        short_desc TEXT,
-        full_desc TEXT,
-        quote TEXT,
-        year TEXT,
-        project_url TEXT,
-        is_featured INTEGER DEFAULT 0,
-        status TEXT DEFAULT 'published',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """)
-    # 5. Services table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS services (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        slug TEXT UNIQUE,
-        short_desc TEXT,
-        full_desc TEXT,
-        icon TEXT,
-        display_order INTEGER DEFAULT 0,
-        is_active INTEGER DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """)
-    # 6. Subscribers table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS subscribers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """)
-    # 7. Site Settings table
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS settings (
-        key TEXT PRIMARY KEY,
-        value TEXT,
-        category TEXT DEFAULT 'general'
-    );
-    """)
-    conn.commit()
-    # Migration: Ensure client-related columns exist in users table
-    cursor.execute("PRAGMA table_info(users)")
-    user_cols = {row["name"] for row in cursor.fetchall()}
-    if "full_name" not in user_cols:
-        cursor.execute("ALTER TABLE users ADD COLUMN full_name TEXT")
-    if "company" not in user_cols:
-        cursor.execute("ALTER TABLE users ADD COLUMN company TEXT")
-    if "phone" not in user_cols:
-        cursor.execute("ALTER TABLE users ADD COLUMN phone TEXT")
 
-    # Migration: Ensure user_id, timeline, and updated_at columns exist in inquiries table
-    cursor.execute("PRAGMA table_info(inquiries)")
-    inquiry_cols = {row["name"] for row in cursor.fetchall()}
-    if "user_id" not in inquiry_cols:
-        cursor.execute("ALTER TABLE inquiries ADD COLUMN user_id INTEGER")
-    if "timeline" not in inquiry_cols:
-        cursor.execute("ALTER TABLE inquiries ADD COLUMN timeline TEXT")
-    if "updated_at" not in inquiry_cols:
-        cursor.execute("ALTER TABLE inquiries ADD COLUMN updated_at TIMESTAMP")
+_client = None
 
-    # Backfill timeline from message if present
+def get_client():
+    """Create and return a cached MongoClient, connecting to MongoDB Atlas or falling back to local store."""
+    global _client
+    if _client is not None:
+        return _client
+
+    uri = (Config.MONGO_URI or "").strip()
+    if uri and (uri.startswith("mongodb://") or uri.startswith("mongodb+srv://")):
+        print(f"[*] Connecting to MongoDB Atlas ({Config.MONGO_DB_NAME})...")
+        client = MongoClient(uri, serverSelectionTimeoutMS=10000)
+        try:
+            client.admin.command("ping")
+        except Exception as e:
+            # Fail loudly: silently falling back to memory would lose every write.
+            raise RuntimeError(f"Could not connect to MongoDB Atlas: {e}") from e
+        print("[*] Successfully connected to MongoDB Atlas!")
+        _client = client
+        return _client
+
+    print("[!] MONGO_URI not set - using temporary in-memory database (data is lost on restart).")
     try:
-        cursor.execute("""
-            UPDATE inquiries 
-            SET timeline = SUBSTR(message, INSTR(message, '[Target Timeline: ') + 17, 
-                                  INSTR(message, ']') - (INSTR(message, '[Target Timeline: ') + 17))
-            WHERE (timeline IS NULL OR timeline = '') AND message LIKE '%[Target Timeline:%'
-        """)
-    except Exception:
-        pass
-    # Migration: Ensure portfolio-related columns exist
-    cursor.execute("PRAGMA table_info(portfolio)")
-    port_cols = {row["name"] for row in cursor.fetchall()}
-    if "banner_image" not in port_cols:
-        cursor.execute("ALTER TABLE portfolio ADD COLUMN banner_image TEXT")
-    if "thumbnail_image" not in port_cols:
-        cursor.execute("ALTER TABLE portfolio ADD COLUMN thumbnail_image TEXT")
-    if "approach_image" not in port_cols:
-        cursor.execute("ALTER TABLE portfolio ADD COLUMN approach_image TEXT")
-    if "approach" not in port_cols:
-        cursor.execute("ALTER TABLE portfolio ADD COLUMN approach TEXT")
-    if "middle_banner_image" not in port_cols:
-        cursor.execute("ALTER TABLE portfolio ADD COLUMN middle_banner_image TEXT")
+        import mongomock
+        _client = mongomock.MongoClient()
+    except ImportError:
+        _client = MongoClient("mongodb://localhost:27017/", serverSelectionTimeoutMS=2000)
+    return _client
 
-    # Sync thumbnail_image and cover_image
-    cursor.execute("UPDATE portfolio SET thumbnail_image = cover_image WHERE (thumbnail_image IS NULL OR thumbnail_image = '') AND cover_image IS NOT NULL AND cover_image != ''")
-    cursor.execute("UPDATE portfolio SET cover_image = thumbnail_image WHERE (cover_image IS NULL OR cover_image = '') AND thumbnail_image IS NOT NULL AND thumbnail_image != ''")
+def get_db():
+    """Return the active MongoDB database object."""
+    client = get_client()
+    return client[Config.MONGO_DB_NAME]
 
-    # Initial data backfill for standard case studies
-    initial_portfolio_data = {
-        1: {
-            "banner_image": "/assets/portfolio_page/shaanvi posts/1_shaanvi.png",
-            "thumbnail_image": "/assets/images/portfolio/hp/4.jpg",
-            "approach_image": "/assets/portfolio_page/shaanvi posts/shaanvi-works.png",
-            "approach": "We created a cohesive visual direction that places the fabric at the centre, using minimal design and balanced compositions to highlight texture, colour and detail. The focus was on building a clean, consistent and premium aesthetic that enhances the brand’s identity, resulting in a more refined presence and stronger visual recall.",
-            "middle_banner_image": "/assets/portfolio_page/shaanvi posts/portfolio-works.png",
-        },
-        2: {
-            "banner_image": "/assets/portfolio_page/mantras/matras-banner.png",
-            "thumbnail_image": "/assets/images/portfolio/hp/2.jpg",
-            "approach_image": "/assets/portfolio_page/mantras/matra-works.png",
-            "approach": "We built a clean and informative digital presence that balances clinical expertise with approachability. Through minimal, structured design and educational-led content, we simplified complex treatments while maintaining a refined, premium aesthetic. The focus was on creating clarity, building trust and positioning Mantras as a credible and reliable clinic thus resulting in stronger engagement and a more consistent brand presence.",
-            "middle_banner_image": "/assets/portfolio_page/mantras/phnbnr.png",
-        },
-        3: {
-            "banner_image": "/assets/portfolio_page/picklejar/portfolio-banners.png",
-            "thumbnail_image": "/assets/images/portfolio/hp/3.jpg",
-            "approach_image": "/assets/portfolio_page/picklejar/postfolio-about.png",
-            "approach": "We built a warm and engaging visual identity that brings out the richness and nostalgia of homemade flavours. Through vibrant, appetising visuals and relatable storytelling the focus was on making the product feel both authentic and desirable. The result is a distinctive and inviting brand presence that enhances recall and connects with audiences through taste, tradition and emotion.",
-            "middle_banner_image": "/assets/portfolio_page/picklejar/portfolio_bnr.png",
-        },
-        4: {
-            "banner_image": "/assets/portfolio_page/bship/bshipbnr.png",
-            "thumbnail_image": "/assets/images/portfolio/hp/1.jpg",
-            "approach_image": "/assets/portfolio_page/bship/postfolio-about.png",
-            "approach": "We positioned BShip with a clear and structured communication style that reflects reliability, efficiency, and end-to-end logistics support. By organising core services into distinct, easily digestible segments, we streamlined complex supply-chain capabilities into an intuitive digital experience.",
-            "middle_banner_image": "/assets/portfolio_page/bship/portfolio-works.png",
-        },
-        5: {
-            "banner_image": "/assets/portfolio_page/fishland/portfolio-banners.png",
-            "thumbnail_image": "/assets/images/portfolio/hp/5.jpg",
-            "approach_image": "/assets/portfolio_page/fishland/postfolio-about.png",
-            "approach": "We built a visually rich and appetite-led content direction that highlights freshness, quality and maritime authenticity. Through bold, clean compositions and vibrant storytelling, the focus was on positioning Fishland as a trusted destination for premium seafood.",
-            "middle_banner_image": "/assets/portfolio_page/fishland/portfolio-works.png",
-        },
-        6: {
-            "banner_image": "/assets/portfolio_page/temple/portfolio-banners.png",
-            "thumbnail_image": "/assets/images/portfolio/hp/6.jpg",
-            "approach_image": "/assets/portfolio_page/temple/postfolio-about.png",
-            "approach": "We crafted a spiritual and cultural preservation narrative that documents sacred temple architecture, intricate sculptures, and timeless ritual traditions with profound dignity and visual grandeur.",
-            "middle_banner_image": "/assets/portfolio_page/temple/portfolio-works.png",
-        },
-        7: {
-            "banner_image": "/assets/portfolio_page/sbl_food/portfolio-banners.png",
-            "thumbnail_image": "/assets/images/portfolio/hp/7.jpg",
-            "approach_image": "/assets/portfolio_page/sbl_food/postfolio-about.png",
-            "approach": "We helped position SBL Food as a brand with a simplified and emotion-led communication style. By highlighting purity, tradition and everyday nourishment, we crafted an identity that connects deeply with modern households while celebrating culinary heritage.",
-            "middle_banner_image": "/assets/portfolio_page/sbl_food/portfolio-works.png",
-        },
-        8: {
-            "banner_image": "/assets/portfolio_page/sbl_farm/portfolio-banners.png",
-            "thumbnail_image": "/assets/images/portfolio/hp/8.jpg",
-            "approach_image": "/assets/portfolio_page/sbl_farm/postfolio-about.png",
-            "approach": "We positioned SBL Farms with a storytelling-led communication style that captures the authenticity of the land, fresh produce, and regenerative farming. Through natural visuals and grounded narratives, we connected the farm-to-table ethos with modern consumers.",
-            "middle_banner_image": "/assets/portfolio_page/sbl_farm/portfolio-works.png",
-        },
-        9: {
-            "banner_image": "/assets/portfolio_page/books/portfolio-banners.png",
-            "thumbnail_image": "/assets/images/portfolio/hp/9.jpg",
-            "approach_image": "/assets/portfolio_page/books/postfolio-about.png",
-            "approach": "We positioned Achuthan Publications with a clear and academically grounded communication style. By balancing timeless editorial elegance with structured layouts, we crafted an authoritative presence celebrating literature and scholarship.",
-            "middle_banner_image": "/assets/portfolio_page/books/portfolio-works.png",
-        },
-    }
-    for pid, vals in initial_portfolio_data.items():
-        cursor.execute("""
-            UPDATE portfolio
-            SET banner_image = COALESCE(NULLIF(banner_image, ''), ?),
-                thumbnail_image = COALESCE(NULLIF(thumbnail_image, ''), ?),
-                approach_image = COALESCE(NULLIF(approach_image, ''), ?),
-                approach = COALESCE(NULLIF(approach, ''), ?),
-                middle_banner_image = COALESCE(NULLIF(middle_banner_image, ''), ?)
-            WHERE id = ?
-        """, (vals["banner_image"], vals["thumbnail_image"], vals["approach_image"], vals["approach"], vals["middle_banner_image"], pid))
+def get_next_sequence_value(sequence_name):
+    """Generate an atomic auto-increment integer ID for collections."""
+    db = get_db()
+    seq = db.counters.find_one_and_update(
+        {"_id": sequence_name},
+        {"$inc": {"seq": 1}},
+        upsert=True,
+        return_document=pymongo.ReturnDocument.AFTER
+    )
+    return seq["seq"]
 
-    conn.commit()
-    # Seed default admin if no user exists
-    cursor.execute("SELECT COUNT(*) FROM users")
-    if cursor.fetchone()[0] == 0:
+def to_query_id(val):
+    """Normalize ID lookup to match either auto-increment integer 'id' or ObjectId '_id'."""
+    if isinstance(val, int):
+        return {"$or": [{"id": val}, {"id": str(val)}]}
+    s = str(val).strip()
+    if s.isdigit():
+        return {"$or": [{"id": int(s)}, {"id": s}]}
+    if ObjectId.is_valid(s):
+        return {"$or": [{"_id": ObjectId(s)}, {"id": s}]}
+    return {"id": s}
+
+def serialize_doc(doc):
+    """Convert MongoDB BSON document to clean dict with 'id' and stringified '_id'."""
+    if not doc:
+        return None
+    d = dict(doc)
+    if "_id" in d:
+        oid_str = str(d["_id"])
+        d["_id"] = oid_str
+        if "id" not in d:
+            d["id"] = oid_str
+    return d
+
+def migrate_login_history(db):
+    """Move entries from the legacy `login_history` collection into
+    `admin_login_history` / `client_login_history`, keeping their ids, then
+    drop the legacy collection so this runs once."""
+    if "login_history" not in db.list_collection_names():
+        return
+    try:
+        moved = {"admin_login_history": 0, "client_login_history": 0}
+        for doc in db.login_history.find({}):
+            target = "admin_login_history" if doc.get("role") == "admin" else "client_login_history"
+            db[target].replace_one({"_id": doc["_id"]}, doc, upsert=True)
+            moved[target] += 1
+        for name in moved:
+            top = db[name].find_one({"id": {"$type": "int"}}, sort=[("id", pymongo.DESCENDING)])
+            if top:
+                db.counters.update_one({"_id": f"{name}_id"}, {"$max": {"seq": top["id"]}}, upsert=True)
+        db.login_history.drop()
+        print(f"[*] Split login history: {moved['admin_login_history']} admin, "
+              f"{moved['client_login_history']} client entries (old login_history collection removed).")
+    except Exception as mig_err:
+        print(f"[!] Login history migration error: {mig_err}")
+
+
+def init_db(app=None, run_seed=True):
+    """Initialize MongoDB collections, indexes, and seed default data."""
+    os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
+    db = get_db()
+
+    # 1. Ensure indexes
+    try:
+        db.users.create_index([("username", pymongo.ASCENDING)], unique=True)
+        db.users.create_index([("email", pymongo.ASCENDING)], unique=True)
+        db.blogs.create_index([("slug", pymongo.ASCENDING)], unique=True)
+        db.portfolio.create_index([("slug", pymongo.ASCENDING)], unique=True)
+        db.services.create_index([("slug", pymongo.ASCENDING)], unique=True)
+        db.settings.create_index([("key", pymongo.ASCENDING)], unique=True)
+        db.subscribers.create_index([("email", pymongo.ASCENDING)], unique=True)
+    except Exception as idx_err:
+        print(f"[*] Notice on index creation: {idx_err}")
+
+    # 1b. Split the old shared login_history collection into admin/client collections (runs once)
+    migrate_login_history(db)
+
+    # 2. Check if we have exported data from sqlite_dump.json to migrate
+    dump_path = os.path.join(str(Config.BASE_DIR.parent), "sqlite_dump.json")
+    actual_dump = dump_path if os.path.exists(dump_path) else None
+
+    if actual_dump and os.path.exists(actual_dump) and db.portfolio.count_documents({}) == 0:
+        import json
+        try:
+            with open(actual_dump, "r", encoding="utf-8") as f:
+                dump_data = json.load(f)
+
+            print("[*] Migrating SQLite data to MongoDB Atlas collections...")
+            for table_name, rows in dump_data.items():
+                if not rows:
+                    continue
+                col = getattr(db, table_name)
+                if col.count_documents({}) == 0:
+                    for row in rows:
+                        row_copy = dict(row)
+                        col.insert_one(row_copy)
+                    # Update sequence counter
+                    max_id = max((r.get("id") or 0 for r in rows if isinstance(r.get("id"), int)), default=0)
+                    if max_id > 0:
+                        seq_key = {
+                            "users": "user_id",
+                            "inquiries": "inquiry_id",
+                            "blogs": "blog_id",
+                            "portfolio": "portfolio_id",
+                            "services": "service_id",
+                            "subscribers": "subscriber_id",
+                        }.get(table_name, f"{table_name}_id")
+
+                        db.counters.update_one(
+                            {"_id": seq_key},
+                            {"$set": {"seq": max_id}},
+                            upsert=True
+                        )
+            print("[*] Successfully migrated all records into MongoDB Atlas collections!")
+        except Exception as mig_err:
+            print(f"[!] SQLite migration error: {mig_err}")
+
+    # 3. Seed default admin user if not exists
+    if db.users.count_documents({}) == 0:
         hashed = generate_password_hash(Config.DEFAULT_ADMIN_PASSWORD)
-        cursor.execute(
-            "INSERT INTO users (username, email, password_hash, role, full_name) VALUES (?, ?, ?, ?, ?)",
-            (Config.DEFAULT_ADMIN_USERNAME, Config.DEFAULT_ADMIN_EMAIL, hashed, "admin", "Studio Admin")
-        )
-        conn.commit()
+        admin_id = get_next_sequence_value("user_id")
+        db.users.insert_one({
+            "id": admin_id,
+            "username": Config.DEFAULT_ADMIN_USERNAME,
+            "email": Config.DEFAULT_ADMIN_EMAIL,
+            "password_hash": hashed,
+            "role": "admin",
+            "full_name": "Studio Admin",
+            "company": "Storyworks Studio",
+            "phone": "+91 73492 51972",
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "last_login": None,
+        })
         print(f"[*] Created default admin user: {Config.DEFAULT_ADMIN_USERNAME}")
-    # Seed default site settings if not present
+
+    # 4. Seed default settings if not present
     default_settings = [
-        ("site_name", "Storyworks Studio", "general"),
-        ("site_tagline", "Where Strategy Meets Storytelling", "general"),
-        ("contact_email", "hello@storyworks.studio", "contact"),
-        ("contact_phone", "+91 98765 43210", "contact"),
-        ("contact_address", "Bengaluru, Karnataka, India", "contact"),
-        ("instagram_url", "https://www.instagram.com/storyworks.studio?igsi=aG5jY2w3YjA0amRy&utm_source=qr", "social"),
-        ("linkedin_url", "https://linkedin.com", "social"),
-        ("twitter_url", "https://x.com", "social"),
+        {"key": "site_name", "value": "Storyworks Studio", "category": "general"},
+        {"key": "site_tagline", "value": "Where Strategy Meets Storytelling", "category": "general"},
+        {"key": "contact_email", "value": "hello@storyworks.studio", "category": "contact"},
+        {"key": "contact_phone", "value": "+91 98765 43210", "category": "contact"},
+        {"key": "contact_address", "value": "Bengaluru, Karnataka, India", "category": "contact"},
+        {"key": "instagram_url", "value": "https://www.instagram.com/storyworks.studio?igsi=aG5jY2w3YjA0amRy&utm_source=qr", "category": "social"},
+        {"key": "linkedin_url", "value": "https://linkedin.com", "category": "social"},
+        {"key": "twitter_url", "value": "https://x.com", "category": "social"},
     ]
-    for key, val, cat in default_settings:
-        cursor.execute(
-            "INSERT OR IGNORE INTO settings (key, value, category) VALUES (?, ?, ?)",
-            (key, val, cat)
-        )
-    # Ensure standard services match website offerings
-    cursor.execute("SELECT slug FROM services")
-    existing_slugs = {row[0] for row in cursor.fetchall()}
-    if "brand-strategy-identity" in existing_slugs or len(existing_slugs) == 0:
-        # Clear legacy seeded services if present
-        cursor.execute("DELETE FROM services WHERE slug IN ('brand-strategy-identity', 'web-design-digital-experiences', 'photography-visual-craft', 'local-seo-performance-marketing')")
+    for s in default_settings:
+        db.settings.update_one({"key": s["key"]}, {"$setOnInsert": s}, upsert=True)
+
+    # 5. Seed default 9 portfolio items if empty
+    if db.portfolio.count_documents({}) == 0:
+        initial_portfolios = [
+            {
+                "id": 1,
+                "title": "Shaanvi",
+                "slug": "shaanvi",
+                "client": "Shaanvi",
+                "category": "Branding & Packaging",
+                "badge": "SHAANVI",
+                "cover_image": "assets/images/portfolio/hp/4.jpg",
+                "thumbnail_image": "assets/images/portfolio/hp/4.jpg",
+                "banner_image": "/assets/portfolio_page/shaanvi posts/1_shaanvi.png",
+                "approach_image": "/assets/portfolio_page/shaanvi posts/shaanvi-works.png",
+                "approach": "We adopted an architectural minimalism philosophy focusing on light, form, and texture.",
+                "middle_banner_image": "/assets/portfolio_page/shaanvi posts/portfolio-works.png",
+                "gallery_images": "[]",
+                "short_desc": "End-to-end brand identity, packaging design, and visual art direction for premium organic foods.",
+                "full_desc": "Shaanvi approached Story Works Studio to create a timeless visual identity.",
+                "quote": "We finally have a brand voice that feels as premium as our products. The level of intentionality in every design choice has given our team a clear North Star for all future growth.",
+                "year": "2026",
+                "project_url": "1_shaanvi.html",
+                "is_featured": 1,
+                "status": "published",
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            },
+            {
+                "id": 2,
+                "title": "Mantras",
+                "slug": "mantras",
+                "client": "Mantras",
+                "category": "Brand Strategy & Identity",
+                "badge": "MANTRAS",
+                "cover_image": "assets/images/portfolio/hp/2.jpg",
+                "thumbnail_image": "assets/images/portfolio/hp/2.jpg",
+                "banner_image": "/assets/portfolio_page/mantras/matras-banner.png",
+                "approach_image": "/assets/portfolio_page/mantras/matra-works.png",
+                "approach": "We built a clean and informative digital presence that balances clinical expertise with approachability.",
+                "middle_banner_image": "/assets/portfolio_page/mantras/phnbnr.png",
+                "gallery_images": "[]",
+                "short_desc": "Holistic brand positioning and serene packaging for modern wellness lifestyle products.",
+                "full_desc": "Holistic brand positioning and serene packaging for modern wellness lifestyle products.",
+                "quote": "The transition from a concept to a living brand felt seamless under their guidance. They have a rare ability to bridge the gap between creative storytelling and real-world business logic.",
+                "year": "2026",
+                "project_url": "2_mantras.html",
+                "is_featured": 1,
+                "status": "published",
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            },
+            {
+                "id": 3,
+                "title": "Bhruhadrupi Hanuman Temple",
+                "slug": "bhruhadrupi-temple",
+                "client": "Bhruhadrupi",
+                "category": "Architectural Visuals & Print",
+                "badge": "BHRUHADRUPI",
+                "cover_image": "assets/images/portfolio/hp/6.jpg",
+                "thumbnail_image": "assets/images/portfolio/hp/6.jpg",
+                "banner_image": "/assets/portfolio_page/temple/portfolio-banners.png",
+                "approach_image": "/assets/portfolio_page/temple/postfolio-about.png",
+                "approach": "We crafted a spiritual and cultural preservation narrative that documents sacred temple architecture.",
+                "middle_banner_image": "/assets/portfolio_page/temple/portfolio-works.png",
+                "gallery_images": "[]",
+                "short_desc": "Sacred architecture documentation, commemorative coffee table book, and cultural preservation.",
+                "full_desc": "Sacred architecture documentation, commemorative coffee table book, and cultural preservation.",
+                "quote": "Preserving sacred tradition while ensuring modern accessibility is a delicate balance. The studio handled our narrative with immense respect, creating a visual identity that is both timeless and resonant.",
+                "year": "2025",
+                "project_url": "6_temple.html",
+                "is_featured": 1,
+                "status": "published",
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            },
+            {
+                "id": 4,
+                "title": "Fishland",
+                "slug": "fishland",
+                "client": "Fishland",
+                "category": "Retail & Environmental Branding",
+                "badge": "FISHLAND",
+                "cover_image": "assets/images/portfolio/hp/7.jpg",
+                "thumbnail_image": "assets/images/portfolio/hp/7.jpg",
+                "banner_image": "/assets/portfolio_page/fishland/portfolio-banners.png",
+                "approach_image": "/assets/portfolio_page/fishland/postfolio-about.png",
+                "approach": "We positioned Fishland with bold, clean compositions and vibrant storytelling.",
+                "middle_banner_image": "/assets/portfolio_page/fishland/portfolio-works.png",
+                "gallery_images": "[]",
+                "short_desc": "Coastal culinary branding, retail store graphics, and fresh seafood packaging.",
+                "full_desc": "Coastal culinary branding, retail store graphics, and fresh seafood packaging.",
+                "quote": "They helped us cut through a crowded market by finding our unique 'signal.' Our brand now speaks with a clarity and consistency that has significantly improved our customer trust and recall.",
+                "year": "2025",
+                "project_url": "5_fishland.html",
+                "is_featured": 1,
+                "status": "published",
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            },
+            {
+                "id": 5,
+                "title": "SBL Farms",
+                "slug": "sbl-farms",
+                "client": "SBL-Farms",
+                "category": "Sustainable Agri-Branding",
+                "badge": "SBL-FARMS",
+                "cover_image": "assets/images/portfolio/hp/1.jpg",
+                "thumbnail_image": "assets/images/portfolio/hp/1.jpg",
+                "banner_image": "/assets/portfolio_page/sbl_farm/portfolio-banners.png",
+                "approach_image": "/assets/portfolio_page/sbl_farm/postfolio-about.png",
+                "approach": "We articulated the heritage of our land and connected farm-to-table ethos with modern consumers.",
+                "middle_banner_image": "/assets/portfolio_page/sbl_farm/portfolio-works.png",
+                "gallery_images": "[]",
+                "short_desc": "Organic farming branding, farm-gate packaging, and environmental storytelling.",
+                "full_desc": "Organic farming branding, farm-gate packaging, and environmental storytelling.",
+                "quote": "Story Works Studio didn't just design our packaging; they articulated the heritage of our land. They transformed our agricultural roots into a sophisticated brand that commands a premium market position.",
+                "year": "2025",
+                "project_url": "8_farms.html",
+                "is_featured": 1,
+                "status": "published",
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            },
+            {
+                "id": 6,
+                "title": "Achuthan Publications",
+                "slug": "achuthan-publications",
+                "client": "Achuthan",
+                "category": "Editorial & Book Design",
+                "badge": "ACHUTHAN PUBLICATIONS",
+                "cover_image": "assets/images/portfolio/hp/9.jpg",
+                "thumbnail_image": "assets/images/portfolio/hp/9.jpg",
+                "banner_image": "/assets/portfolio_page/books/portfolio-banners.png",
+                "approach_image": "/assets/portfolio_page/books/postfolio-about.png",
+                "approach": "We crafted an authoritative presence celebrating literature, typography and scholarship.",
+                "middle_banner_image": "/assets/portfolio_page/books/portfolio-works.png",
+                "gallery_images": "[]",
+                "short_desc": "Fine typography, custom book covers, and artisanal print binding.",
+                "full_desc": "Fine typography, custom book covers, and artisanal print binding.",
+                "quote": "Working with Story Works Studio was an exercise in precision. They took decades of published history and distilled it into a cohesive, modern framework without losing our original soul.",
+                "year": "2025",
+                "project_url": "9_book.html",
+                "is_featured": 1,
+                "status": "published",
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            },
+            {
+                "id": 7,
+                "title": "SBL Foods",
+                "slug": "sbl-foods",
+                "client": "SBL-Foods",
+                "category": "FMCG Brand Architecture",
+                "badge": "SBL-FOODS",
+                "cover_image": "assets/images/portfolio/hp/11.jpg",
+                "thumbnail_image": "assets/images/portfolio/hp/11.jpg",
+                "banner_image": "/assets/portfolio_page/sbl_food/portfolio-banners.png",
+                "approach_image": "/assets/portfolio_page/sbl_food/postfolio-about.png",
+                "approach": "We helped position SBL Food as an emotion-led household brand celebrating purity and culinary heritage.",
+                "middle_banner_image": "/assets/portfolio_page/sbl_food/portfolio-works.png",
+                "gallery_images": "[]",
+                "short_desc": "Multi-category FMCG packaging suite and corporate brand architecture.",
+                "full_desc": "Multi-category FMCG packaging suite and corporate brand architecture.",
+                "quote": "Story Works Studio didn't just design our packaging; they articulated the heritage of our land. They transformed our agricultural roots into a sophisticated brand that commands a premium market position.",
+                "year": "2026",
+                "project_url": "7_sblfood.html",
+                "is_featured": 1,
+                "status": "published",
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            },
+            {
+                "id": 8,
+                "title": "Bship",
+                "slug": "bship",
+                "client": "Bship",
+                "category": "Corporate Digital Identity",
+                "badge": "BSHIP",
+                "cover_image": "assets/images/portfolio/hp/8.jpg",
+                "thumbnail_image": "assets/images/portfolio/hp/8.jpg",
+                "banner_image": "/assets/portfolio_page/bship/bshipbnr.png",
+                "approach_image": "/assets/portfolio_page/bship/postfolio-about.png",
+                "approach": "We positioned BShip with clear structured communication reflecting logistics reliability.",
+                "middle_banner_image": "/assets/portfolio_page/bship/portfolio-works.png",
+                "gallery_images": "[]",
+                "short_desc": "High-impact visual identity and interactive web experience for freight & maritime operations.",
+                "full_desc": "High-impact visual identity and interactive web experience for freight & maritime operations.",
+                "quote": "Launch strategy is where this studio truly shines. They orchestrated our market entry with surgical precision, ensuring our brand was not just seen, but immediately understood by our audience.",
+                "year": "2026",
+                "project_url": "4_bship.html",
+                "is_featured": 1,
+                "status": "published",
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            },
+            {
+                "id": 9,
+                "title": "PickleJar",
+                "slug": "picklejar",
+                "client": "PickleJar",
+                "category": "Packaging & Art Direction",
+                "badge": "PICKLEJAR",
+                "cover_image": "assets/images/portfolio/hp/10.jpg",
+                "thumbnail_image": "assets/images/portfolio/hp/10.jpg",
+                "banner_image": "/assets/portfolio_page/picklejar/portfolio-banners.png",
+                "approach_image": "/assets/portfolio_page/picklejar/postfolio-about.png",
+                "approach": "We built a warm visual identity bringing out the richness and nostalgia of homemade flavours.",
+                "middle_banner_image": "/assets/portfolio_page/picklejar/portfolio_bnr.png",
+                "gallery_images": "[]",
+                "short_desc": "Nostalgic culinary roots reimagined with vibrant modern shelf appeal.",
+                "full_desc": "Nostalgic culinary roots reimagined with vibrant modern shelf appeal.",
+                "quote": "Launch strategy is where this studio truly shines. They orchestrated our market entry with surgical precision, ensuring our brand was not just seen, but immediately understood by our audience.",
+                "year": "2025",
+                "project_url": "3_picklejar.html",
+                "is_featured": 1,
+                "status": "published",
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+        ]
+        db.portfolio.insert_many(initial_portfolios)
+        db.counters.update_one({"_id": "portfolio_id"}, {"$set": {"seq": 9}}, upsert=True)
+
+    # 6. Seed default services if empty
+    if db.services.count_documents({}) == 0:
         standard_services = [
-            ("Brand Strategy", "brand-strategy", "We move beyond aesthetics to architect the strategic soul of your business. By synthesizing market intelligence with intuition, we build the narrative frameworks that drive your brand’s future.", "We move beyond aesthetics to architect the strategic soul of your business. By synthesizing market intelligence with intuition, we build the narrative frameworks that drive your brand’s future.", "fas fa-chart-line", 1, 1),
-            ("Brand Identity & Design", "brand-identity-design", "We craft visual legacies through intentional design, from signature logos to multi-sensory systems. Every touchpoint is engineered for flawless consistency, creating a timeless invitation into your brand’s world.", "We craft visual legacies through intentional design, from signature logos to multi-sensory systems. Every touchpoint is engineered for flawless consistency, creating a timeless invitation into your brand’s world.", "fas fa-search", 2, 1),
-            ("Content & Copywriting", "content-copywriting", "Our narratives do more than fill space; they command attention and build lasting rapport. We translate complex value propositions into persuasive human stories that sell a philosophy, not just a product.", "Our narratives do more than fill space; they command attention and build lasting rapport. We translate complex value propositions into persuasive human stories that sell a philosophy, not just a product.", "fas fa-thumbs-up", 3, 1),
-            ("Digital Marketing", "digital-marketing", "Our approach integrates high-intent SEO and strategic social storytelling into performance-driven ecosystems that grow your community and your revenue in equal measure.", "Our approach integrates high-intent SEO and strategic social storytelling into performance-driven ecosystems that grow your community and your revenue in equal measure.", "fab fa-google", 4, 1),
-            ("Web & Experience Design", "web-experience-design", "We view the digital interface as a premier storefront. Our team designs high-conversion digital environments where elegant minimalism meets functional rigor, ensuring every click feels intuitive and every interaction reinforces trust.", "We view the digital interface as a premier storefront. Our team designs high-conversion digital environments where elegant minimalism meets functional rigor, ensuring every click feels intuitive and every interaction reinforces trust.", "fas fa-laptop-code", 5, 1),
-            ("Launch & Campaign Strategy", "launch-campaign-strategy", "We transform entries into arrivals through strategic blueprints and high-impact storytelling. By orchestrating the pivotal moments where brands meet the world, we ensure your debut is both seen and felt.", "We transform entries into arrivals through strategic blueprints and high-impact storytelling. By orchestrating the pivotal moments where brands meet the world, we ensure your debut is both seen and felt.", "fas fa-code", 6, 1),
+            {"id": 1, "title": "Brand Strategy", "slug": "brand-strategy", "short_desc": "We move beyond aesthetics to architect the strategic soul of your business. By synthesizing market intelligence with intuition, we build the narrative frameworks that drive your brand’s future.", "full_desc": "We move beyond aesthetics to architect the strategic soul of your business. By synthesizing market intelligence with intuition, we build the narrative frameworks that drive your brand’s future.", "icon": "fas fa-chart-line", "display_order": 1, "is_active": 1, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"id": 2, "title": "Brand Identity & Design", "slug": "brand-identity-design", "short_desc": "We craft visual legacies through intentional design, from signature logos to multi-sensory systems. Every touchpoint is engineered for flawless consistency, creating a timeless invitation into your brand’s world.", "full_desc": "We craft visual legacies through intentional design, from signature logos to multi-sensory systems. Every touchpoint is engineered for flawless consistency, creating a timeless invitation into your brand’s world.", "icon": "fas fa-search", "display_order": 2, "is_active": 1, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"id": 3, "title": "Content & Copywriting", "slug": "content-copywriting", "short_desc": "Our narratives do more than fill space; they command attention and build lasting rapport. We translate complex value propositions into persuasive human stories that sell a philosophy, not just a product.", "full_desc": "Our narratives do more than fill space; they command attention and build lasting rapport. We translate complex value propositions into persuasive human stories that sell a philosophy, not just a product.", "icon": "fas fa-thumbs-up", "display_order": 3, "is_active": 1, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"id": 4, "title": "Digital Marketing", "slug": "digital-marketing", "short_desc": "Our approach integrates high-intent SEO and strategic social storytelling into performance-driven ecosystems that grow your community and your revenue in equal measure.", "full_desc": "Our approach integrates high-intent SEO and strategic social storytelling into performance-driven ecosystems that grow your community and your revenue in equal measure.", "icon": "fab fa-google", "display_order": 4, "is_active": 1, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"id": 5, "title": "Web & Experience Design", "slug": "web-experience-design", "short_desc": "We view the digital interface as a premier storefront. Our team designs high-conversion digital environments where elegant minimalism meets functional rigor, ensuring every click feels intuitive and every interaction reinforces trust.", "full_desc": "We view the digital interface as a premier storefront. Our team designs high-conversion digital environments where elegant minimalism meets functional rigor, ensuring every click feels intuitive and every interaction reinforces trust.", "icon": "fas fa-laptop-code", "display_order": 5, "is_active": 1, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"id": 6, "title": "Launch & Campaign Strategy", "slug": "launch-campaign-strategy", "short_desc": "We transform entries into arrivals through strategic blueprints and high-impact storytelling. By orchestrating the pivotal moments where brands meet the world, we ensure your debut is both seen and felt.", "full_desc": "We transform entries into arrivals through strategic blueprints and high-impact storytelling. By orchestrating the pivotal moments where brands meet the world, we ensure your debut is both seen and felt.", "icon": "fas fa-code", "display_order": 6, "is_active": 1, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
         ]
-        for title, slug, sdesc, fdesc, icon, order, active in standard_services:
-            cursor.execute(
-                """
-                INSERT OR IGNORE INTO services (title, slug, short_desc, full_desc, icon, display_order, is_active)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
-                (title, slug, sdesc, fdesc, icon, order, active),
-            )
-        conn.commit()
-    # Ensure all cover_image paths in blogs and portfolio start with '/'
-    cursor.execute("UPDATE blogs SET cover_image = '/' || cover_image WHERE cover_image IS NOT NULL AND cover_image != '' AND cover_image NOT LIKE '/%' AND cover_image NOT LIKE 'http%'")
-    cursor.execute("UPDATE portfolio SET cover_image = '/' || cover_image WHERE cover_image IS NOT NULL AND cover_image != '' AND cover_image NOT LIKE '/%' AND cover_image NOT LIKE 'http%'")
-    # Check if legacy blog seeds exist (e.g. power-of-visual-storytelling)
-    cursor.execute("SELECT slug FROM blogs")
-    blog_slugs = {row[0] for row in cursor.fetchall()}
-    if "power-of-visual-storytelling" in blog_slugs:
-        cursor.execute("DELETE FROM blogs WHERE slug IN ('power-of-visual-storytelling', 'building-a-distinct-brand-voice', 'data-driven-creative-growth')")
-        new_blogs = [
-            ("In-House Marketing vs Hiring a Bangalore Agency: What’s the Real Cost?", "in-house-marketing-vs-hiring-agency-cost", "Strategy & Scaling", "Storyworks Studio", "MAR 16, 2026", "/assets/blogs/d1.jpg", "The choice between creating an internal marketing team and outsourcing to an external agency is frequently presented as a matter of comparing costs. For a founder, though the true issue isn't how much you spend, it's the return you receive for it.", "The choice between creating an internal marketing team and outsourcing to an external agency is frequently presented as a matter of comparing costs. For a founder, though the true issue isn't how much you spend, it's the return you receive for it. Revenue, speed and reliability are far more important than mere superficial savings.\nMarketing today is not a single role, it demands strategy, content, design, performance marketing, analytics and ongoing optimization. Assembling an in-house team that performs effectively in all these functions is costly and time-consuming.", "published"),
-            ("The 2026 Digital Marketing Playbook for Bangalore SMEs: What Actually Works", "digital-marketing-playbook-bangalore-smes", "Digital Growth", "Storyworks Studio", "MAR 20, 2026", "/assets/blogs/e1.jpg", "Digital marketing has advanced to the stage where fragmented initiatives no longer yield significant outcomes. For small and medium-sized enterprises in Bengaluru, the issue is not an absence of avenues but rather clarity on what truly fuels expansion.", "Digital marketing has advanced to the stage where fragmented initiatives no longer yield significant outcomes. For small and medium-sized enterprises in Bengaluru, the issue is not an absence of avenue but rather uncertainty about what truly fuels expansion.\nThe approach for 2026 emphasizes building a targeted system aligned with customer behavior and business goals, rather than experimenting across every platform.", "published"),
-            ("Why Most Businesses Struggle With Marketing Even After Spending on It", "why-businesses-struggle-with-marketing", "Marketing Strategy", "Storyworks Studio", "MAR 26, 2026", "/assets/blogs/f1.jpg", "Building a brand today comes with far more challenges than just creating a product and putting it online. The absence of a suitable marketing framework is one of the most serious difficulties companies confront.", "Building a brand today comes with far more challenges than just creating a product and putting it online. The absence of a suitable marketing framework is one of the most serious difficulties companies confront, not the absence of marketing activity.\nHow effectively several departments cooperate concurrently determines the modern success of brand expansion. Performance marketing, customer psychology, SEO, analytics, design, storytelling, and conversion optimization all have to work in perfect harmony.", "published")
+        db.services.insert_many(standard_services)
+        db.counters.update_one({"_id": "service_id"}, {"$set": {"seq": 6}}, upsert=True)
+
+    # 7. Seed default blogs if empty
+    if db.blogs.count_documents({}) == 0:
+        default_blogs = [
+            {"id": 1, "title": "Dominate the Namma Bengaluru Market: A Local SEO Guide for Local Businesses", "slug": "dominate-namma-bengaluru-market-local-seo", "category": "Local SEO", "author": "Storyworks Studio", "published_date": "FEB 19, 2026", "cover_image": "/assets/blogs/a1.jpg", "excerpt": "If your business is not showing up when someone searches for your service in Bengaluru, you are losing customers in real time.", "content": "If your business is not showing up when someone searches for your service in Bengaluru, you are losing customers in real time. Every day, potential buyers are searching for exactly what you offer.", "status": "published", "views": 0, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"id": 2, "title": "Stop Buying Likes & Start Driving Sales: The ROI-First Social Media Strategy", "slug": "stop-buying-likes-start-driving-sales", "category": "Performance Marketing", "author": "Storyworks Studio", "published_date": "FEB 25, 2026", "cover_image": "/assets/blogs/b1.jpg", "excerpt": "Most businesses put money into social media with the hope that being seen will lead to sales, but in reality, a lot of marketing spend goes to waste without an ROI-driven architecture.", "content": "Most businesses put money into social media with the hope that being seen will lead to sales, but in reality, a lot of vanity metrics distract from what actually moves the needle.", "status": "published", "views": 0, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"id": 3, "title": "Why Your Beautiful Website Is Losing Customers (And How to Fix It)", "slug": "why-your-website-is-losing-customers", "category": "Web Design & CRO", "author": "Storyworks Studio", "published_date": "MAR 07, 2026", "cover_image": "/assets/blogs/c1.jpg", "excerpt": "A well-designed website can make a strong first impression, but design alone doesn't guarantee sales.", "content": "A well-designed website can make a strong first impression, but design alone doesn't guarantee sales. Here is why pretty websites fail and how conversion architecture solves it.", "status": "published", "views": 0, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"id": 4, "title": "In-House Marketing vs Hiring a Bangalore Agency: What’s the Real Cost?", "slug": "in-house-marketing-vs-hiring-agency-cost", "category": "Strategy & Scaling", "author": "Storyworks Studio", "published_date": "MAR 16, 2026", "cover_image": "/assets/blogs/d1.jpg", "excerpt": "The choice between creating an internal marketing team and outsourcing to an external agency is frequently presented as a matter of comparing costs.", "content": "The choice between creating an internal marketing team and outsourcing to an external agency is frequently presented as a matter of comparing costs. For a founder, though the true issue isn't how much you spend, it's the return you receive for it.", "status": "published", "views": 0, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"id": 5, "title": "The 2026 Digital Marketing Playbook for Bangalore SMEs: What Actually Works", "slug": "digital-marketing-playbook-bangalore-smes", "category": "Digital Growth", "author": "Storyworks Studio", "published_date": "MAR 20, 2026", "cover_image": "/assets/blogs/e1.jpg", "excerpt": "Digital marketing has advanced to the stage where fragmented initiatives no longer yield significant outcomes.", "content": "Digital marketing has advanced to the stage where fragmented initiatives no longer yield significant outcomes. For small and medium-sized enterprises in Bengaluru, the issue is not an absence of avenues but rather clarity on what truly fuels expansion.", "status": "published", "views": 0, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            {"id": 6, "title": "Why Most Businesses Struggle With Marketing Even After Spending on It", "slug": "why-businesses-struggle-with-marketing", "category": "Marketing Strategy", "author": "Storyworks Studio", "published_date": "MAR 26, 2026", "cover_image": "/assets/blogs/f1.jpg", "excerpt": "Building a brand today comes with far more challenges than just creating a product and putting it online.", "content": "Building a brand today comes with far more challenges than just creating a product and putting it online. The absence of a suitable marketing framework is one of the most serious difficulties companies confront.", "status": "published", "views": 0, "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
         ]
-        for title, slug, cat, author, pdate, cimg, excerpt, content, status in new_blogs:
-            cursor.execute(
-                """
-                INSERT OR IGNORE INTO blogs (title, slug, category, author, published_date, cover_image, excerpt, content, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (title, slug, cat, author, pdate, cimg, excerpt, content, status)
-            )
-    conn.commit()
-    # Auto-seed initial content if database was freshly created
-    if run_seed:
-        cursor.execute("SELECT COUNT(*) FROM blogs")
-        if cursor.fetchone()[0] == 0:
-            try:
-                from database.seed_data import seed_all
-                seed_all()
-            except Exception as seed_err:
-                print(f"[*] Auto-seed notice: {seed_err}")
-    conn.close()
-    print("[*] Database initialized successfully.")
+        db.blogs.insert_many(default_blogs)
+        db.counters.update_one({"_id": "blog_id"}, {"$set": {"seq": 6}}, upsert=True)
+
+    print("[*] MongoDB Atlas database initialized successfully.")

@@ -1,135 +1,158 @@
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
+from bson import ObjectId
+import pymongo
 from werkzeug.security import check_password_hash, generate_password_hash
-from app.database import get_db
+from app.database import get_db, get_next_sequence_value, to_query_id, serialize_doc
+
+
 def slugify(text: str) -> str:
     """Convert text to URL-friendly slug."""
     text = text.lower().strip()
     text = re.sub(r"[^\w\s-]", "", text)
     text = re.sub(r"[\s_-]+", "-", text)
     return text.strip("-")
+
+
 class User:
     @staticmethod
     def get_by_id(user_id):
-        conn = get_db()
-        user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
-        conn.close()
-        return dict(user) if user else None
+        db = get_db()
+        doc = db.users.find_one(to_query_id(user_id))
+        return serialize_doc(doc)
+
     @staticmethod
     def get_by_username(username):
-        conn = get_db()
-        user = conn.execute("SELECT * FROM users WHERE username = ? OR email = ?", (username, username)).fetchone()
-        conn.close()
-        return dict(user) if user else None
+        db = get_db()
+        u = (username or "").strip()
+        doc = db.users.find_one({
+            "$or": [
+                {"username": u},
+                {"email": u.lower()}
+            ]
+        })
+        return serialize_doc(doc)
+
     @staticmethod
     def get_by_email(email):
-        conn = get_db()
-        user = conn.execute("SELECT * FROM users WHERE LOWER(email) = LOWER(?)", (email.strip(),)).fetchone()
-        conn.close()
-        return dict(user) if user else None
+        db = get_db()
+        e = (email or "").strip().lower()
+        doc = db.users.find_one({"email": e})
+        return serialize_doc(doc)
+
     @staticmethod
     def create(username, email, password, role="client", full_name="", company="", phone=""):
-        conn = get_db()
-        cursor = conn.cursor()
+        db = get_db()
+        user_id = get_next_sequence_value("user_id")
         hashed = generate_password_hash(password)
-        cursor.execute(
-            """
-            INSERT INTO users (username, email, password_hash, role, full_name, company, phone)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            """,
-            (username.strip(), email.strip().lower(), hashed, role, full_name.strip(), company.strip(), phone.strip()),
-        )
-        user_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
+        doc = {
+            "id": user_id,
+            "username": username.strip(),
+            "email": email.strip().lower(),
+            "password_hash": hashed,
+            "role": role,
+            "full_name": full_name.strip(),
+            "company": company.strip(),
+            "phone": phone.strip(),
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "last_login": None,
+        }
+        db.users.insert_one(doc)
         return user_id
+
     @staticmethod
     def update_client_profile(user_id, full_name, company, phone):
-        conn = get_db()
-        conn.execute(
-            "UPDATE users SET full_name = ?, company = ?, phone = ? WHERE id = ?",
-            (full_name.strip(), company.strip(), phone.strip(), user_id),
+        db = get_db()
+        db.users.update_one(
+            to_query_id(user_id),
+            {"$set": {
+                "full_name": full_name.strip(),
+                "company": company.strip(),
+                "phone": phone.strip()
+            }}
         )
-        conn.commit()
-        conn.close()
+
     @staticmethod
     def verify_password(stored_hash, password):
         return check_password_hash(stored_hash, password)
+
     @staticmethod
     def update_password(user_id, new_password):
-        conn = get_db()
+        db = get_db()
         hashed = generate_password_hash(new_password)
-        conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (hashed, user_id))
-        conn.commit()
-        conn.close()
+        db.users.update_one(to_query_id(user_id), {"$set": {"password_hash": hashed}})
+
     @staticmethod
     def update_profile(user_id, username, email):
-        conn = get_db()
-        conn.execute("UPDATE users SET username = ?, email = ? WHERE id = ?", (username, email, user_id))
-        conn.commit()
-        conn.close()
+        db = get_db()
+        db.users.update_one(
+            to_query_id(user_id),
+            {"$set": {"username": username.strip(), "email": email.strip().lower()}}
+        )
+
     @staticmethod
     def record_login(user_id):
-        conn = get_db()
+        db = get_db()
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        conn.execute("UPDATE users SET last_login = ? WHERE id = ?", (now, user_id))
-        conn.commit()
-        conn.close()
+        db.users.update_one(to_query_id(user_id), {"$set": {"last_login": now}})
+
+
 class Inquiry:
     @staticmethod
     def create(data):
-        conn = get_db()
-        cursor = conn.cursor()
+        db = get_db()
         timeline = (data.get("timeline") or "").strip()
         msg = data.get("message", "") or ""
         if not timeline and "[Target Timeline:" in msg:
-            import re
             m = re.search(r"\[Target Timeline:\s*([^\]]+)\]", msg)
             if m:
                 timeline = m.group(1).strip()
 
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        cursor.execute(
-            """
-            INSERT INTO inquiries (user_id, first_name, last_name, email, phone, company, budget, timeline, services, message, ip_address, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                data.get("user_id"),
-                data.get("first_name", "").strip(),
-                data.get("last_name", "").strip(),
-                data.get("email", "").strip(),
-                data.get("phone", "").strip(),
-                data.get("company", "").strip(),
-                data.get("budget", "").strip(),
-                timeline,
-                data.get("services", ""),
-                msg.strip(),
-                data.get("ip_address", ""),
-                now,
-                now,
-            ),
-        )
-        new_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
+        new_id = get_next_sequence_value("inquiry_id")
+
+        raw_uid = data.get("user_id")
+        uid = int(raw_uid) if raw_uid is not None and str(raw_uid).isdigit() else raw_uid
+
+        doc = {
+            "id": new_id,
+            "user_id": uid,
+            "first_name": (data.get("first_name") or "").strip(),
+            "last_name": (data.get("last_name") or "").strip(),
+            "email": (data.get("email") or "").strip(),
+            "phone": (data.get("phone") or "").strip(),
+            "company": (data.get("company") or "").strip(),
+            "budget": (data.get("budget") or "").strip(),
+            "timeline": timeline,
+            "services": data.get("services", "") or "",
+            "message": msg.strip(),
+            "status": "new",
+            "notes": "",
+            "ip_address": data.get("ip_address", "") or "",
+            "created_at": now,
+            "updated_at": now,
+        }
+        db.inquiries.insert_one(doc)
         return new_id
+
     @staticmethod
     def get_for_client(user_id, email=None):
-        conn = get_db()
+        db = get_db()
+        conds = []
+        if user_id is not None:
+            conds.append({"user_id": user_id})
+            if str(user_id).isdigit():
+                conds.append({"user_id": int(user_id)})
+                conds.append({"user_id": str(user_id)})
         if email:
-            rows = conn.execute(
-                "SELECT * FROM inquiries WHERE user_id = ? OR LOWER(email) = LOWER(?) ORDER BY id DESC",
-                (user_id, email.strip()),
-            ).fetchall()
-        else:
-            rows = conn.execute(
-                "SELECT * FROM inquiries WHERE user_id = ? ORDER BY id DESC",
-                (user_id,),
-            ).fetchall()
-        conn.close()
-        return [dict(r) for r in rows]
+            clean_email = email.strip()
+            conds.append({"email": {"$regex": f"^{re.escape(clean_email)}$", "$options": "i"}})
+
+        q = {"$or": conds} if conds else {}
+        docs = list(db.inquiries.find(q).sort("id", pymongo.DESCENDING))
+        return [serialize_doc(d) for d in docs]
+
     @staticmethod
     def get_client_stats(user_id, email=None):
         inquiries = Inquiry.get_for_client(user_id, email)
@@ -143,97 +166,107 @@ class Inquiry:
             "in_progress": in_progress,
             "completed": completed,
         }
+
     @staticmethod
     def get_all(status=None, search=None, date_from=None, date_to=None):
-        conn = get_db()
-        query = """
-            SELECT i.*, 
-                   u.username AS client_username, 
-                   u.full_name AS client_full_name, 
-                   u.company AS client_company,
-                   u.phone AS client_phone,
-                   u.created_at AS client_created_at, 
-                   u.last_login AS client_last_login 
-            FROM inquiries i 
-            LEFT JOIN users u ON i.user_id = u.id 
-            WHERE 1=1
-        """
-        params = []
+        db = get_db()
+        q = {}
         if status and status != "all":
-            query += " AND i.status = ?"
-            params.append(status)
+            q["status"] = status
+
         if search:
-            query += " AND (i.first_name LIKE ? OR i.last_name LIKE ? OR i.email LIKE ? OR i.company LIKE ? OR i.phone LIKE ? OR i.services LIKE ? OR u.username LIKE ?)"
-            s_param = f"%{search}%"
-            params.extend([s_param, s_param, s_param, s_param, s_param, s_param, s_param])
+            s_param = re.escape(search.strip())
+            s_regex = {"$regex": s_param, "$options": "i"}
+            q["$or"] = [
+                {"first_name": s_regex},
+                {"last_name": s_regex},
+                {"email": s_regex},
+                {"company": s_regex},
+                {"phone": s_regex},
+                {"services": s_regex},
+            ]
+
         if date_from:
-            query += " AND DATE(i.created_at) >= DATE(?)"
-            params.append(date_from)
+            q.setdefault("created_at", {})["$gte"] = str(date_from)
         if date_to:
-            query += " AND DATE(i.created_at) <= DATE(?)"
-            params.append(date_to)
-        query += " ORDER BY i.id DESC"
-        rows = conn.execute(query, params).fetchall()
-        conn.close()
-        return [dict(r) for r in rows]
+            q.setdefault("created_at", {})["$lte"] = f"{date_to} 23:59:59"
+
+        docs = list(db.inquiries.find(q).sort("id", pymongo.DESCENDING))
+        users_cache = {u["id"]: u for u in [serialize_doc(x) for x in db.users.find({})]}
+
+        result = []
+        for d in docs:
+            item = serialize_doc(d)
+            uid = item.get("user_id")
+            client_user = users_cache.get(uid) or users_cache.get(int(uid) if str(uid).isdigit() else None)
+            if client_user:
+                item["client_username"] = client_user.get("username")
+                item["client_full_name"] = client_user.get("full_name")
+                item["client_company"] = client_user.get("company")
+                item["client_phone"] = client_user.get("phone")
+                item["client_created_at"] = client_user.get("created_at")
+                item["client_last_login"] = client_user.get("last_login")
+            else:
+                item["client_username"] = None
+                item["client_full_name"] = None
+                item["client_company"] = None
+                item["client_phone"] = None
+                item["client_created_at"] = None
+                item["client_last_login"] = None
+            result.append(item)
+        return result
+
     @staticmethod
     def get_by_id(inquiry_id):
-        conn = get_db()
-        query = """
-            SELECT i.*, 
-                   u.username AS client_username, 
-                   u.full_name AS client_full_name, 
-                   u.company AS client_company,
-                   u.phone AS client_phone,
-                   u.created_at AS client_created_at, 
-                   u.last_login AS client_last_login 
-            FROM inquiries i 
-            LEFT JOIN users u ON i.user_id = u.id 
-            WHERE i.id = ?
-        """
-        row = conn.execute(query, (inquiry_id,)).fetchone()
-        conn.close()
-        return dict(row) if row else None
+        db = get_db()
+        doc = db.inquiries.find_one(to_query_id(inquiry_id))
+        if not doc:
+            return None
+        item = serialize_doc(doc)
+        uid = item.get("user_id")
+        if uid:
+            client_user = User.get_by_id(uid)
+            if client_user:
+                item["client_username"] = client_user.get("username")
+                item["client_full_name"] = client_user.get("full_name")
+                item["client_company"] = client_user.get("company")
+                item["client_phone"] = client_user.get("phone")
+                item["client_created_at"] = client_user.get("created_at")
+                item["client_last_login"] = client_user.get("last_login")
+        return item
+
     @staticmethod
     def update_status(inquiry_id, status):
-        conn = get_db()
+        db = get_db()
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        conn.execute("UPDATE inquiries SET status = ?, updated_at = ? WHERE id = ?", (status, now, inquiry_id))
-        conn.commit()
-        conn.close()
+        db.inquiries.update_one(to_query_id(inquiry_id), {"$set": {"status": status, "updated_at": now}})
+
     @staticmethod
     def update_notes(inquiry_id, notes):
-        conn = get_db()
+        db = get_db()
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        conn.execute("UPDATE inquiries SET notes = ?, updated_at = ? WHERE id = ?", (notes, now, inquiry_id))
-        conn.commit()
-        conn.close()
+        db.inquiries.update_one(to_query_id(inquiry_id), {"$set": {"notes": notes, "updated_at": now}})
+
     @staticmethod
     def delete(inquiry_id):
-        conn = get_db()
-        conn.execute("DELETE FROM inquiries WHERE id = ?", (inquiry_id,))
-        conn.commit()
-        conn.close()
+        db = get_db()
+        db.inquiries.delete_one(to_query_id(inquiry_id))
+
     @staticmethod
     def delete_all():
-        conn = get_db()
-        conn.execute("DELETE FROM inquiries")
-        try:
-            conn.execute("DELETE FROM sqlite_sequence WHERE name = 'inquiries'")
-        except Exception:
-            pass
-        conn.commit()
-        conn.close()
+        db = get_db()
+        db.inquiries.delete_many({})
+        db.counters.update_one({"_id": "inquiry_id"}, {"$set": {"seq": 0}}, upsert=True)
+
     @staticmethod
     def get_stats():
-        conn = get_db()
-        total = conn.execute("SELECT COUNT(*) FROM inquiries").fetchone()[0]
-        new_count = conn.execute("SELECT COUNT(*) FROM inquiries WHERE status = 'new'").fetchone()[0]
-        contacted = conn.execute("SELECT COUNT(*) FROM inquiries WHERE status = 'contacted'").fetchone()[0]
-        in_progress = conn.execute("SELECT COUNT(*) FROM inquiries WHERE status = 'in_progress'").fetchone()[0]
-        closed = conn.execute("SELECT COUNT(*) FROM inquiries WHERE status = 'closed'").fetchone()[0]
-        not_interested = conn.execute("SELECT COUNT(*) FROM inquiries WHERE status = 'not_interested'").fetchone()[0]
-        conn.close()
+        db = get_db()
+        total = db.inquiries.count_documents({})
+        new_count = db.inquiries.count_documents({"status": "new"})
+        contacted = db.inquiries.count_documents({"status": "contacted"})
+        in_progress = db.inquiries.count_documents({"status": "in_progress"})
+        closed = db.inquiries.count_documents({"status": "closed"})
+        not_interested = db.inquiries.count_documents({"status": "not_interested"})
         return {
             "total": total,
             "new": new_count,
@@ -242,146 +275,131 @@ class Inquiry:
             "closed": closed,
             "not_interested": not_interested,
         }
+
+
 class Blog:
     @staticmethod
     def get_all(status=None):
-        conn = get_db()
-        if status:
-            rows = conn.execute("SELECT * FROM blogs WHERE status = ? ORDER BY id DESC", (status,)).fetchall()
-        else:
-            rows = conn.execute("SELECT * FROM blogs ORDER BY id DESC").fetchall()
-        conn.close()
-        return [dict(r) for r in rows]
+        db = get_db()
+        q = {"status": status} if status else {}
+        docs = list(db.blogs.find(q).sort("id", pymongo.DESCENDING))
+        return [serialize_doc(d) for d in docs]
+
     @staticmethod
     def get_by_id(blog_id):
-        conn = get_db()
-        row = conn.execute("SELECT * FROM blogs WHERE id = ?", (blog_id,)).fetchone()
-        conn.close()
-        return dict(row) if row else None
+        db = get_db()
+        doc = db.blogs.find_one(to_query_id(blog_id))
+        return serialize_doc(doc)
+
     @staticmethod
     def get_by_slug(slug):
-        conn = get_db()
-        row = conn.execute("SELECT * FROM blogs WHERE slug = ?", (slug,)).fetchone()
-        conn.close()
-        return dict(row) if row else None
-    @staticmethod
-    def create(data):
-        conn = get_db()
-        cursor = conn.cursor()
-        slug = data.get("slug") or slugify(data.get("title", ""))
-        # Ensure unique slug
-        base_slug = slug
-        counter = 1
-        while cursor.execute("SELECT id FROM blogs WHERE slug = ?", (slug,)).fetchone():
-            slug = f"{base_slug}-{counter}"
-            counter += 1
-        cursor.execute(
-            """
-            INSERT INTO blogs (title, slug, category, author, published_date, cover_image, excerpt, content, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                data.get("title"),
-                slug,
-                data.get("category", "Blog"),
-                data.get("author", "Storyworks Studio"),
-                data.get("published_date", datetime.now().strftime("%b %d, %Y")),
-                data.get("cover_image", ""),
-                data.get("excerpt", ""),
-                data.get("content", ""),
-                data.get("status", "published"),
-            ),
-        )
-        new_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
-        return new_id
-    @staticmethod
-    def update(blog_id, data):
-        conn = get_db()
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        slug = data.get("slug") or slugify(data.get("title", ""))
-        conn.execute(
-            """
-            UPDATE blogs
-            SET title = ?, slug = ?, category = ?, author = ?, published_date = ?, cover_image = ?, excerpt = ?, content = ?, status = ?, updated_at = ?
-            WHERE id = ?
-            """,
-            (
-                data.get("title"),
-                slug,
-                data.get("category", "Blog"),
-                data.get("author", "Storyworks Studio"),
-                data.get("published_date"),
-                data.get("cover_image"),
-                data.get("excerpt"),
-                data.get("content"),
-                data.get("status", "published"),
-                now,
-                blog_id,
-            ),
-        )
-        conn.commit()
-        conn.close()
-    @staticmethod
-    def delete(blog_id):
-        conn = get_db()
-        conn.execute("DELETE FROM blogs WHERE id = ?", (blog_id,))
-        conn.commit()
-        conn.close()
-    @staticmethod
-    def increment_views(blog_id):
-        conn = get_db()
-        conn.execute("UPDATE blogs SET views = views + 1 WHERE id = ?", (blog_id,))
-        conn.commit()
-        conn.close()
-class Portfolio:
-    @staticmethod
-    def get_all(category=None, status=None):
-        conn = get_db()
-        query = "SELECT * FROM portfolio WHERE 1=1"
-        params = []
-        if status:
-            query += " AND status = ?"
-            params.append(status)
-        if category and category != "all":
-            query += " AND category = ?"
-            params.append(category)
-        query += " ORDER BY id ASC"
-        rows = conn.execute(query, params).fetchall()
-        conn.close()
-        return [dict(r) for r in rows]
-    @staticmethod
-    def get_by_id(item_id):
-        conn = get_db()
-        row = conn.execute("SELECT * FROM portfolio WHERE id = ?", (item_id,)).fetchone()
-        conn.close()
-        return dict(row) if row else None
-    @staticmethod
-    def get_by_slug(slug):
-        conn = get_db()
-        row = conn.execute("SELECT * FROM portfolio WHERE slug = ?", (slug,)).fetchone()
-        conn.close()
-        return dict(row) if row else None
-    @staticmethod
-    def get_by_project_url(url):
-        conn = get_db()
-        clean_url = url.split("?")[0].lstrip("/")
-        row = conn.execute(
-            "SELECT * FROM portfolio WHERE project_url = ? OR project_url = ? OR slug = ?",
-            (clean_url, "/" + clean_url, clean_url)
-        ).fetchone()
-        conn.close()
-        return dict(row) if row else None
+        db = get_db()
+        doc = db.blogs.find_one({"slug": slug})
+        return serialize_doc(doc)
 
     @staticmethod
     def create(data):
-        conn = get_db()
-        cursor = conn.cursor()
+        db = get_db()
         slug = data.get("slug") or slugify(data.get("title", ""))
         base_slug = slug
         counter = 1
-        while cursor.execute("SELECT id FROM portfolio WHERE slug = ?", (slug,)).fetchone():
+        while db.blogs.find_one({"slug": slug}):
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+
+        new_id = get_next_sequence_value("blog_id")
+        doc = {
+            "id": new_id,
+            "title": data.get("title"),
+            "slug": slug,
+            "category": data.get("category", "Blog"),
+            "author": data.get("author", "Storyworks Studio"),
+            "published_date": data.get("published_date") or datetime.now().strftime("%b %d, %Y"),
+            "cover_image": data.get("cover_image", "") or "",
+            "excerpt": data.get("excerpt", "") or "",
+            "content": data.get("content", "") or "",
+            "status": data.get("status", "published"),
+            "views": 0,
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        db.blogs.insert_one(doc)
+        return new_id
+
+    @staticmethod
+    def update(blog_id, data):
+        db = get_db()
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        slug = data.get("slug") or slugify(data.get("title", ""))
+        fields = {
+            "title": data.get("title"),
+            "slug": slug,
+            "category": data.get("category", "Blog"),
+            "author": data.get("author", "Storyworks Studio"),
+            "published_date": data.get("published_date"),
+            "cover_image": data.get("cover_image"),
+            "excerpt": data.get("excerpt"),
+            "content": data.get("content"),
+            "status": data.get("status", "published"),
+            "updated_at": now,
+        }
+        db.blogs.update_one(to_query_id(blog_id), {"$set": fields})
+
+    @staticmethod
+    def delete(blog_id):
+        db = get_db()
+        db.blogs.delete_one(to_query_id(blog_id))
+
+    @staticmethod
+    def increment_views(blog_id):
+        db = get_db()
+        db.blogs.update_one(to_query_id(blog_id), {"$inc": {"views": 1}})
+
+
+class Portfolio:
+    @staticmethod
+    def get_all(category=None, status=None):
+        db = get_db()
+        q = {}
+        if status:
+            q["status"] = status
+        if category and category != "all":
+            q["category"] = category
+        docs = list(db.portfolio.find(q).sort("id", pymongo.ASCENDING))
+        return [serialize_doc(d) for d in docs]
+
+    @staticmethod
+    def get_by_id(item_id):
+        db = get_db()
+        doc = db.portfolio.find_one(to_query_id(item_id))
+        return serialize_doc(doc)
+
+    @staticmethod
+    def get_by_slug(slug):
+        db = get_db()
+        doc = db.portfolio.find_one({"slug": slug})
+        return serialize_doc(doc)
+
+    @staticmethod
+    def get_by_project_url(url):
+        db = get_db()
+        clean_url = url.split("?")[0].lstrip("/")
+        doc = db.portfolio.find_one({
+            "$or": [
+                {"project_url": clean_url},
+                {"project_url": "/" + clean_url},
+                {"slug": clean_url}
+            ]
+        })
+        return serialize_doc(doc)
+
+    @staticmethod
+    def create(data):
+        db = get_db()
+        slug = data.get("slug") or slugify(data.get("title", ""))
+        base_slug = slug
+        counter = 1
+        while db.portfolio.find_one({"slug": slug}):
             slug = f"{base_slug}-{counter}"
             counter += 1
 
@@ -392,43 +410,37 @@ class Portfolio:
         approach = (data.get("approach") or "").strip()
         middle_banner_image = (data.get("middle_banner_image") or "").strip()
 
-        cursor.execute(
-            """
-            INSERT INTO portfolio (title, slug, client, category, badge, cover_image, thumbnail_image, banner_image, approach_image, approach, middle_banner_image, gallery_images, short_desc, full_desc, quote, year, project_url, is_featured, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                data.get("title"),
-                slug,
-                data.get("client", ""),
-                data.get("category", ""),
-                data.get("badge", ""),
-                cover_image,
-                thumbnail_image,
-                banner_image,
-                approach_image,
-                approach,
-                middle_banner_image,
-                data.get("gallery_images", "[]"),
-                data.get("short_desc", ""),
-                data.get("full_desc", ""),
-                data.get("quote", ""),
-                data.get("year", "2026"),
-                data.get("project_url", ""),
-                1 if data.get("is_featured") else 0,
-                data.get("status", "published"),
-            ),
-        )
-        new_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
+        new_id = get_next_sequence_value("portfolio_id")
+        doc = {
+            "id": new_id,
+            "title": data.get("title"),
+            "slug": slug,
+            "client": data.get("client", "") or "",
+            "category": data.get("category", "") or "",
+            "badge": data.get("badge", "") or "",
+            "cover_image": cover_image,
+            "thumbnail_image": thumbnail_image,
+            "banner_image": banner_image,
+            "approach_image": approach_image,
+            "approach": approach,
+            "middle_banner_image": middle_banner_image,
+            "gallery_images": data.get("gallery_images", "[]"),
+            "short_desc": data.get("short_desc", "") or "",
+            "full_desc": data.get("full_desc", "") or "",
+            "quote": data.get("quote", "") or "",
+            "year": data.get("year", "2026"),
+            "project_url": data.get("project_url", "") or "",
+            "is_featured": 1 if data.get("is_featured") else 0,
+            "status": data.get("status", "published"),
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        db.portfolio.insert_one(doc)
         return new_id
 
     @staticmethod
     def update(item_id, data):
-        conn = get_db()
+        db = get_db()
         slug = data.get("slug") or slugify(data.get("title", ""))
-
         thumbnail_image = (data.get("thumbnail_image") or data.get("cover_image") or "").strip()
         cover_image = (data.get("cover_image") or thumbnail_image).strip()
         banner_image = (data.get("banner_image") or "").strip()
@@ -436,156 +448,238 @@ class Portfolio:
         approach = (data.get("approach") or "").strip()
         middle_banner_image = (data.get("middle_banner_image") or "").strip()
 
-        conn.execute(
-            """
-            UPDATE portfolio
-            SET title = ?, slug = ?, client = ?, category = ?, badge = ?, cover_image = ?, thumbnail_image = ?, banner_image = ?, approach_image = ?, approach = ?, middle_banner_image = ?, gallery_images = ?, short_desc = ?, full_desc = ?, quote = ?, year = ?, project_url = ?, is_featured = ?, status = ?
-            WHERE id = ?
-            """,
-            (
-                data.get("title"),
-                slug,
-                data.get("client"),
-                data.get("category"),
-                data.get("badge"),
-                cover_image,
-                thumbnail_image,
-                banner_image,
-                approach_image,
-                approach,
-                middle_banner_image,
-                data.get("gallery_images", "[]"),
-                data.get("short_desc"),
-                data.get("full_desc"),
-                data.get("quote"),
-                data.get("year"),
-                data.get("project_url"),
-                1 if data.get("is_featured") else 0,
-                data.get("status", "published"),
-                item_id,
-            ),
-        )
-        conn.commit()
-        conn.close()
+        fields = {
+            "title": data.get("title"),
+            "slug": slug,
+            "client": data.get("client"),
+            "category": data.get("category"),
+            "badge": data.get("badge"),
+            "cover_image": cover_image,
+            "thumbnail_image": thumbnail_image,
+            "banner_image": banner_image,
+            "approach_image": approach_image,
+            "approach": approach,
+            "middle_banner_image": middle_banner_image,
+            "gallery_images": data.get("gallery_images", "[]"),
+            "short_desc": data.get("short_desc"),
+            "full_desc": data.get("full_desc"),
+            "quote": data.get("quote"),
+            "year": data.get("year"),
+            "project_url": data.get("project_url"),
+            "is_featured": 1 if data.get("is_featured") else 0,
+            "status": data.get("status", "published"),
+        }
+        db.portfolio.update_one(to_query_id(item_id), {"$set": fields})
+
     @staticmethod
     def delete(item_id):
-        conn = get_db()
-        conn.execute("DELETE FROM portfolio WHERE id = ?", (item_id,))
-        conn.commit()
-        conn.close()
+        db = get_db()
+        db.portfolio.delete_one(to_query_id(item_id))
+
+
 class Service:
     @staticmethod
     def get_all(only_active=False):
-        conn = get_db()
-        if only_active:
-            rows = conn.execute("SELECT * FROM services WHERE is_active = 1 ORDER BY display_order ASC, id ASC").fetchall()
-        else:
-            rows = conn.execute("SELECT * FROM services ORDER BY display_order ASC, id ASC").fetchall()
-        conn.close()
-        return [dict(r) for r in rows]
+        db = get_db()
+        q = {"is_active": 1} if only_active else {}
+        docs = list(db.services.find(q).sort([("display_order", pymongo.ASCENDING), ("id", pymongo.ASCENDING)]))
+        return [serialize_doc(d) for d in docs]
+
     @staticmethod
     def get_by_id(service_id):
-        conn = get_db()
-        row = conn.execute("SELECT * FROM services WHERE id = ?", (service_id,)).fetchone()
-        conn.close()
-        return dict(row) if row else None
+        db = get_db()
+        doc = db.services.find_one(to_query_id(service_id))
+        return serialize_doc(doc)
+
     @staticmethod
     def create(data):
-        conn = get_db()
-        cursor = conn.cursor()
+        db = get_db()
         slug = data.get("slug") or slugify(data.get("title", ""))
-        cursor.execute(
-            """
-            INSERT INTO services (title, slug, short_desc, full_desc, icon, display_order, is_active)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                data.get("title"),
-                slug,
-                data.get("short_desc", ""),
-                data.get("full_desc", ""),
-                data.get("icon", ""),
-                int(data.get("display_order", 0)),
-                1 if data.get("is_active", 1) else 0,
-            ),
-        )
-        new_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
+        new_id = get_next_sequence_value("service_id")
+        doc = {
+            "id": new_id,
+            "title": data.get("title"),
+            "slug": slug,
+            "short_desc": data.get("short_desc", "") or "",
+            "full_desc": data.get("full_desc", "") or "",
+            "icon": data.get("icon", "") or "",
+            "display_order": int(data.get("display_order", 0)),
+            "is_active": 1 if data.get("is_active", 1) else 0,
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        db.services.insert_one(doc)
         return new_id
+
     @staticmethod
     def update(service_id, data):
-        conn = get_db()
+        db = get_db()
         slug = data.get("slug") or slugify(data.get("title", ""))
-        conn.execute(
-            """
-            UPDATE services
-            SET title = ?, slug = ?, short_desc = ?, full_desc = ?, icon = ?, display_order = ?, is_active = ?
-            WHERE id = ?
-            """,
-            (
-                data.get("title"),
-                slug,
-                data.get("short_desc"),
-                data.get("full_desc"),
-                data.get("icon"),
-                int(data.get("display_order", 0)),
-                1 if data.get("is_active", 1) else 0,
-                service_id,
-            ),
-        )
-        conn.commit()
-        conn.close()
+        fields = {
+            "title": data.get("title"),
+            "slug": slug,
+            "short_desc": data.get("short_desc"),
+            "full_desc": data.get("full_desc"),
+            "icon": data.get("icon"),
+            "display_order": int(data.get("display_order", 0)),
+            "is_active": 1 if data.get("is_active", 1) else 0,
+        }
+        db.services.update_one(to_query_id(service_id), {"$set": fields})
+
     @staticmethod
     def delete(service_id):
-        conn = get_db()
-        conn.execute("DELETE FROM services WHERE id = ?", (service_id,))
-        conn.commit()
-        conn.close()
+        db = get_db()
+        db.services.delete_one(to_query_id(service_id))
+
+
 class Setting:
     @staticmethod
     def get_all_dict():
-        conn = get_db()
-        rows = conn.execute("SELECT key, value FROM settings").fetchall()
-        conn.close()
-        return {r["key"]: r["value"] for r in rows}
+        try:
+            db = get_db()
+            docs = list(db.settings.find({}))
+            return {d["key"]: d.get("value", "") for d in docs}
+        except Exception:
+            return {}
+
     @staticmethod
     def get(key, default=""):
-        conn = get_db()
-        row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
-        conn.close()
-        return row["value"] if row else default
+        try:
+            db = get_db()
+            doc = db.settings.find_one({"key": key})
+            return doc.get("value", default) if doc else default
+        except Exception:
+            return default
+
     @staticmethod
     def set(key, value, category="general"):
-        conn = get_db()
-        conn.execute(
-            "INSERT INTO settings (key, value, category) VALUES (?, ?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-            (key, value, category),
+        db = get_db()
+        db.settings.update_one(
+            {"key": key},
+            {"$set": {"key": key, "value": value, "category": category}},
+            upsert=True
         )
-        conn.commit()
-        conn.close()
+
+
 class Subscriber:
     @staticmethod
     def add(email):
-        conn = get_db()
+        db = get_db()
+        clean = (email or "").strip().lower()
+        if not clean:
+            return False
         try:
-            conn.execute("INSERT INTO subscribers (email) VALUES (?)", (email.strip().lower(),))
-            conn.commit()
-            success = True
+            sub_id = get_next_sequence_value("subscriber_id")
+            db.subscribers.update_one(
+                {"email": clean},
+                {"$setOnInsert": {
+                    "id": sub_id,
+                    "email": clean,
+                    "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }},
+                upsert=True
+            )
+            return True
         except Exception:
-            success = False
-        finally:
-            conn.close()
-        return success
+            return False
+
     @staticmethod
     def get_all():
-        conn = get_db()
-        rows = conn.execute("SELECT * FROM subscribers ORDER BY id DESC").fetchall()
-        conn.close()
-        return [dict(r) for r in rows]
+        db = get_db()
+        docs = list(db.subscribers.find({}).sort("id", pymongo.DESCENDING))
+        return [serialize_doc(d) for d in docs]
+
     @staticmethod
     def delete(sub_id):
-        conn = get_db()
-        conn.execute("DELETE FROM subscribers WHERE id = ?", (sub_id,))
-        conn.commit()
-        conn.close()
+        db = get_db()
+        db.subscribers.delete_one(to_query_id(sub_id))
+
+
+class LoginHistory:
+    """Admin-portal and client-portal logins are kept in separate collections,
+    each with its own id sequence. `portal` is "admin" or "client"."""
+
+    COLLECTIONS = {"admin": "admin_login_history", "client": "client_login_history"}
+
+    @staticmethod
+    def collection_name(portal):
+        return LoginHistory.COLLECTIONS["admin" if portal == "admin" else "client"]
+
+    @staticmethod
+    def record_login(user, portal, ip_address="", user_agent=""):
+        db = get_db()
+        name = LoginHistory.collection_name(portal)
+        new_id = get_next_sequence_value(f"{name}_id")
+        doc = {
+            "id": new_id,
+            "user_id": user.get("id"),
+            "username": user.get("username", ""),
+            "role": user.get("role", ""),
+            "login_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "logout_at": None,
+            "ip_address": ip_address or "",
+            "user_agent": user_agent or "",
+        }
+        db[name].insert_one(doc)
+        return new_id
+
+    @staticmethod
+    def record_logout(entry_id, portal):
+        db = get_db()
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        db[LoginHistory.collection_name(portal)].update_one(to_query_id(entry_id), {"$set": {"logout_at": now}})
+
+    @staticmethod
+    def get_all(portal=None, limit=200):
+        """Entries for one portal, or (portal=None) both collections merged newest first."""
+        db = get_db()
+        names = [LoginHistory.collection_name(portal)] if portal else list(LoginHistory.COLLECTIONS.values())
+        docs = []
+        for name in names:
+            docs.extend(db[name].find({}).sort("login_at", pymongo.DESCENDING).limit(limit))
+        docs.sort(key=lambda d: d.get("login_at") or "", reverse=True)
+        return [serialize_doc(d) for d in docs[:limit]]
+
+
+class PasswordReset:
+    """One pending OTP per user. The OTP itself is never stored, only its hash."""
+
+    @staticmethod
+    def create(user_id, otp, expiry_minutes):
+        db = get_db()
+        now = datetime.now()
+        db.password_resets.delete_many({"user_id": user_id})
+        db.password_resets.insert_one({
+            "user_id": user_id,
+            "otp_hash": generate_password_hash(otp),
+            "attempts": 0,
+            "sent_at": now,
+            "expires_at": now + timedelta(minutes=expiry_minutes),
+        })
+
+    @staticmethod
+    def seconds_since_sent(user_id):
+        db = get_db()
+        doc = db.password_resets.find_one({"user_id": user_id})
+        return (datetime.now() - doc["sent_at"]).total_seconds() if doc else None
+
+    @staticmethod
+    def verify(user_id, otp, max_attempts):
+        """Return "ok", "invalid", "expired" or "locked"."""
+        db = get_db()
+        doc = db.password_resets.find_one({"user_id": user_id})
+        if not doc:
+            return "expired"
+        if datetime.now() > doc["expires_at"]:
+            db.password_resets.delete_one({"_id": doc["_id"]})
+            return "expired"
+        if doc.get("attempts", 0) >= max_attempts:
+            return "locked"
+        if not check_password_hash(doc["otp_hash"], otp):
+            db.password_resets.update_one({"_id": doc["_id"]}, {"$inc": {"attempts": 1}})
+            return "locked" if doc.get("attempts", 0) + 1 >= max_attempts else "invalid"
+        return "ok"
+
+    @staticmethod
+    def clear(user_id):
+        db = get_db()
+        db.password_resets.delete_many({"user_id": user_id})

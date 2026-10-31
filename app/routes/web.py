@@ -129,6 +129,8 @@ def static_pages_and_files(path):
         or lower_path.endswith(".db")
         or lower_path.endswith(".env")
         or ".git" in lower_path
+        or lower_path.startswith(("venv/", "tests/"))
+        or "__pycache__" in lower_path
     ):
         abort(404)
 
@@ -141,7 +143,7 @@ def static_pages_and_files(path):
     if os.path.isfile(full_path + ".html"):
         directory = os.path.dirname(full_path)
         return send_from_directory(directory, os.path.basename(full_path) + ".html")
-    # Case-insensitive resolution for Linux containers (Railway)
+    # Case-insensitive resolution for Linux containers
     resolved = _resolve_file_case_insensitive(Config.BASE_DIR, safe_path)
     if resolved and os.path.isfile(resolved):
         return send_from_directory(os.path.dirname(resolved), os.path.basename(resolved))

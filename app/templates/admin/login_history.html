@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+{% block title %}Login History{% endblock %}
+{% block page_title %}Login History{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">Recent Logins ({{ entries|length }})</div>
+    <div style="display: flex; gap: 8px;">
+      {% for value, label in [("all", "All"), ("admin", "Admins"), ("client", "Clients")] %}
+        <a href="{{ url_for('admin.login_history', role=value) }}" class="btn btn-sm {% if current_role == value %}btn-primary{% else %}btn-secondary{% endif %}">{{ label }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width: 70px;">#</th>
+          <th>User</th>
+          <th>Role</th>
+          <th>Login Time</th>
+          <th>Logout Time</th>
+          <th>IP Address</th>
+          <th>Browser / Device</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if entries %}
+          {% for entry in entries %}
+            <tr>
+              <td style="color: var(--text-dim);">#{{ entry.id }}</td>
+              <td style="font-weight: 600;">{{ entry.username }}</td>
+              <td><span class="badge {% if entry.role == 'admin' %}badge-published{% else %}badge-contacted{% endif %}">{{ entry.role|capitalize }}</span></td>
+              <td style="font-size: 13px;">{{ entry.login_at|format_dt }}</td>
+              <td style="color: var(--text-dim); font-size: 13px;">
+                {% if entry.logout_at %}{{ entry.logout_at|format_dt }}{% else %}—{% endif %}
+              </td>
+              <td style="color: var(--text-dim); font-size: 13px;">{{ entry.ip_address or "—" }}</td>
+              <td style="color: var(--text-dim); font-size: 12px; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ entry.user_agent }}">{{ entry.user_agent or "—" }}</td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 48px;">
+              No logins recorded yet.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

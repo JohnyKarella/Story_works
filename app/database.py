@@ -23,7 +23,7 @@ def get_client():
             client.admin.command("ping")
         except Exception as e:
             # Fail loudly: silently falling back to memory would lose every write.
-            raise RuntimeError(f"Could not connect to MongoDB Atlas: {e}") from e
+            raise RuntimeError(f"Could not connect to MongoDB Atlas: {type(e).__name__}: {e}") from e
         print("[*] Successfully connected to MongoDB Atlas!")
         _client = client
         return _client

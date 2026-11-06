@@ -20,41 +20,7 @@ $(document).ready(function () {
 		$(this).addClass('active').siblings().removeClass('active');
 	})
 })
-// Robot
-// Extraa
-// ♡ This pen is a remix of https://codepen.io/jh3y/pen/jORQyzZ by @jh3y
-const UPDATE = ({ x, y }) => {
-	const xNorm = (x / window.innerWidth - 0.5) * 2;
-	const yNorm = (y / window.innerHeight - 0.5) * 2;
-	document.documentElement.style.setProperty("--x", xNorm);
-	document.documentElement.style.setProperty("--y", yNorm);
-};
-window.addEventListener("mousemove", UPDATE);
-const handleOrientation = ({ beta, gamma }) => {
-	const isLandscape = window.matchMedia("(orientation: landscape)").matches;
-	const xVal = Math.max(
-		-1,
-		Math.min(1, isLandscape ? (beta || 0) / 45 : (gamma || 0) / 45)
-	);
-	const yVal = Math.max(
-		-1,
-		Math.min(1, isLandscape ? Math.abs(gamma || 0) / 45 : (beta || 0) / 45)
-	);
-	document.documentElement.style.setProperty("--x", xVal);
-	document.documentElement.style.setProperty("--y", yVal);
-};
-const START = () => {
-	if (DeviceOrientationEvent?.requestPermission) {
-		DeviceOrientationEvent.requestPermission().then((result) => {
-			if (result === "granted") {
-				window.addEventListener("deviceorientation", handleOrientation);
-			}
-		});
-	} else {
-		window.addEventListener("deviceorientation", handleOrientation);
-	}
-};
-document.body.addEventListener("click", START, { once: true });
+// Robot mousemove listeners removed to eliminate constant layout thrashing and CPU lag
 // Services
 // Track mouse movement for glow effect
 document.addEventListener('DOMContentLoaded', function () {
@@ -264,4 +230,38 @@ document.addEventListener('DOMContentLoaded', function () {
   } else {
     initTermsModal();
   }
+})();
+
+// Gmail compose links: desktop keeps the Gmail web compose link (href);
+// phones open the Gmail app instead, since Gmail web compose doesn't work on mobile browsers.
+(function () {
+  var ua = navigator.userAgent || "";
+  var isAndroid = /Android/i.test(ua);
+  var isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (!isAndroid && !isIOS) return;
+
+  document.addEventListener("click", function (e) {
+    var link = e.target.closest && e.target.closest('a[href^="https://mail.google.com/mail/?view=cm"]');
+    if (!link) return;
+    var to = new URL(link.href).searchParams.get("to");
+    if (!to) return;
+    e.preventDefault();
+
+    if (isAndroid) {
+      // Opens the Gmail app; if it isn't installed, Chrome falls back to Gmail web.
+      window.location.href = "intent:" + to + "#Intent;scheme=mailto;package=com.google.android.gm;" +
+        "S.browser_fallback_url=" + encodeURIComponent(link.href) + ";end";
+      return;
+    }
+
+    // iOS: try the Gmail app; if it doesn't open, use the default mail app.
+    var opened = false;
+    var onHide = function () { if (document.hidden) opened = true; };
+    document.addEventListener("visibilitychange", onHide);
+    window.location.href = "googlegmail://co?to=" + encodeURIComponent(to);
+    setTimeout(function () {
+      document.removeEventListener("visibilitychange", onHide);
+      if (!opened) window.location.href = "mailto:" + to;
+    }, 1500);
+  });
 })();
